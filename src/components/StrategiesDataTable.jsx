@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import './StrategiesDataTable.css';
 import { nftStrategyService } from '../services/nftStrategyService.js';
 import SkeletonTable from './SkeletonTable.jsx';
+import { posthogService } from '../services/posthogService';
 
 const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
   const [strategies, setStrategies] = useState([]);
@@ -113,6 +114,25 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
     );
   }, [strategies, searchTerm]);
 
+  // Debounced search tracking
+  useEffect(() => {
+    if (searchTerm) {
+      const timeoutId = setTimeout(() => {
+        posthogService.trackSearchEvent('search', {
+          term: searchTerm,
+          filterType: 'table_search',
+          resultsCount: filteredStrategies.length
+        }, {
+          search_length: searchTerm.length,
+          total_strategies: strategies.length,
+          has_results: filteredStrategies.length > 0
+        });
+      }, 1000); // Track after 1 second of no typing
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [searchTerm, filteredStrategies.length, strategies.length]);
+
   // Sort strategies
   const sortedStrategies = useMemo(() => {
     if (!sortConfig.key) return filteredStrategies;
@@ -159,15 +179,39 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
 
   // Handle sorting
   const handleSort = (key) => {
-    setSortConfig(prevConfig => ({
+    const newDirection = sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc';
+    
+    setSortConfig({
       key,
-      direction: prevConfig.key === key && prevConfig.direction === 'asc' ? 'desc' : 'asc'
-    }));
+      direction: newDirection
+    });
+
+    // Track sorting event
+    posthogService.trackSearchEvent('sort', {
+      term: searchTerm,
+      filterType: 'table_sort',
+      resultsCount: filteredStrategies.length
+    }, {
+      sort_column: key,
+      sort_direction: newDirection,
+      total_strategies: strategies.length
+    });
   };
 
   // Handle pagination
   const handlePageChange = (page) => {
     setCurrentPage(page);
+
+    // Track pagination event
+    posthogService.trackEngagementEvent('pagination', {
+      pageViews: page,
+      interactionsCount: 1
+    }, {
+      current_page: page,
+      total_pages: totalPages,
+      items_per_page: itemsPerPage,
+      total_items: filteredStrategies.length
+    });
   };
 
   // Format currency
@@ -280,7 +324,20 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
             <select
               id="items-per-page-select"
               value={itemsPerPage}
-              onChange={(e) => setItemsPerPage(Number(e.target.value))}
+              onChange={(e) => {
+                const newItemsPerPage = Number(e.target.value);
+                setItemsPerPage(newItemsPerPage);
+                setCurrentPage(1); // Reset to first page
+                
+                // Track items per page change
+                posthogService.trackEngagementEvent('items_per_page_change', {
+                  interactionsCount: 1
+                }, {
+                  new_items_per_page: newItemsPerPage,
+                  total_items: filteredStrategies.length,
+                  new_total_pages: Math.ceil(filteredStrategies.length / newItemsPerPage)
+                });
+              }}
               aria-label="Number of items to display per page"
             >
               <option value={10}>10</option>

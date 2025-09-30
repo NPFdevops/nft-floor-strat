@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createChart, AreaSeries } from 'lightweight-charts';
 import './TradingViewChart.css';
 import logoImage from '../assets/NFTPriceFloor_logo.png';
+import { posthogService } from '../services/posthogService';
 
 const TradingViewChart = ({ 
   collections = [], 
@@ -162,7 +163,7 @@ const TradingViewChart = ({
             priceFormat: {
               type: 'custom',
               formatter: (price) => {
-                return `${parseFloat(price).toFixed(2)} ETH`;
+                return `${parseFloat(price).toFixed(4)} ETH`;
               },
             },
           });
@@ -209,7 +210,21 @@ const TradingViewChart = ({
   }, [collections, height]);
 
   const handleRangeClick = (range) => {
+    const previousRange = selectedRange;
     setSelectedRange(range.label);
+    
+    // Track chart range change
+    posthogService.trackChartEvent('range_change', {
+      type: 'chart_range_selector',
+      timeframe: range.label
+    }, {
+      previous_range: previousRange,
+      new_range: range.label,
+      range_days: range.days,
+      collections_count: collections?.length || 0,
+      has_data: collections?.some(c => c && c.data && c.data.length > 0) || false
+    });
+    
     if (onRangeChange) {
       onRangeChange(range.days);
     }

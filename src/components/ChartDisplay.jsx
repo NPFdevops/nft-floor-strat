@@ -90,7 +90,7 @@ const ChartDisplay = ({ collection, collection2, title, loading, error, timefram
               return (
                 <div key={coll.name} className="text-right">
                   <p className="text-sm font-bold" style={{ color: color }}>{coll.name}</p>
-                  <p className="text-black text-base font-bold eth-price">{parseFloat(price).toFixed(2)} ETH</p>
+                  <p className="text-black text-base font-bold eth-price">{parseFloat(price).toFixed(4)} ETH</p>
                   {change !== null && (
                     <p className={`text-xs font-medium ${
                       change >= 0 ? 'text-green-600' : 'text-red-600'
@@ -145,7 +145,7 @@ const ChartDisplay = ({ collection, collection2, title, loading, error, timefram
           </div>
           {floorPrice && (
             <div className="text-right">
-              <p className="text-black text-lg font-bold eth-price">{parseFloat(floorPrice).toFixed(2)} ETH</p>
+              <p className="text-black text-lg font-bold eth-price">{parseFloat(floorPrice).toFixed(4)} ETH</p>
               {priceChange !== null && (
                 <p className={`text-sm font-medium ${
                   priceChange >= 0 ? 'text-green-600' : 'text-red-600'

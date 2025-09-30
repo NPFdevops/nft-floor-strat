@@ -9,13 +9,11 @@ import { posthogService } from './services/posthogService.js'
 posthogService.init();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/nftstrategies" element={<App />} />
-        <Route path="/nftstrategies/:strategyName" element={<App />} />
-      </Routes>
-    </BrowserRouter>
-  </React.StrictMode>,
+  <BrowserRouter>
+    <Routes>
+      <Route path="/" element={<App />} />
+      <Route path="/nftstrategies" element={<App />} />
+      <Route path="/nftstrategies/:strategyName" element={<App />} />
+    </Routes>
+  </BrowserRouter>
 )

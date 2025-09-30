@@ -13,13 +13,16 @@ const ScreenshotShare = ({ targetId, collection1, collection2, timeframe, layout
     
     if (!targetElement) {
       // Track failed screenshot attempt
-      posthogService.track('screenshot_failed', {
-        reason: 'no_target_element',
-        target_id: targetId,
-        has_collection1: !!collection1,
-        has_collection2: !!collection2,
+      posthogService.trackShareEvent('failed', {
+        type: 'screenshot',
+        targetElement: targetId,
+        collections: [collection1?.slug, collection2?.slug].filter(Boolean),
         timeframe: timeframe,
         layout: layout
+      }, {
+        error_reason: 'no_target_element',
+        has_collection1: !!collection1,
+        has_collection2: !!collection2
       });
       
       // Add haptic feedback for error
@@ -31,12 +34,13 @@ const ScreenshotShare = ({ targetId, collection1, collection2, timeframe, layout
     }
 
     // Track screenshot attempt
-    posthogService.track('screenshot_started', {
-      target_id: targetId,
-      collection1_slug: collection1?.slug,
-      collection2_slug: collection2?.slug,
+    posthogService.trackShareEvent('started', {
+      type: 'screenshot',
+      targetElement: targetId,
+      collections: [collection1?.slug, collection2?.slug].filter(Boolean),
       timeframe: timeframe,
-      layout: layout,
+      layout: layout
+    }, {
       has_both_collections: !!(collection1 && collection2)
     });
 
@@ -73,12 +77,14 @@ const ScreenshotShare = ({ targetId, collection1, collection2, timeframe, layout
         document.body.removeChild(link);
         
         // Track successful screenshot
-        posthogService.track('screenshot_completed', {
-          filename: filename,
-          collection1_slug: collection1?.slug,
-          collection2_slug: collection2?.slug,
+        posthogService.trackShareEvent('completed', {
+          type: 'screenshot',
+          targetElement: targetId,
+          collections: [collection1?.slug, collection2?.slug].filter(Boolean),
           timeframe: timeframe,
-          layout: layout,
+          layout: layout
+        }, {
+          filename: filename,
           has_both_collections: !!(collection1 && collection2)
         });
         
@@ -103,11 +109,13 @@ const ScreenshotShare = ({ targetId, collection1, collection2, timeframe, layout
     const shareText = `${shareTitle} - View interactive comparison`;
     
     // Track URL sharing attempt
-    posthogService.track('url_share_started', {
-      collection1_slug: collection1?.slug,
-      collection2_slug: collection2?.slug,
+    posthogService.trackShareEvent('started', {
+      type: 'url',
+      targetElement: targetId,
+      collections: [collection1?.slug, collection2?.slug].filter(Boolean),
       timeframe: timeframe,
-      layout: layout,
+      layout: layout
+    }, {
       has_both_collections: !!(collection1 && collection2),
       share_method: navigator.share ? 'native_share' : 'clipboard'
     });

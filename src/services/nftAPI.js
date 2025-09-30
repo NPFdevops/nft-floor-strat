@@ -297,7 +297,7 @@ export const fetchFloorPriceHistory = async (collectionSlug, granularity = '1d',
 };
 
 // Import collections from data file
-import { TOP_COLLECTIONS } from '../data/collections';
+import { TOP_COLLECTIONS } from '../data/collections.js';
 
 /**
  * Search for NFT collections by name
@@ -490,45 +490,56 @@ export const fetchCollectionDetails = async (collectionSlug) => {
         
         const data = response.data;
         
-        // Extract and format the collection data
+        // Debug: Log the stats structure to understand the API response
+        console.log('🔍 Debug - API data structure:', {
+          hasStats: !!data.stats,
+          statsKeys: data.stats ? Object.keys(data.stats) : [],
+          floorInfo: data.stats?.floorInfo,
+          salesTemporality: data.stats?.salesTemporalityUsd,
+          totalOwners: data.stats?.totalOwners,
+          totalSupply: data.stats?.totalSupply
+        });
+        
+        // Extract and format the collection data based on NFTPriceFloor API structure
         const result = {
           success: true,
           data: {
             slug: data.slug || collectionSlug,
             name: data.name || data.title || collectionSlug,
             description: data.description,
-            image: data.image || data.logo,
+            image: data.image || data.logo || data.imageBlur,
             website: data.website,
             twitter: data.twitter,
             discord: data.discord,
             
-            // Market data
-            floor_price_eth: data.floor_price_eth || data.floorPrice,
-            floor_price_usd: data.floor_price_usd || data.floorPriceUsd,
-            market_cap_eth: data.market_cap_eth || data.marketCapEth,
-            market_cap_usd: data.market_cap_usd || data.marketCapUsd,
+            // Market data from stats object
+            floor_price_eth: data.stats?.floorInfo?.currentFloorNative || data.floor_price_eth || data.floorPrice,
+            floor_price_usd: data.stats?.floorInfo?.currentFloorUsd || data.floor_price_usd || data.floorPriceUsd,
+            market_cap_eth: data.stats?.floorCapEth || data.market_cap_eth || data.marketCapEth,
+            market_cap_usd: data.stats?.floorCapUsd || data.market_cap_usd || data.marketCapUsd,
             
-            // Volume and trading data
-            volume_24h_eth: data.volume_24h_eth || data.volume24hEth,
-            volume_24h_usd: data.volume_24h_usd || data.volume24hUsd,
-            volume_7d_eth: data.volume_7d_eth || data.volume7dEth,
-            volume_7d_usd: data.volume_7d_usd || data.volume7dUsd,
+            // Volume and trading data from stats
+            volume_24h_eth: data.stats?.salesTemporalityEth?.volume?.val24h || data.volume_24h_eth || data.volume24hEth,
+            volume_24h_usd: data.stats?.salesTemporalityUsd?.volume?.val24h || data.volume_24h_usd || data.volume24hUsd,
+            volume_7d_eth: data.stats?.salesTemporalityEth?.volume?.val7d || data.volume_7d_eth || data.volume7dEth,
+            volume_7d_usd: data.stats?.salesTemporalityUsd?.volume?.val7d || data.volume_7d_usd || data.volume7dUsd,
             
-            // Price changes
-            price_change_24h: data.price_change_24h || data.priceChange24h,
-            price_change_7d: data.price_change_7d || data.priceChange7d,
-            price_change_30d: data.price_change_30d || data.priceChange30d,
+            // Price changes from stats
+            price_change_24h: data.stats?.floorInfo?.floorChange24h || data.price_change_24h || data.priceChange24h,
+            price_change_7d: data.stats?.floorInfo?.floorChange7d || data.price_change_7d || data.priceChange7d,
+            price_change_30d: data.stats?.floorInfo?.floorChange30d || data.price_change_30d || data.priceChange30d,
             
             // Collection stats
-            total_supply: data.total_supply || data.totalSupply,
-            holders_count: data.holders_count || data.holdersCount || data.holders,
-            listed_count: data.listed_count || data.listedCount,
+            total_supply: data.stats?.totalSupply || data.total_supply || data.totalSupply,
+            holders_count: data.stats?.totalOwners || data.holders_count || data.holdersCount || data.holders,
+            listed_count: data.stats?.totalListed || data.listed_count || data.listedCount,
             
             // Additional metadata
             contract_address: data.contract_address || data.contractAddress,
             blockchain: data.blockchain || 'ethereum',
             created_date: data.created_date || data.createdDate,
             verified: data.verified || false,
+            ranking: data.ranking,
             
             // Raw data for debugging
             _raw: data

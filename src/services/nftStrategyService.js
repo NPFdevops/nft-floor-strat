@@ -361,6 +361,40 @@ class NFTStrategyService {
     
     return sales.sort((a, b) => new Date(b.date) - new Date(a.date));
   }
+
+
+
+
+
+  /**
+   * Extract token symbol from strategy data
+   * @param {Object} strategy - Strategy object
+   * @returns {string|null} Token symbol or null if not found
+   */
+  getTokenSymbolFromStrategy(strategy) {
+    // Try tokenSymbol first, then fallback to tokenName
+    if (strategy.tokenSymbol && typeof strategy.tokenSymbol === 'string') {
+      return strategy.tokenSymbol.toUpperCase();
+    }
+    
+    if (strategy.tokenName && typeof strategy.tokenName === 'string') {
+      // Common token name to symbol mappings
+      const nameToSymbol = {
+        'ethereum': 'ETH',
+        'bitcoin': 'BTC',
+        'wrapped ethereum': 'WETH',
+        'wrapped bitcoin': 'WBTC',
+        'usd coin': 'USDC',
+        'tether': 'USDT',
+        'dai': 'DAI'
+      };
+      
+      const normalizedName = strategy.tokenName.toLowerCase();
+      return nameToSymbol[normalizedName] || strategy.tokenName.toUpperCase();
+    }
+    
+    return null;
+  }
 }
 
 // Create and export singleton instance

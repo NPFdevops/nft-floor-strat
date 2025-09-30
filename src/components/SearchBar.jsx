@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { collectionsService } from '../services/collectionsService';
+import { posthogService } from '../services/posthogService';
 
 const SearchBar = ({ 
   placeholder, 
@@ -71,6 +72,25 @@ const SearchBar = ({
     }
   };
 
+  // Debounced search tracking
+  useEffect(() => {
+    if (query.trim()) {
+      const timeoutId = setTimeout(() => {
+        posthogService.trackSearchEvent('collection_search', {
+          term: query,
+          filterType: 'collection_search',
+          resultsCount: filteredCollections.length
+        }, {
+          search_length: query.length,
+          has_results: filteredCollections.length > 0,
+          dropdown_open: isDropdownOpen
+        });
+      }, 1000); // Track after 1 second of no typing
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [query, filteredCollections.length, isDropdownOpen]);
+
   const handleInputClick = () => {
     setIsDropdownOpen(true);
     if (!query.trim()) {
@@ -82,6 +102,18 @@ const SearchBar = ({
   const handleCollectionSelect = (collection) => {
     setQuery(collection.name);
     setIsDropdownOpen(false);
+    
+    // Track collection selection
+    posthogService.trackSearchEvent('collection_selected', {
+      term: collection.name,
+      filterType: 'collection_dropdown',
+      resultsCount: 1
+    }, {
+      collection_slug: collection.slug,
+      collection_name: collection.name,
+      search_method: 'dropdown_selection'
+    });
+    
     onSearch(collection.slug);
   };
 
@@ -91,9 +123,23 @@ const SearchBar = ({
   };
 
   const handleClear = () => {
+    const previousQuery = query;
     setQuery('');
     setIsDropdownOpen(false);
     setFilteredCollections([]);
+    
+    // Track search clear
+    if (previousQuery.trim()) {
+      posthogService.trackSearchEvent('search_cleared', {
+        term: '',
+        filterType: 'collection_search',
+        resultsCount: 0
+      }, {
+        previous_query: previousQuery,
+        previous_query_length: previousQuery.length
+      });
+    }
+    
     onClear();
     inputRef.current?.focus();
   };

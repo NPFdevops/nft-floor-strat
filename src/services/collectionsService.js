@@ -1,5 +1,5 @@
 import { fetchTopCollections } from './nftAPI';
-import { TOP_COLLECTIONS } from '../data/collections';
+import { TOP_COLLECTIONS } from '../data/collections.js';
 
 class CollectionsService {
   constructor() {

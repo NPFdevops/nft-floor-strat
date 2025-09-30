@@ -1,5 +1,6 @@
 import React from 'react';
 import './TradingViewChart.css';
+import { posthogService } from '../services/posthogService';
 
 const TimeframeSelector = ({ timeframe, onTimeframeChange }) => {
   const timeframes = [
@@ -15,6 +16,16 @@ const TimeframeSelector = ({ timeframe, onTimeframeChange }) => {
       window.navigator.vibrate(1);
     }
     console.log('TimeframeSelector: Selected', value);
+    
+    // Track timeframe selection
+    posthogService.trackChartEvent('timeframe_change', {
+      type: 'timeframe_selector',
+      timeframe: value
+    }, {
+      previous_timeframe: timeframe,
+      new_timeframe: value
+    });
+    
     onTimeframeChange(value);
   };
 

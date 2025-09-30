@@ -4,7 +4,7 @@ import StrategiesDataTable from './components/StrategiesDataTable';
 import StrategyDetailView from './components/StrategyDetailView';
 import InfoCards from './components/InfoCards';
 import { createStrategyUrl, createStrategiesUrl, findStrategyByEncodedName } from './utils/urlUtils';
-import posthogService from './services/posthogService';
+import { posthogService } from './services/posthogService';
 import logoImage from './assets/NFTPriceFloor_logo.png';
 import mobileLogoImage from './assets/nftpf_logo_mobile.png';
 
@@ -18,6 +18,19 @@ function App() {
   
   const [selectedStrategy, setSelectedStrategy] = useState(null); // Track selected strategy for detail view
   const [strategies, setStrategies] = useState([]); // Store strategies for URL-based lookup
+
+  // Test PostHog tracking on app load
+  useEffect(() => {
+    console.log('App: Component mounted');
+    
+    // Test PostHog tracking on app load
+    posthogService.trackEngagementEvent('app_loaded', {
+      interactionsCount: 1
+    }, {
+      timestamp: new Date().toISOString(),
+      test_event: true
+    });
+  }, []);
 
   // Strategy URL initialization effect - handle strategy routing from URL
   useEffect(() => {
@@ -49,10 +62,9 @@ function App() {
     setSelectedStrategy(strategy);
     
     // Track strategy selection analytics
-    posthogService.track('strategy_selected', {
-      strategy_name: strategy.collectionName,
-      token_name: strategy.tokenName,
-      market_cap: strategy.poolData?.market_cap_usd
+    posthogService.trackStrategyEvent('selected', strategy, {
+      source: 'strategy_table',
+      navigation_method: 'click'
     });
   };
 
@@ -68,7 +80,10 @@ function App() {
     setSelectedStrategy(null);
     
     // Track back navigation analytics
-    posthogService.track('strategy_detail_back');
+    posthogService.trackStrategyEvent('detail_back', selectedStrategy, {
+      source: 'strategy_detail',
+      navigation_method: 'back_button'
+    });
   };
 
   // Handle strategies data update from StrategiesDataTable

@@ -402,15 +402,23 @@ const StrategyDetailView = ({ strategy, onBack }) => {
               <div className="group relative flex-shrink-0 ml-2">
                 <span className="text-gray-400 cursor-help">ℹ️</span>
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                  Total value of NFTs held by this strategy
+                  Total number of NFT items held by this strategy
                 </div>
               </div>
             </div>
             <div className="text-xl lg:text-3xl font-bold text-black">
-              {strategy.nftStrategyMarketCap ? 
-                formatCurrency(strategy.nftStrategyMarketCap).replace('$', '') : 'N/A'
-              }
+              {loadingStates.holdings ? (
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-2"></div>
+                  <span className="text-gray-500 text-lg">Loading...</span>
+                </div>
+              ) : (
+                holdingsData && Array.isArray(holdingsData) ? 
+                  formatNumber(holdingsData.length) : 
+                  (holdingsData?.totalCount ? formatNumber(holdingsData.totalCount) : 'N/A')
+              )}
             </div>
+            <p className="text-xs lg:text-sm text-gray-600 mt-1">Number of NFT items owned</p>
             <div className="mt-3">
               <button
                 onClick={() => setActiveTab('holdings')}
@@ -539,10 +547,8 @@ const StrategyDetailView = ({ strategy, onBack }) => {
                   </div>
                 ) : (
                   <DextoolsChart
-                    tokenAddress={strategy.tokenAddress}
-                    tokenName={strategy.tokenName || 'Token'}
+                    strategy={strategy}
                     height={320}
-                    theme="light"
                   />
                 )}
               </div>
