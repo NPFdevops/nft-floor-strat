@@ -3,9 +3,14 @@ import { cacheService } from './cacheService.js';
 
 class NFTStrategyService {
   constructor() {
-    this.baseURL = '/api/strategies';
+    // Use direct external API in production, proxy in development
+    this.baseURL = import.meta.env.PROD 
+      ? 'https://www.nftstrategy.fun/api/strategies'
+      : '/api/strategies';
     this.cache = new Map();
     this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
+    
+    console.log('🔧 NFTStrategyService initialized with baseURL:', this.baseURL);
   }
 
   /**

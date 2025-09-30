@@ -2,9 +2,15 @@ import axios from 'axios';
 
 class HoldingsService {
   constructor() {
-    this.baseURL = '/api'; // Use local proxy instead of external URL
+    // Use environment-aware API endpoints
+    this.baseURL = import.meta.env.DEV 
+      ? '/api' // Development: use Vite proxy
+      : 'https://www.nftstrategy.fun/api'; // Production: direct external API
+    
     this.cache = new Map();
     this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
+    
+    console.log('🔧 HoldingsService initialized with baseURL:', this.baseURL);
   }
 
   /**

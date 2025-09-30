@@ -24,35 +24,9 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
         
         console.log(`🔄 Fetching strategies from API... (attempt ${retryCount + 1}/${maxRetries + 1})`);
         
-        const response = await fetch('/api/strategies', {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          cache: 'no-cache'
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch strategies (${response.status}): ${response.statusText}`);
-        }
-        
-        // Check content type before parsing
-        const contentType = response.headers.get('content-type');
-        console.log('📋 Response content type:', contentType);
-        
-        if (!contentType || !contentType.includes('application/json')) {
-          // If not JSON, get the text to see what we received
-          const text = await response.text();
-          console.error('❌ Expected JSON but received:', text.substring(0, 200));
-          throw new Error(`Expected JSON response but received ${contentType || 'unknown content type'}. Response: ${text.substring(0, 100)}...`);
-        }
-        
-        const data = await response.json();
-        console.log('✅ Successfully parsed JSON data:', data.length, 'strategies');
-        
-        if (!Array.isArray(data)) {
-          throw new Error('Invalid data format received from API - expected array');
-        }
+        // Use the nftStrategyService which handles environment-specific URLs
+        const data = await nftStrategyService.fetchStrategies();
+        console.log('✅ Successfully fetched strategies data:', data.length, 'strategies');
         
         // Enhance data with additional API calls for burn percentage and holders
         const enhancedData = await nftStrategyService.enhanceStrategiesData(data);
@@ -327,6 +301,12 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
   }
 
   if (error) {
+    // Determine error type for better user guidance
+    const isJSONError = error.includes('Unexpected token') || error.includes('not valid JSON');
+    const isNetworkError = error.includes('fetch') || error.includes('network') || error.includes('ENOTFOUND');
+    const isTimeoutError = error.includes('timeout') || error.includes('ECONNABORTED');
+    const isRateLimitError = error.includes('429') || error.includes('rate limit');
+    
     return (
       <div className="strategies-table-container">
         <div className="error-message">
@@ -335,15 +315,40 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
           <div className="error-suggestions">
             <p><strong>This might be due to:</strong></p>
             <ul>
-              <li>Temporary network connectivity issues</li>
-              <li>API server maintenance</li>
-              <li>Browser cache issues</li>
+              {isJSONError && (
+                <li>API configuration issue (receiving HTML instead of JSON data)</li>
+              )}
+              {isNetworkError && (
+                <li>Network connectivity issues or API server unavailable</li>
+              )}
+              {isTimeoutError && (
+                <li>API server taking too long to respond</li>
+              )}
+              {isRateLimitError && (
+                <li>API rate limit exceeded - too many requests</li>
+              )}
+              {!isJSONError && !isNetworkError && !isTimeoutError && !isRateLimitError && (
+                <>
+                  <li>Temporary network connectivity issues</li>
+                  <li>API server maintenance</li>
+                  <li>Browser cache issues</li>
+                </>
+              )}
             </ul>
             <p><strong>Try:</strong></p>
             <ul>
-              <li>Refreshing the page</li>
-              <li>Checking your internet connection</li>
-              <li>Waiting a few minutes and trying again</li>
+              {isRateLimitError ? (
+                <li>Waiting a few minutes before trying again</li>
+              ) : (
+                <>
+                  <li>Refreshing the page</li>
+                  <li>Checking your internet connection</li>
+                  <li>Waiting a few minutes and trying again</li>
+                </>
+              )}
+              {isJSONError && (
+                <li>If this persists, please contact support - there may be a deployment issue</li>
+              )}
             </ul>
           </div>
           <div className="error-actions">
