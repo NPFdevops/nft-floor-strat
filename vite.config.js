@@ -11,6 +11,12 @@ export default defineConfig({
         changeOrigin: true,
         secure: true,
         rewrite: (path) => path.replace(/^\/api\/strategies/, '/api/strategies')
+      },
+      '/api/holdings': {
+        target: 'https://www.nftstrategy.fun',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path.replace(/^\/api\/holdings/, '/api/holdings')
       }
     }
   }

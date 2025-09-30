@@ -9,7 +9,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [sortConfig, setSortConfig] = useState({ key: 'floorMarketCap', direction: 'desc' });
+  const [sortConfig, setSortConfig] = useState({ key: 'nftStrategyMarketCap', direction: 'desc' });
   const [searchTerm, setSearchTerm] = useState('');
 
   // Fetch data from API
@@ -395,6 +395,21 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 MarketCap Ratio
                 {getSortIcon('floorMarketCap')}
               </th>
+              <th 
+                className="sortable" 
+                onClick={() => handleSort('nftStrategyMarketCap')}
+                onKeyDown={(e) => e.key === 'Enter' && handleSort('nftStrategyMarketCap')}
+                tabIndex="0"
+                role="columnheader"
+                aria-sort={
+                  sortConfig.key === 'nftStrategyMarketCap' 
+                    ? sortConfig.direction === 'asc' ? 'ascending' : 'descending'
+                    : 'none'
+                }
+                aria-label="Sort by market cap"
+              >
+                Market Cap {getSortIcon('nftStrategyMarketCap')}
+              </th>
               <th role="columnheader" aria-label="Actions">Action</th>
             </tr>
           </thead>
@@ -464,6 +479,11 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                       </div>
                     </div>
                   ) : 'N/A'}
+                </td>
+                <td className="market-cap-value-cell" role="gridcell">
+                  <span aria-label={`Market cap: ${formatCurrency(strategy.nftStrategyMarketCap)}`}>
+                    {formatCurrency(strategy.nftStrategyMarketCap)}
+                  </span>
                 </td>
                 <td className="action-cell" role="gridcell">
                   <button 

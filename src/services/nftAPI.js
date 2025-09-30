@@ -455,3 +455,150 @@ export const getCurrentFloorPrice = async (collectionSlug) => {
     };
   }
 };
+
+/**
+ * Fetch comprehensive collection details from NFTPricefloor API
+ * @param {string} collectionSlug - The collection identifier/slug
+ * @returns {Promise<Object>} Collection details including market cap, holders, etc.
+ */
+export const fetchCollectionDetails = async (collectionSlug) => {
+  try {
+    const cacheKey = `collection_details_${collectionSlug}`;
+    
+    // Check if there's already a pending request for this data
+    if (pendingRequests.has(cacheKey)) {
+      console.log(`⏳ Waiting for pending collection details request: ${collectionSlug}`);
+      return await pendingRequests.get(cacheKey);
+    }
+    
+    // Try to get from cache first (5 minute TTL for collection details)
+    const cachedData = await cacheService.get(cacheKey, '5m');
+    if (cachedData) {
+      console.log(`✅ Using cached collection details for ${collectionSlug}`);
+      return cachedData;
+    }
+    
+    // Create a promise for this request and store it to prevent duplicates
+    const requestPromise = (async () => {
+      try {
+        console.log(`🔄 Fetching collection details for ${collectionSlug}`);
+        
+        const response = await apiClient.get(`/projects/${collectionSlug}`);
+        
+        console.log('Collection details API response status:', response.status);
+        console.log('Collection details API response data:', response.data);
+        
+        const data = response.data;
+        
+        // Extract and format the collection data
+        const result = {
+          success: true,
+          data: {
+            slug: data.slug || collectionSlug,
+            name: data.name || data.title || collectionSlug,
+            description: data.description,
+            image: data.image || data.logo,
+            website: data.website,
+            twitter: data.twitter,
+            discord: data.discord,
+            
+            // Market data
+            floor_price_eth: data.floor_price_eth || data.floorPrice,
+            floor_price_usd: data.floor_price_usd || data.floorPriceUsd,
+            market_cap_eth: data.market_cap_eth || data.marketCapEth,
+            market_cap_usd: data.market_cap_usd || data.marketCapUsd,
+            
+            // Volume and trading data
+            volume_24h_eth: data.volume_24h_eth || data.volume24hEth,
+            volume_24h_usd: data.volume_24h_usd || data.volume24hUsd,
+            volume_7d_eth: data.volume_7d_eth || data.volume7dEth,
+            volume_7d_usd: data.volume_7d_usd || data.volume7dUsd,
+            
+            // Price changes
+            price_change_24h: data.price_change_24h || data.priceChange24h,
+            price_change_7d: data.price_change_7d || data.priceChange7d,
+            price_change_30d: data.price_change_30d || data.priceChange30d,
+            
+            // Collection stats
+            total_supply: data.total_supply || data.totalSupply,
+            holders_count: data.holders_count || data.holdersCount || data.holders,
+            listed_count: data.listed_count || data.listedCount,
+            
+            // Additional metadata
+            contract_address: data.contract_address || data.contractAddress,
+            blockchain: data.blockchain || 'ethereum',
+            created_date: data.created_date || data.createdDate,
+            verified: data.verified || false,
+            
+            // Raw data for debugging
+            _raw: data
+          },
+          collectionName: data.name || data.title || collectionSlug,
+          timestamp: Date.now()
+        };
+        
+        console.log('Formatted collection details result:', {
+          success: result.success,
+          collectionName: result.collectionName,
+          floorPrice: result.data.floor_price_eth,
+          marketCap: result.data.market_cap_usd,
+          holders: result.data.holders_count
+        });
+        
+        // Cache the result with 5-minute TTL
+        await cacheService.set(cacheKey, result, '5m');
+        
+        return result;
+        
+      } catch (error) {
+        console.error(`❌ Error fetching collection details for ${collectionSlug}:`, error);
+        
+        let errorMessage = 'Failed to fetch collection details';
+        if (error.response) {
+          const status = error.response.status;
+          if (status === 404) {
+            errorMessage = `Collection '${collectionSlug}' not found`;
+          } else if (status === 429) {
+            errorMessage = 'Rate limit exceeded while fetching collection details';
+          } else {
+            errorMessage = `API Error (${status}): ${error.response.data?.message || error.response.statusText}`;
+          }
+        } else if (error.code === 'ENOTFOUND') {
+          errorMessage = 'Network error - Unable to reach collection API';
+        }
+        
+        const errorResult = {
+          success: false,
+          error: errorMessage,
+          data: null,
+          collectionName: collectionSlug
+        };
+        
+        // Cache error result for 1 minute to prevent repeated failed requests
+        await cacheService.set(cacheKey, errorResult, '1m');
+        
+        return errorResult;
+      }
+    })();
+    
+    // Store the promise to prevent duplicate requests
+    pendingRequests.set(cacheKey, requestPromise);
+    
+    try {
+      const result = await requestPromise;
+      return result;
+    } finally {
+      // Clean up the pending request
+      pendingRequests.delete(cacheKey);
+    }
+    
+  } catch (error) {
+    console.error(`❌ Unexpected error in fetchCollectionDetails for ${collectionSlug}:`, error);
+    return {
+      success: false,
+      error: error.message,
+      data: null,
+      collectionName: collectionSlug
+    };
+  }
+};
