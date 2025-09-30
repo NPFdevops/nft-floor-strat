@@ -1,6 +1,20 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "env": {
+    "VITE_RAPIDAPI_KEY": "@vite_rapidapi_key",
+    "VITE_RAPIDAPI_HOST": "@vite_rapidapi_host",
+    "VITE_POSTHOG_KEY": "@vite_posthog_key",
+    "VITE_POSTHOG_HOST": "@vite_posthog_host"
+  },
+  "build": {
+    "env": {
+      "VITE_RAPIDAPI_KEY": "@vite_rapidapi_key",
+      "VITE_RAPIDAPI_HOST": "@vite_rapidapi_host",
+      "VITE_POSTHOG_KEY": "@vite_posthog_key",
+      "VITE_POSTHOG_HOST": "@vite_posthog_host"
+    }
+  },
   "rewrites": [
     {
       "source": "/(.*)",
