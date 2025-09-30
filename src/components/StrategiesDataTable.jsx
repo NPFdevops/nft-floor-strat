@@ -13,21 +13,45 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
   const [sortConfig, setSortConfig] = useState({ key: 'nftStrategyMarketCap', direction: 'desc' });
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Fetch data from API
+  // Fetch data from API with retry mechanism
   useEffect(() => {
-    const fetchStrategies = async () => {
+    const fetchStrategies = async (retryCount = 0) => {
+      const maxRetries = 3;
+      
       try {
         setLoading(true);
         setError(null);
         
-        const response = await fetch('/api/strategies');
+        console.log(`🔄 Fetching strategies from API... (attempt ${retryCount + 1}/${maxRetries + 1})`);
+        
+        const response = await fetch('/api/strategies', {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          cache: 'no-cache'
+        });
+        
         if (!response.ok) {
-          throw new Error(`Failed to fetch strategies (${response.status})`);
+          throw new Error(`Failed to fetch strategies (${response.status}): ${response.statusText}`);
         }
+        
+        // Check content type before parsing
+        const contentType = response.headers.get('content-type');
+        console.log('📋 Response content type:', contentType);
+        
+        if (!contentType || !contentType.includes('application/json')) {
+          // If not JSON, get the text to see what we received
+          const text = await response.text();
+          console.error('❌ Expected JSON but received:', text.substring(0, 200));
+          throw new Error(`Expected JSON response but received ${contentType || 'unknown content type'}. Response: ${text.substring(0, 100)}...`);
+        }
+        
         const data = await response.json();
+        console.log('✅ Successfully parsed JSON data:', data.length, 'strategies');
         
         if (!Array.isArray(data)) {
-          throw new Error('Invalid data format received from API');
+          throw new Error('Invalid data format received from API - expected array');
         }
         
         // Enhance data with additional API calls for burn percentage and holders
@@ -87,17 +111,31 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
         if (onStrategiesUpdate) {
           onStrategiesUpdate(finalData);
         }
+        
+        // Success - stop loading
+        setLoading(false);
+        
       } catch (err) {
-        console.error('Failed to fetch strategies:', err.message);
-        setError(`Failed to load strategies: ${err.message}`);
+        console.error(`Failed to fetch strategies (attempt ${retryCount + 1}):`, err.message);
+        
+        // Retry if we haven't exceeded max retries
+        if (retryCount < maxRetries) {
+          console.log(`⏳ Retrying in ${(retryCount + 1) * 1000}ms...`);
+          setTimeout(() => {
+            fetchStrategies(retryCount + 1);
+          }, (retryCount + 1) * 1000); // Exponential backoff
+          return;
+        }
+        
+        // If all retries failed, set error state
+        setError(`Failed to load strategies after ${maxRetries + 1} attempts: ${err.message}`);
         setStrategies([]);
+        setLoading(false);
         
         // Notify parent component about empty strategies
         if (onStrategiesUpdate) {
           onStrategiesUpdate([]);
         }
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -292,9 +330,42 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
     return (
       <div className="strategies-table-container">
         <div className="error-message">
-          <h3>Error loading strategies</h3>
-          <p>{error}</p>
-          <button onClick={() => window.location.reload()}>Retry</button>
+          <h3>🚫 Unable to Load Strategies</h3>
+          <p className="error-details">{error}</p>
+          <div className="error-suggestions">
+            <p><strong>This might be due to:</strong></p>
+            <ul>
+              <li>Temporary network connectivity issues</li>
+              <li>API server maintenance</li>
+              <li>Browser cache issues</li>
+            </ul>
+            <p><strong>Try:</strong></p>
+            <ul>
+              <li>Refreshing the page</li>
+              <li>Checking your internet connection</li>
+              <li>Waiting a few minutes and trying again</li>
+            </ul>
+          </div>
+          <div className="error-actions">
+            <button 
+              onClick={() => window.location.reload()} 
+              className="retry-button primary"
+            >
+              🔄 Refresh Page
+            </button>
+            <button 
+              onClick={() => {
+                setError(null);
+                setLoading(true);
+                // Trigger a re-fetch by updating a dependency
+                window.location.hash = Date.now();
+                window.location.hash = '';
+              }}
+              className="retry-button secondary"
+            >
+              🔁 Try Again
+            </button>
+          </div>
         </div>
       </div>
     );
