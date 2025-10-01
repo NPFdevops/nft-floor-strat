@@ -15,14 +15,22 @@
       "VITE_POSTHOG_HOST": "@vite_posthog_host"
     }
   },
+  "functions": {
+    "api/strategies.js": {
+      "maxDuration": 30
+    },
+    "api/holdings.js": {
+      "maxDuration": 30
+    }
+  },
   "rewrites": [
     {
       "source": "/api/strategies",
       "destination": "/api/strategies"
     },
     {
-      "source": "/api/holdings",
-      "destination": "/api/holdings"
+      "source": "/api/holdings(.*)",
+      "destination": "/api/holdings$1"
     },
     {
       "source": "/(.*)",

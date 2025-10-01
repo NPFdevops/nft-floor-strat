@@ -52,17 +52,26 @@ class NFTStrategyService {
       }
 
       console.log('🔄 Fetching strategies from nftstrategy API...');
+      console.log('🔧 Request URL:', this.baseURL);
+      console.log('🔧 Environment:', import.meta.env.MODE);
+      
       const response = await axios.get(this.baseURL, {
         timeout: 30000
       });
+
+      console.log('📡 Response status:', response.status);
+      console.log('📡 Response headers:', response.headers);
+      console.log('📡 Response data type:', typeof response.data);
+      console.log('📡 Response data preview:', typeof response.data === 'string' ? response.data.substring(0, 200) : JSON.stringify(response.data).substring(0, 200));
 
       // Enhanced error detection for HTML responses (common in Vercel deployment issues)
       const contentType = response.headers['content-type'] || '';
       if (contentType.includes('text/html')) {
         const htmlSnippet = typeof response.data === 'string' 
-          ? response.data.substring(0, 100) 
-          : String(response.data).substring(0, 100);
-        throw new Error(`Received HTML instead of JSON. This usually indicates a deployment/routing issue. Response: ${htmlSnippet}...`);
+          ? response.data.substring(0, 500) 
+          : String(response.data).substring(0, 500);
+        console.error('🚨 HTML Response detected:', htmlSnippet);
+        throw new Error(`Received HTML instead of JSON. This usually indicates a deployment/routing issue. Content-Type: ${contentType}. Response: ${htmlSnippet}...`);
       }
 
       if (!response.data || !Array.isArray(response.data)) {
