@@ -1,0 +1,17 @@
+{
+  "levels": {
+    "low": false,
+    "moderate": true,
+    "high": true,
+    "critical": true
+  },
+  "advisories": [
+  ],
+  "allowlist": [
+  ],
+  "report-type": "full",
+  "package-manager": "npm",
+  "path": "./",
+  "show-found": true,
+  "registry": "https://registry.npmjs.org/"
+}

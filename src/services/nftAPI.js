@@ -482,11 +482,19 @@ export const fetchCollectionDetails = async (collectionSlug) => {
     const requestPromise = (async () => {
       try {
         console.log(`🔄 Fetching collection details for ${collectionSlug}`);
+        console.log(`🌐 API URL: ${API_BASE_URL}/projects/${collectionSlug}`);
+        console.log(`🔑 API Key: ${RAPIDAPI_KEY ? RAPIDAPI_KEY.substring(0, 8) + '...' : 'NOT SET'}`);
         
         const response = await apiClient.get(`/projects/${collectionSlug}`);
         
         console.log('Collection details API response status:', response.status);
-        console.log('Collection details API response data:', response.data);
+        console.log('Collection details API response headers:', response.headers);
+        console.log('Collection details API response data (full):', response.data);
+        
+        // Verify we got valid data
+        if (!response.data) {
+          throw new Error('API returned empty response');
+        }
         
         const data = response.data;
         
@@ -497,10 +505,32 @@ export const fetchCollectionDetails = async (collectionSlug) => {
           floorInfo: data.stats?.floorInfo,
           salesTemporality: data.stats?.salesTemporalityUsd,
           floortemporalityusd: data.stats?.floortemporalityusd,
+          floorTemporalityUsd: data.stats?.floorTemporalityUsd,
           floortemporalityusd_diff24h: data.stats?.floortemporalityusd?.diff24h,
+          floorTemporalityUsd_diff24h: data.stats?.floorTemporalityUsd?.diff24h,
           totalOwners: data.stats?.totalOwners,
           totalSupply: data.stats?.totalSupply
         });
+        
+        // Extract 24h price change from floorTemporalityUsd.diff24h
+        console.log('🔍 Debugging 24h price change extraction:');
+        console.log('  - data.stats:', !!data.stats);
+        console.log('  - data.stats.floorTemporalityUsd:', data.stats?.floorTemporalityUsd);
+        console.log('  - data.stats.floorTemporalityUsd.diff24h:', data.stats?.floorTemporalityUsd?.diff24h);
+        console.log('  - data.stats.floortemporalityusd:', data.stats?.floortemporalityusd);
+        console.log('  - data.stats.floorInfo:', data.stats?.floorInfo);
+        
+        const diff24h_primary = data.stats?.floorTemporalityUsd?.diff24h;
+        const diff24h_fallback1 = data.stats?.floortemporalityusd?.diff24h;
+        const diff24h_fallback2 = data.stats?.floorInfo?.floorChange24h;
+        
+        console.log('🎯 Final 24h change values:');
+        console.log('  - diff24h_primary (floorTemporalityUsd):', diff24h_primary, typeof diff24h_primary);
+        console.log('  - diff24h_fallback1 (floortemporalityusd):', diff24h_fallback1, typeof diff24h_fallback1);
+        console.log('  - diff24h_fallback2 (floorInfo):', diff24h_fallback2, typeof diff24h_fallback2);
+        
+        const finalDiff24h = diff24h_primary || diff24h_fallback1 || diff24h_fallback2;
+        console.log('  - FINAL VALUE TO BE STORED:', finalDiff24h, typeof finalDiff24h);
         
         // Extract and format the collection data based on NFTPriceFloor API structure
         const result = {
@@ -526,13 +556,13 @@ export const fetchCollectionDetails = async (collectionSlug) => {
             volume_7d_eth: data.stats?.salesTemporalityEth?.volume?.val7d || data.volume_7d_eth || data.volume7dEth,
             volume_7d_usd: data.stats?.salesTemporalityUsd?.volume?.val7d || data.volume_7d_usd || data.volume7dUsd,
             
-            // Price changes from stats - using floortemporalityusd.diff24h as requested
-            price_change_24h: data.stats?.floortemporalityusd?.diff24h || data.stats?.floorInfo?.floorChange24h || data.price_change_24h || data.priceChange24h,
+            // Price changes from stats - using floorTemporalityUsd.diff24h as requested
+            price_change_24h: data.stats?.floorTemporalityUsd?.diff24h || data.stats?.floortemporalityusd?.diff24h || data.stats?.floorInfo?.floorChange24h || data.price_change_24h || data.priceChange24h,
             price_change_7d: data.stats?.floorInfo?.floorChange7d || data.price_change_7d || data.priceChange7d,
             price_change_30d: data.stats?.floorInfo?.floorChange30d || data.price_change_30d || data.priceChange30d,
             
             // Include the full floorTemporalityUsd object for detailed display
-            floorTemporalityUsd: data.stats?.floortemporalityusd || null,
+            floorTemporalityUsd: data.stats?.floorTemporalityUsd || data.stats?.floortemporalityusd || null,
             
             // Collection stats
             total_supply: data.stats?.totalSupply || data.total_supply || data.totalSupply,
@@ -560,8 +590,18 @@ export const fetchCollectionDetails = async (collectionSlug) => {
           marketCap: result.data.market_cap_usd,
           holders: result.data.holders_count,
           price_change_24h: result.data.price_change_24h,
-          price_change_24h_source: data.stats?.floortemporalityusd?.diff24h ? 'floortemporalityusd.diff24h' : 
+          'typeof price_change_24h': typeof result.data.price_change_24h,
+          'price_change_24h === null': result.data.price_change_24h === null,
+          'price_change_24h === undefined': result.data.price_change_24h === undefined,
+          price_change_24h_source: data.stats?.floorTemporalityUsd?.diff24h ? 'floorTemporalityUsd.diff24h (camelCase)' : 
+                                   data.stats?.floortemporalityusd?.diff24h ? 'floortemporalityusd.diff24h (lowercase)' : 
                                    data.stats?.floorInfo?.floorChange24h ? 'floorInfo.floorChange24h' : 'fallback'
+        });
+        
+        console.log('💥 CRITICAL DEBUG - price_change_24h value being stored:', {
+          value: result.data.price_change_24h,
+          type: typeof result.data.price_change_24h,
+          isValid: result.data.price_change_24h !== null && result.data.price_change_24h !== undefined && !isNaN(result.data.price_change_24h)
         });
         
         // Cache the result with 5-minute TTL

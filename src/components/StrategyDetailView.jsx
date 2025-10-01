@@ -152,7 +152,13 @@ const StrategyDetailView = ({ strategy, onBack }) => {
               if (result.success) {
                 setCollectionDetails(result.data);
                 console.log(`✅ Collection details loaded for ${result.collectionName}`);
-                console.log(`📊 24h Price Change: ${result.data.price_change_24h}% (from floortemporalityusd.diff24h)`);
+                console.log(`📊 24h Price Change: ${result.data.price_change_24h}%`);
+                if (result.data.price_change_24h === null || result.data.price_change_24h === undefined) {
+                  console.warn('⚠️ 24h Price Change is null/undefined:', {
+                    price_change_24h: result.data.price_change_24h,
+                    floorTemporalityUsd: result.data.floorTemporalityUsd
+                  });
+                }
               } else {
                 console.warn('⚠️ No collection details available:', result.error);
                 setCollectionDetails(null);
@@ -321,7 +327,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
     // Convert to number if it's a string
     const numValue = typeof value === 'string' ? parseFloat(value) : value;
     
-    // Check if it's a valid number
+    // Check if it's a valid number (including 0)
     if (isNaN(numValue) || typeof numValue !== 'number') return 'N/A';
     
     return `${numValue >= 0 ? '+' : ''}${numValue.toFixed(2)}%`;
@@ -352,7 +358,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
     return (
       <div className="space-y-6">
         {/* Comparative Table */}
-        <div className="rounded-none border-2 border-black bg-white shadow-[8px_8px_0px_#000000] overflow-hidden">
+        <div className="rounded-none border-2 border-black bg-white shadow-[8px_8px_0px_#000000] overflow-visible">
           <div className="border-b-2 border-black px-6 py-4 bg-gray-50">
             <h3 className="text-xl font-bold text-black">Strategy vs Collection Comparison</h3>
             <p className="text-sm text-gray-600 mt-1">Side-by-side comparison of NFT collection and strategy metrics</p>
@@ -371,7 +377,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
               </div>
             )}
           </div>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
             <table className="w-full">
               <thead>
                 <tr className="border-b-2 border-black bg-gray-50">
@@ -433,9 +439,9 @@ const StrategyDetailView = ({ strategy, onBack }) => {
                       </div>
                     ) : (
                       <span className={`font-medium ${
-                        (collectionDetails?.floorTemporalityUsd?.diff24h || collectionDetails?.price_change_24h) >= 0 ? 'text-green-600' : 'text-red-600'
+                        collectionDetails?.price_change_24h >= 0 ? 'text-green-600' : 'text-red-600'
                       }`}>
-                        {formatPercentage(collectionDetails?.floorTemporalityUsd?.diff24h || collectionDetails?.price_change_24h)}
+                        {formatPercentage(collectionDetails?.price_change_24h)}
                       </span>
                     )}
                   </td>
@@ -561,7 +567,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
           
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
             {/* NFT Floor Price Chart */}
-            <div className="rounded-none border-2 border-black bg-white shadow-[8px_8px_0px_#000000] min-h-[400px]">
+            <div className="rounded-none border-2 border-black bg-white shadow-[8px_8px_0px_#000000] min-h-[320px] sm:min-h-[400px]">
               <div className="border-b-2 border-black px-6 py-4 bg-gray-50">
                 <div className="flex items-center justify-between">
                   <div>
@@ -574,7 +580,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
                   </div>
                 </div>
               </div>
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 {errorStates.nftPrice && (
                   <div className="bg-red-50 border border-red-200 rounded-md p-3 mb-4">
                     <div className="flex">
@@ -590,7 +596,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
                   </div>
                 )}
                 {loadingStates.nftPrice ? (
-                  <div className="flex items-center justify-center h-80">
+                  <div className="flex items-center justify-center h-72 sm:h-80">
                     <div className="text-center">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
                       <p className="text-gray-500">Loading NFT price data...</p>
@@ -606,7 +612,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
                     height={320}
                   />
                 ) : (
-                  <div className="flex items-center justify-center h-80">
+                  <div className="flex items-center justify-center h-72 sm:h-80">
                     <div className="text-center">
                       <div className="text-gray-400 text-5xl mb-3">📊</div>
                       <p className="text-gray-600 font-medium text-lg">NFT Floor Price Data</p>
@@ -618,7 +624,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <button
                     onClick={() => window.open(`https://nftpricefloor.com/${collectionSlug}`, '_blank')}
-                    className="w-full px-4 py-3 bg-blue-600 text-white rounded-none border-2 border-blue-600 hover:bg-blue-700 hover:border-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
+                    className="w-full px-4 py-3 bg-blue-600 text-white rounded-none border-2 border-blue-600 hover:bg-blue-700 hover:border-blue-700 transition-colors font-medium flex items-center justify-center gap-2 min-h-[44px]"
                   >
                     <span>View on NFTPricefloor</span>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -630,7 +636,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
             </div>
 
             {/* Token Price Chart */}
-            <div className="rounded-none border-2 border-black bg-white shadow-[8px_8px_0px_#000000] min-h-[400px]">
+            <div className="rounded-none border-2 border-black bg-white shadow-[8px_8px_0px_#000000] min-h-[320px] sm:min-h-[400px]">
               <div className="border-b-2 border-black px-6 py-4 bg-gray-50">
                 <div className="flex items-center justify-between">
                   <div>
@@ -643,7 +649,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
                   </div>
                 </div>
               </div>
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 {errorStates.tokenPrice && (
                   <div className="bg-red-50 border border-red-200 rounded-md p-3 mb-4">
                     <div className="flex">
@@ -884,10 +890,10 @@ const StrategyDetailView = ({ strategy, onBack }) => {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 py-8">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 py-8 pb-24" style={{ paddingBottom: 'calc(96px + env(safe-area-inset-bottom, 0px))' }}>
 
       {/* Tab Navigation */}
-      <div className="flex items-center gap-1 mb-6 bg-gray-100 p-1 rounded-lg w-fit">
+      <div className="flex items-center gap-1 mb-6 bg-gray-100 p-1 rounded-lg w-full overflow-x-auto whitespace-nowrap scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
         {[
           { id: 'overview', label: 'Overview' },
           { id: 'holdings', label: 'Holdings' },
@@ -896,7 +902,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+            className={`px-4 py-3 rounded-md text-sm font-medium transition-all inline-flex min-h-[44px] ${
               activeTab === tab.id
                 ? 'bg-white text-black shadow-sm'
                 : 'text-gray-600 hover:text-black'

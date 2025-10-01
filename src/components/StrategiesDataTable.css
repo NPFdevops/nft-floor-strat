@@ -259,44 +259,39 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
-  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
   color: white;
   border-radius: 50%;
-  font-size: 12px;
-  font-weight: 800;
+  font-size: 10px;
+  font-weight: 700;
   cursor: help;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s ease;
   font-family: 'Space Grotesk', sans-serif;
-  box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   position: relative;
+  flex-shrink: 0;
 }
 
 .tooltip-icon:hover {
-  background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
-  transform: scale(1.15) rotate(5deg);
-  box-shadow: 
-    0 4px 16px rgba(0, 0, 0, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  transform: scale(1.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .tooltip-icon:active {
-  transform: scale(1.05) rotate(2deg);
+  transform: scale(0.95);
   transition-duration: 0.1s;
 }
 
 /* Keyboard navigation and focus states */
 .tooltip-icon:focus {
   outline: 2px solid #3b82f6;
-  outline-offset: 2px;
+  outline-offset: 1px;
   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  box-shadow: 
-    0 4px 16px rgba(59, 130, 246, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 .tooltip-icon:focus-visible {
@@ -684,7 +679,10 @@
 .table-wrapper {
   position: relative;
   z-index: 1;
-  overflow: visible;
+  /* Keep horizontal scrolling for responsiveness, allow vertical overflow for tooltips */
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Collection Cell */
@@ -815,6 +813,15 @@
   max-width: 150px;
   position: relative;
   overflow: visible;
+}
+
+/* Ensure tooltip icon inherits the correct font size context */
+.market-cap-cell .tooltip-icon {
+  font-size: 0.75em;
+  width: 1.2em;
+  height: 1.2em;
+  min-width: 14px;
+  min-height: 14px;
 }
 
 .actions-cell {
@@ -993,6 +1000,7 @@
     font-size: 12px;
   }
   
+  
   .collection-info {
     flex-direction: row;
     align-items: center;
@@ -1063,6 +1071,7 @@
     padding: 10px 6px;
     font-size: 11px;
   }
+  
   
   .collection-cell {
     min-width: 140px;
@@ -1229,11 +1238,9 @@
 }
 
 /* Hide components as requested */
-.table-header h2,
-.search-container,
-.items-per-page,
-.pagination {
-  display: none !important;
+/* Mobile: hide only the search control as requested */
+@media (max-width: 768px) {
+  .search-container { display: none !important; }
 }
 
 /* Make NFT collection name black */

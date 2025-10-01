@@ -10,10 +10,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
   const [strategies, setStrategies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [sortConfig, setSortConfig] = useState({ key: 'nftStrategyMarketCap', direction: 'desc' });
-  const [searchTerm, setSearchTerm] = useState('');
 
   // Fetch data from API with retry mechanism
   useEffect(() => {
@@ -147,40 +144,12 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
     fetchStrategies();
   }, []);
 
-  // Filter strategies based on search term
-  const filteredStrategies = useMemo(() => {
-    if (!searchTerm) return strategies;
-    return strategies.filter(strategy =>
-      strategy.collectionName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      strategy.tokenName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      strategy.tokenSymbol?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [strategies, searchTerm]);
-
-  // Debounced search tracking
-  useEffect(() => {
-    if (searchTerm) {
-      const timeoutId = setTimeout(() => {
-        posthogService.trackSearchEvent('search', {
-          term: searchTerm,
-          filterType: 'table_search',
-          resultsCount: filteredStrategies.length
-        }, {
-          search_length: searchTerm.length,
-          total_strategies: strategies.length,
-          has_results: filteredStrategies.length > 0
-        });
-      }, 1000); // Track after 1 second of no typing
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [searchTerm, filteredStrategies.length, strategies.length]);
 
   // Sort strategies
   const sortedStrategies = useMemo(() => {
-    if (!sortConfig.key) return filteredStrategies;
+    if (!sortConfig.key) return strategies;
 
-    return [...filteredStrategies].sort((a, b) => {
+    return [...strategies].sort((a, b) => {
       let aValue = a[sortConfig.key];
       let bValue = b[sortConfig.key];
 
@@ -207,18 +176,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
       }
       return 0;
     });
-  }, [filteredStrategies, sortConfig]);
-
-  // Paginate strategies
-  const paginatedStrategies = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return sortedStrategies.slice(startIndex, startIndex + itemsPerPage);
-  }, [sortedStrategies, currentPage, itemsPerPage]);
-
-  // Calculate pagination values
-  const totalPages = Math.ceil(filteredStrategies.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
+  }, [strategies, sortConfig]);
 
   // Handle sorting
   const handleSort = (key) => {
@@ -231,9 +189,9 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
 
     // Track sorting event
     posthogService.trackSearchEvent('sort', {
-      term: searchTerm,
+      term: '',
       filterType: 'table_sort',
-      resultsCount: filteredStrategies.length
+      resultsCount: strategies.length
     }, {
       sort_column: key,
       sort_direction: newDirection,
@@ -241,21 +199,6 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
     });
   };
 
-  // Handle pagination
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-
-    // Track pagination event
-    posthogService.trackEngagementEvent('pagination', {
-      pageViews: page,
-      interactionsCount: 1
-    }, {
-      current_page: page,
-      total_pages: totalPages,
-      items_per_page: itemsPerPage,
-      total_items: filteredStrategies.length
-    });
-  };
 
   // Format currency
   const formatCurrency = (value) => {
@@ -328,7 +271,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
   );
 
   if (loading) {
-    return <SkeletonTable rows={itemsPerPage} />;
+    return <SkeletonTable rows={10} />;
   }
 
   if (error) {
@@ -409,58 +352,10 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
 
   return (
     <div className="strategies-table-container">
-      <div className="table-header">
-        <h2 id="strategies-table-title">NFT Strategies</h2>
-        <div className="table-controls">
-          <div className="search-container">
-            <input
-              type="text"
-              placeholder="Search strategies..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-              aria-label="Search NFT strategies"
-              aria-describedby="search-help"
-            />
-            <span id="search-help" className="sr-only">
-              Search by collection name or strategy type
-            </span>
-          </div>
-          <div className="items-per-page">
-            <label htmlFor="items-per-page-select">Items per page:</label>
-            <select
-              id="items-per-page-select"
-              value={itemsPerPage}
-              onChange={(e) => {
-                const newItemsPerPage = Number(e.target.value);
-                setItemsPerPage(newItemsPerPage);
-                setCurrentPage(1); // Reset to first page
-                
-                // Track items per page change
-                posthogService.trackEngagementEvent('items_per_page_change', {
-                  interactionsCount: 1
-                }, {
-                  new_items_per_page: newItemsPerPage,
-                  total_items: filteredStrategies.length,
-                  new_total_pages: Math.ceil(filteredStrategies.length / newItemsPerPage)
-                });
-              }}
-              aria-label="Number of items to display per page"
-            >
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
       <div className="table-wrapper">
         <table 
           className="strategies-table"
           role="table"
-          aria-labelledby="strategies-table-title"
           aria-describedby="table-description"
         >
           <caption id="table-description" className="sr-only">
@@ -591,11 +486,11 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
             </tr>
           </thead>
           <tbody>
-            {paginatedStrategies.map((strategy, index) => (
+            {sortedStrategies.map((strategy, index) => (
               <tr 
                 key={strategy.id} 
                 role="row"
-                aria-rowindex={startIndex + index + 1}
+                aria-rowindex={index + 1}
                 className="clickable-row"
                 onClick={() => {
                   // Track click event
@@ -709,64 +604,6 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
             ))}
           </tbody>
         </table>
-      </div>
-
-      <div className="pagination" role="navigation" aria-label="Table pagination">
-        <div className="pagination-info">
-          <span aria-live="polite">
-            Showing {startIndex + 1} to {Math.min(endIndex, filteredStrategies.length)} of {filteredStrategies.length} strategies
-          </span>
-        </div>
-        <div className="pagination-controls">
-          <button 
-            className="pagination-button"
-            onClick={() => setCurrentPage(1)}
-            disabled={currentPage === 1}
-            aria-label="Go to first page"
-          >
-            First
-          </button>
-          <button 
-            className="pagination-button"
-            onClick={() => setCurrentPage(currentPage - 1)}
-            disabled={currentPage === 1}
-            aria-label="Go to previous page"
-          >
-            Previous
-          </button>
-          
-          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-            const pageNumber = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
-            return pageNumber <= totalPages ? (
-              <button
-                key={pageNumber}
-                className={`pagination-button ${currentPage === pageNumber ? 'active' : ''}`}
-                onClick={() => setCurrentPage(pageNumber)}
-                aria-label={`Go to page ${pageNumber}`}
-                aria-current={currentPage === pageNumber ? 'page' : undefined}
-              >
-                {pageNumber}
-              </button>
-            ) : null;
-          })}
-          
-          <button 
-            className="pagination-button"
-            onClick={() => setCurrentPage(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            aria-label="Go to next page"
-          >
-            Next
-          </button>
-          <button 
-            className="pagination-button"
-            onClick={() => setCurrentPage(totalPages)}
-            disabled={currentPage === totalPages}
-            aria-label="Go to last page"
-          >
-            Last
-          </button>
-        </div>
       </div>
     </div>
   );

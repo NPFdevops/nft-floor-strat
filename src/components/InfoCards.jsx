@@ -80,7 +80,7 @@ const InfoCards = ({ strategies = [] }) => {
   ];
 
   return (
-    <div className="mb-4 sm:mb-6">
+    <div className="mb-6">
       {/* Desktop and Tablet: Grid Layout */}
       <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
         {cards.map((card) => (

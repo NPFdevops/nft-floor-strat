@@ -100,17 +100,10 @@ function App() {
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 flex items-center justify-between">
             {/* Logo positioned on the left */}
             <div className="flex items-center gap-2 sm:gap-3 text-black">
-              {/* Desktop logo - hidden on mobile */}
               <img 
                 src={logoImage} 
                 alt="NFT Price Floor Logo" 
-                className="hidden sm:block h-10 lg:h-12" 
-              />
-              {/* Mobile logo - visible only on mobile */}
-              <img 
-                src={mobileLogoImage} 
-                alt="NFT Price Floor Logo" 
-                className="block sm:hidden h-8" 
+                className="h-8 sm:h-10 lg:h-12" 
               />
             </div>
             {/* Centered navigation for desktop */}
@@ -121,15 +114,20 @@ function App() {
               <a href="https://nftpricefloor.com/nft-drops" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-black transition-colors">
                 Drops
               </a>
-              <a href="https://compare.nftpricefloor.com" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-black transition-colors">
-                Compare
-              </a>
               <button 
                 onClick={() => navigate('/nftstrategies')} 
                 className="text-black font-medium transition-colors cursor-pointer"
               >
                 Strategies™
               </button>
+              <div className="relative flex items-center">
+                <span className="text-gray-400 cursor-not-allowed">
+                  Compare
+                </span>
+                <span className="ml-1 text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-full font-medium">
+                  Coming Soon
+                </span>
+              </div>
             </nav>
           </div>
         </header>
@@ -137,8 +135,8 @@ function App() {
         {/* Main Content */}
         <div className="flex flex-1 flex-col py-4 sm:py-8 pb-20 md:pb-8">
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 flex flex-col flex-1">
-            {/* Breadcrumb Navigation */}
-            <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6">
+            {/* Breadcrumb Navigation (hidden on mobile) */}
+            <nav className="hidden md:flex items-center gap-2 text-sm text-gray-600 mb-6">
               <a href="https://nftpricefloor.com" target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors">
                 Home
               </a>
@@ -182,7 +180,7 @@ function App() {
             <div className="flex flex-1">
               {/* View Header */}
               <div className="w-full">
-                <div className="mb-8">
+                <div className="mb-6">
                   {selectedStrategy ? (
                     <div>
                       <h1 className="text-2xl font-bold text-black mb-2">
@@ -221,7 +219,7 @@ function App() {
       </div>
       
       {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t-2 border-solid border-black px-4 py-3 z-50">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t-2 border-solid border-black px-4 py-3 z-[1000000]" style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))' }}>
         <div className="flex items-center justify-around gap-2">
           <a href="https://nftpricefloor.com" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1 text-gray-600 hover:text-black transition-colors min-w-0">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -235,12 +233,6 @@ function App() {
             </svg>
             <span className="text-xs font-medium truncate">Drops</span>
           </a>
-          <a href="https://compare.nftpricefloor.com" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1 text-gray-600 hover:text-black transition-colors min-w-0">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
-            </svg>
-            <span className="text-xs font-medium truncate">Compare</span>
-          </a>
           <button 
             onClick={() => navigate('/nftstrategies')} 
             className="flex flex-col items-center gap-1 text-black font-medium transition-colors min-w-0 cursor-pointer"
@@ -248,8 +240,19 @@ function App() {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
             </svg>
-            <span className="text-xs font-medium truncate">Strategies™</span>
+            <span className="text-xs font-medium truncate">Strategies</span>
           </button>
+          <div className="flex flex-col items-center gap-1 text-gray-400 cursor-not-allowed min-w-0 relative">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+            </svg>
+            <div className="flex flex-col items-center">
+              <span className="text-xs font-medium truncate">Compare</span>
+              <span className="text-[8px] bg-gray-200 text-gray-600 px-1 py-0.5 rounded-full font-medium whitespace-nowrap">
+                Coming Soon
+              </span>
+            </div>
+          </div>
         </div>
       </nav>
       

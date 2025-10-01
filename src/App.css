@@ -156,7 +156,7 @@
   right: 0;
   background: white;
   border-top: 2px solid black;
-  padding: 12px 16px;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)) 16px;
   z-index: 1000;
   box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
 }
@@ -192,7 +192,7 @@
 /* Ensure body content doesn't get hidden behind mobile nav */
 @media (max-width: 767.98px) {
   .layout-container {
-    padding-bottom: 80px;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
   }
 }
 
