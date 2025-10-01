@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import './StrategiesDataTable.css';
 import { nftStrategyService } from '../services/nftStrategyService.js';
+import { fetchTopCollections } from '../services/nftAPI.js';
+import { holdingsService } from '../services/holdingsService.js';
 import SkeletonTable from './SkeletonTable.jsx';
 import { posthogService } from '../services/posthogService';
 
@@ -32,50 +34,79 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
         const enhancedData = await nftStrategyService.enhanceStrategiesData(data);
         
         // Add market cap coefficient calculation
+        // OPTIMIZATION: Fetch all collections once instead of making individual API calls for each strategy
+        let allCollections = [];
+        try {
+          console.log('🔄 Fetching all collections data once for market cap calculations...');
+          const collectionsData = await fetchTopCollections();
+          allCollections = collectionsData.collections || [];
+          console.log(`✅ Fetched ${allCollections.length} collections for market cap matching`);
+        } catch (err) {
+          console.warn('Failed to fetch collections data for market cap calculations:', err);
+        }
+
+        // Enhance data with holdings count for each strategy
         const finalData = await Promise.all(enhancedData.map(async (strategy) => {
           try {
-            // Get market cap from NFTpricefloor API
+            // Get market cap from NFTpricefloor API using the pre-fetched collections data
             let nftPriceFloorMarketCap = null;
-            try {
-              const response = await fetch(`https://${import.meta.env.VITE_RAPIDAPI_HOST}/projects?search=${encodeURIComponent(strategy.name)}`, {
-                headers: {
-                  'X-RapidAPI-Key': import.meta.env.VITE_RAPIDAPI_KEY,
-                  'X-RapidAPI-Host': import.meta.env.VITE_RAPIDAPI_HOST,
-                }
-              });
-              if (response.ok) {
-                const data = await response.json();
-                const project = data.find(p => 
-                  p.name.toLowerCase().includes(strategy.collectionName.toLowerCase()) ||
-                  strategy.collectionName.toLowerCase().includes(p.name.toLowerCase())
-                );
-                if (project && project.stats && project.stats.floorCapUsd) {
-                  nftPriceFloorMarketCap = project.stats.floorCapUsd;
-                }
+            
+            if (allCollections.length > 0) {
+              const project = allCollections.find(p => 
+                p.name.toLowerCase().includes(strategy.collectionName.toLowerCase()) ||
+                strategy.collectionName.toLowerCase().includes(p.name.toLowerCase())
+              );
+              if (project && project.marketCap) {
+                nftPriceFloorMarketCap = project.marketCap;
               }
-            } catch (err) {
-              console.warn('Failed to fetch NFTpricefloor market cap:', err);
             }
             
-            // Calculate Floor Market Cap as NFTpricefloor Market Cap / nftstrategy Market Cap
+            // Calculate Floor Market Cap Ratio as (Strategy Market Cap / NFT Market Cap) * 100
+            // This matches the logic in StrategyDetailView.jsx
             const nftStrategyMarketCap = strategy.poolData?.market_cap_usd;
             console.log(`📊 Market Cap calculation for ${strategy.name}:`);
             console.log(`  - NFTpricefloor Market Cap: ${nftPriceFloorMarketCap}`);
             console.log(`  - nftstrategy Market Cap: ${nftStrategyMarketCap}`);
             
-            const floorMarketCap = (nftPriceFloorMarketCap && nftStrategyMarketCap && nftStrategyMarketCap > 0) ? 
-              nftPriceFloorMarketCap / nftStrategyMarketCap : null;
-            console.log(`  - Floor Market Cap ratio: ${floorMarketCap}`);
+            const floorMarketCapRatio = (nftStrategyMarketCap && nftPriceFloorMarketCap && nftPriceFloorMarketCap > 0) ? 
+              (nftStrategyMarketCap / nftPriceFloorMarketCap) * 100 : null;
+            
+
+            
+            // Fetch holdings count for this strategy
+            let holdingsCount = 0;
+            try {
+              console.log(`🔄 Fetching holdings for strategy: ${strategy.name}`);
+              const strategyAddress = strategy.tokenAddress;
+              const nftAddress = strategy.collection || strategy.contractAddress;
+              
+              if (strategyAddress && nftAddress) {
+                const holdings = await holdingsService.fetchHoldings(strategyAddress, nftAddress);
+                holdingsCount = holdings?.length || 0;
+                console.log(`✅ Holdings count for ${strategy.name}: ${holdingsCount}`);
+              } else {
+                console.warn(`Missing required addresses for strategy ${strategy.name}:`, { strategyAddress, nftAddress });
+                holdingsCount = 0;
+              }
+            } catch (holdingsErr) {
+              console.warn(`Failed to fetch holdings for strategy ${strategy.name}:`, holdingsErr);
+              holdingsCount = 0;
+            }
             
             return {
               ...strategy,
               nftPriceFloorMarketCap,
               nftStrategyMarketCap,
-              floorMarketCap
+              floorMarketCapRatio,
+              holdingsCount
             };
           } catch (err) {
             console.warn('Failed to add market cap coefficient:', err);
-            return strategy;
+            return {
+              ...strategy,
+              floorMarketCapRatio: null,
+              holdingsCount: 0
+            };
           }
         }));
         
@@ -433,7 +464,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
           aria-describedby="table-description"
         >
           <caption id="table-description" className="sr-only">
-            NFT strategies data table showing collection information, strategy details, pricing, and performance metrics. Use arrow keys to navigate and Enter to sort columns.
+            NFT strategies data table showing collection information, strategy details, pricing, and performance metrics. Use arrow keys to navigate and Enter to sort columns. Click on any row to view strategy details.
           </caption>
           <thead>
             <tr role="row">
@@ -466,6 +497,21 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 aria-label="Sort by strategy type"
               >
                 Strategy {getSortIcon('tokenName')}
+              </th>
+              <th 
+                className="sortable" 
+                onClick={() => handleSort('holdingsCount')}
+                onKeyDown={(e) => e.key === 'Enter' && handleSort('holdingsCount')}
+                tabIndex="0"
+                role="columnheader"
+                aria-sort={
+                  sortConfig.key === 'holdingsCount' 
+                    ? sortConfig.direction === 'asc' ? 'ascending' : 'descending'
+                    : 'none'
+                }
+                aria-label="Sort by number of NFT holdings"
+              >
+                Holdings {getSortIcon('holdingsCount')}
               </th>
               <th 
                 className="sortable" 
@@ -514,19 +560,18 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
               </th>
               <th 
                 className="sortable" 
-                onClick={() => handleSort('floorMarketCap')}
-                onKeyDown={(e) => e.key === 'Enter' && handleSort('floorMarketCap')}
+                onClick={() => handleSort('floorMarketCapRatio')}
+                onKeyDown={(e) => e.key === 'Enter' && handleSort('floorMarketCapRatio')}
                 tabIndex="0"
                 role="columnheader"
                 aria-sort={
-                  sortConfig.key === 'floorMarketCap' 
+                  sortConfig.key === 'floorMarketCapRatio' 
                     ? sortConfig.direction === 'asc' ? 'ascending' : 'descending'
                     : 'none'
                 }
                 aria-label="Sort by market cap ratio"
               >
-                MarketCap Ratio
-                {getSortIcon('floorMarketCap')}
+                Market Cap Ratio {getSortIcon('floorMarketCapRatio')}
               </th>
               <th 
                 className="sortable" 
@@ -543,7 +588,6 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
               >
                 Market Cap {getSortIcon('nftStrategyMarketCap')}
               </th>
-              <th role="columnheader" aria-label="Actions">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -552,6 +596,32 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 key={strategy.id} 
                 role="row"
                 aria-rowindex={startIndex + index + 1}
+                className="clickable-row"
+                onClick={() => {
+                  // Track click event
+                  posthogService.trackEngagementEvent('view_strategy_details', {
+                    interactionsCount: 1
+                  }, {
+                    strategy_id: strategy.id,
+                    strategy_name: strategy.tokenName,
+                    collection_name: strategy.collectionName
+                  });
+                  
+                  // Call the onStrategySelect callback
+                  if (onStrategySelect) {
+                    onStrategySelect(strategy);
+                  }
+                }}
+                tabIndex="0"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    if (onStrategySelect) {
+                      onStrategySelect(strategy);
+                    }
+                  }
+                }}
+                aria-label={`View details for ${strategy.collectionName} ${strategy.tokenName} strategy`}
               >
                 <td className="collection-cell" role="gridcell">
                   <div className="collection-info">
@@ -574,6 +644,11 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                     {strategy.tokenName || 'N/A'}
                   </span>
                 </td>
+                <td className="holdings-cell" role="gridcell">
+                  <span aria-label={`Holdings count: ${strategy.holdingsCount || 0}`}>
+                    {strategy.holdingsCount || 0}
+                  </span>
+                </td>
                 <td className="price-cell" role="gridcell">
                   <span aria-label={`Price: ${formatCurrency(strategy.poolData?.price_usd)}`}>
                     {formatCurrency(strategy.poolData?.price_usd)}
@@ -590,24 +665,36 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                   </span>
                 </td>
                 <td className="market-cap-cell" role="gridcell">
-                  {strategy.floorMarketCap ? (
+                  {strategy.floorMarketCapRatio !== null && strategy.floorMarketCapRatio !== undefined ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span>{((1 / strategy.floorMarketCap) * 100).toFixed(2)}%</span>
-                      <div className="custom-tooltip">
-                        <span className="tooltip-icon">?</span>
-                        <div className="tooltip-content">
-                          <span className="tooltip-line">
-                            <span className="tooltip-label">NFT Collection Floor Cap:</span>
-                            <span className="tooltip-value">{formatMillions(strategy.nftPriceFloorMarketCap)}</span>
-                          </span>
-                          <span className="tooltip-line">
-                            <span className="tooltip-label">{strategy.tokenName || strategy.name} Market Cap:</span>
-                            <span className="tooltip-value">{formatMillions(strategy.nftStrategyMarketCap)}</span>
-                          </span>
-                          <span className="tooltip-line">
-                            <span className="tooltip-label">Ratio:</span>
-                            <span className="tooltip-ratio">{((1 / strategy.floorMarketCap) * 100).toFixed(2)}%</span>
-                          </span>
+                      <span>{strategy.floorMarketCapRatio.toFixed(2)}%</span>
+                      <div className="custom-tooltip" role="tooltip">
+                        <span 
+                          className="tooltip-icon"
+                          aria-label="Información detallada del ratio de capitalización de mercado"
+                          aria-describedby={`tooltip-${strategy.id}`}
+                          tabIndex="0"
+                          role="button"
+                        >?</span>
+                        <div 
+                          className="tooltip-content"
+                          id={`tooltip-${strategy.id}`}
+                          role="tooltip"
+                          aria-hidden={true}
+                          aria-live="polite"
+                        >
+                          <div className="tooltip-row" role="group" aria-label="Capitalización del piso NFT">
+                             <span className="tooltip-label">NFT Floor Cap:</span>
+                             <span className="tooltip-value" aria-label={`${formatMillions(strategy.nftPriceFloorMarketCap)} millones`}>
+                               {formatMillions(strategy.nftPriceFloorMarketCap)}
+                             </span>
+                           </div>
+                           <div className="tooltip-row" role="group" aria-label="Capitalización de mercado del token">
+                             <span className="tooltip-label">Token Market Cap:</span>
+                             <span className="tooltip-value" aria-label={`${formatMillions(strategy.nftStrategyMarketCap)} millones`}>
+                               {formatMillions(strategy.nftStrategyMarketCap)}
+                             </span>
+                           </div>
                         </div>
                       </div>
                     </div>
@@ -617,20 +704,6 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                   <span aria-label={`Market cap: ${formatCurrency(strategy.nftStrategyMarketCap)}`}>
                     {formatCurrency(strategy.nftStrategyMarketCap)}
                   </span>
-                </td>
-                <td className="action-cell" role="gridcell">
-                  <button 
-                    className="view-button"
-                    onClick={() => {
-                      console.log('View strategy:', strategy);
-                      if (onStrategySelect) {
-                        onStrategySelect(strategy);
-                      }
-                    }}
-                    aria-label={`View details for ${strategy.collectionName} ${strategy.tokenName} strategy`}
-                  >
-                    View
-                  </button>
                 </td>
               </tr>
             ))}

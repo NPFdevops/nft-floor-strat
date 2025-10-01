@@ -15,8 +15,29 @@
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 20px;
+  padding: var(--container-padding);
   font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+@media (max-width: 768px) {
+  .strategies-table-container {
+    padding: var(--mobile-container-padding);
+  }
+  
+  .table-header {
+    margin-bottom: var(--mobile-section-spacing);
+    gap: var(--mobile-element-spacing);
+  }
+  
+  .table-controls {
+    gap: var(--mobile-element-spacing);
+  }
+}
+
+@media (max-width: 480px) {
+  .strategies-table-container {
+    padding: var(--mobile-container-padding);
+  }
 }
 
 /* Header Section */
@@ -24,9 +45,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 32px;
+  margin-bottom: var(--section-spacing);
   flex-wrap: wrap;
-  gap: 16px;
+  gap: var(--element-spacing);
 }
 
 .table-header h2 {
@@ -40,7 +61,7 @@
 
 .table-controls {
   display: flex;
-  gap: 16px;
+  gap: var(--element-spacing);
   align-items: center;
   flex-wrap: wrap;
 }
@@ -50,7 +71,7 @@
 }
 
 .search-input {
-  padding: 12px 16px;
+  padding: var(--space-sm) var(--space-md);
   border: 2px solid #e5e7eb;
   border-radius: 8px;
   font-size: 14px;
@@ -71,14 +92,14 @@
 .items-per-page label {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-xs);
   font-size: 14px;
   font-weight: 500;
   color: #6b7280;
 }
 
 .items-per-page select {
-  padding: 10px 14px;
+  padding: var(--space-xs) var(--space-sm);
   border: 2px solid #e5e7eb;
   border-radius: 8px;
   font-size: 14px;
@@ -101,7 +122,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80px 20px;
+  padding: var(--space-3xl) var(--container-padding);
   text-align: center;
 }
 
@@ -112,7 +133,7 @@
   border-top: 4px solid #3b82f6;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 20px;
+  margin-bottom: var(--space-lg);
 }
 
 @keyframes spin {
@@ -129,7 +150,7 @@
 
 .error-message {
   text-align: center;
-  padding: 48px 24px;
+  padding: var(--space-2xl) var(--space-lg);
   background: #fef2f2;
   border: 2px solid #fecaca;
   border-radius: 12px;
@@ -177,34 +198,124 @@
 /* Table Wrapper */
 .table-wrapper {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 -8px;
+  padding: 0 8px;
+}
+
+@media (max-width: 1024px) {
+  .table-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .table-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 768px) {
+  .search-input {
+    width: 220px;
+  }
+  
+  .strategies-table th,
+  .strategies-table td {
+    padding: 12px 8px;
+  }
+}
+
+@media (max-width: 640px) {
+  .table-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .search-container {
+    width: 100%;
+  }
+  
+  .search-input {
+    width: 100%;
+  }
+  
+  .items-per-page {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
 }
 
 /* Custom Tooltip Styles */
 .custom-tooltip {
   position: relative;
   cursor: help;
-  z-index: 1000;
+  z-index: 9999;
 }
 
 .tooltip-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
-  background: #6b7280;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
   color: white;
   border-radius: 50%;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 800;
   cursor: help;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   font-family: 'Space Grotesk', sans-serif;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
 }
 
 .tooltip-icon:hover {
-  background: #374151;
-  transform: scale(1.1);
+  background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+  transform: scale(1.15) rotate(5deg);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.tooltip-icon:active {
+  transform: scale(1.05) rotate(2deg);
+  transition-duration: 0.1s;
+}
+
+/* Keyboard navigation and focus states */
+.tooltip-icon:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  box-shadow: 
+    0 4px 16px rgba(59, 130, 246, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.tooltip-icon:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.custom-tooltip:focus-within .tooltip-content {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(-50%) translateX(0) scale(1);
+  transition-delay: 0s;
+}
+
+/* Enhanced accessibility for screen readers */
+.tooltip-content[aria-hidden="false"] {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(-50%) translateX(0) scale(1);
 }
 
 .help-icon {
@@ -233,86 +344,137 @@
   visibility: hidden;
   opacity: 0;
   position: absolute;
-  bottom: 130%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #1f2937;
-  color: white;
-  padding: 16px 20px;
-  border-radius: 10px;
-  font-size: 13px;
+  top: 50%;
+  left: calc(100% + 16px);
+  transform: translateY(-50%) scale(0.95);
+  background: linear-gradient(145deg, #f8fafc 0%, #ffffff 100%);
+  color: #1e293b;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 11px;
   font-weight: 500;
-  line-height: 1.5;
-  white-space: nowrap;
-  z-index: 2147483647;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
-  border: 1px solid #374151;
+  line-height: 1.4;
+  white-space: normal;
+  z-index: 999999;
+  box-shadow: 
+    0 10px 25px rgba(0, 0, 0, 0.15),
+    0 4px 10px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid #e2e8f0;
   font-family: 'Space Grotesk', sans-serif;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(8px);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: 0.6s;
+  backdrop-filter: blur(16px) saturate(180%);
   pointer-events: none;
+  min-width: 196px;
+  max-width: 224px;
+  height: 53px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
 }
 
-.custom-tooltip .tooltip-content::after {
+.custom-tooltip .tooltip-content::before {
   content: '';
   position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 8px solid transparent;
-  border-top-color: #1f2937;
+  top: 50%;
+  left: -6px;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-right-color: #f8fafc;
 }
 
 .custom-tooltip:hover .tooltip-content {
   visibility: visible;
   opacity: 1;
-  transform: translateX(-50%) translateY(-4px);
+  transform: translateY(-50%) translateX(0) scale(1);
+  transition-delay: 0s;
 }
 
-/* Custom tooltip edge case positioning */
-.custom-tooltip:first-child .tooltip-content {
-  left: 0;
-  transform: translateX(0) translateY(-4px);
-}
-
-.custom-tooltip:first-child:hover .tooltip-content {
-  transform: translateX(0) translateY(-4px);
-}
-
-.custom-tooltip:last-child .tooltip-content {
-  right: 0;
+/* Smart positioning for edge cases */
+.custom-tooltip:last-child .tooltip-content,
+.custom-tooltip:nth-last-child(-n+2) .tooltip-content {
   left: auto;
-  transform: translateX(0) translateY(-4px);
+  right: calc(100% + 16px);
+  transform: translateY(-50%) scale(0.95);
 }
 
-.custom-tooltip:last-child:hover .tooltip-content {
-  transform: translateX(0) translateY(-4px);
+.custom-tooltip:last-child .tooltip-content::before,
+.custom-tooltip:nth-last-child(-n+2) .tooltip-content::before {
+  left: auto;
+  right: -7px;
+  border-right-color: transparent;
+  border-left-color: #f8fafc;
 }
 
-.tooltip-line {
-  display: block;
-  margin-bottom: 6px;
+.custom-tooltip:last-child:hover .tooltip-content,
+.custom-tooltip:nth-last-child(-n+2):hover .tooltip-content {
+  transform: translateY(-50%) translateX(0) scale(1);
+  transition-delay: 0s;
 }
 
-.tooltip-line:last-child {
-  margin-bottom: 0;
+/* Responsive positioning adjustments */
+@media (max-width: 1200px) {
+  .custom-tooltip .tooltip-content {
+    left: auto;
+    right: calc(100% + 16px);
+    transform: translateY(-50%) scale(0.95);
+  }
+  
+  .custom-tooltip .tooltip-content::before {
+    left: auto;
+    right: -7px;
+    border-right-color: transparent;
+    border-left-color: rgba(31, 41, 55, 0.95);
+  }
+  
+  .custom-tooltip:hover .tooltip-content {
+    transform: translateY(-50%) translateX(0) scale(1);
+  }
+}
+
+.tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 0;
+  line-height: 1.3;
+  transition: background-color 0.2s ease;
+}
+
+.tooltip-row:hover {
+  background-color: rgba(59, 130, 246, 0.05);
+  border-radius: 3px;
+  padding-left: 4px;
+  padding-right: 4px;
 }
 
 .tooltip-label {
-  color: #d1d5db;
-  font-weight: 500;
+  font-weight: 600;
+  color: #64748b;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  flex: 1;
+  opacity: 0.9;
 }
 
 .tooltip-value {
-  color: #ffffff;
   font-weight: 700;
-  margin-left: 8px;
+  color: #1e293b;
+  font-size: 11px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .tooltip-ratio {
-  color: #60a5fa;
-  font-weight: 700;
-  margin-left: 8px;
+  font-weight: 800;
+  color: #10b981;
+  font-size: 18px;
+  text-align: right;
+  text-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+  font-variant-numeric: tabular-nums;
 }
 
 /* Table Styles */
@@ -322,6 +484,30 @@
   font-size: 14px;
   min-width: 1000px;
   font-family: 'Space Grotesk', sans-serif;
+  position: relative;
+  overflow: visible;
+}
+
+/* Clickable row styles */
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.clickable-row:hover {
+  background-color: rgba(59, 130, 246, 0.05);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.clickable-row:active {
+  transform: translateY(0);
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.clickable-row:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: -2px;
 }
 
 .strategies-table thead {
@@ -344,6 +530,10 @@
   position: relative;
   color: #374151;
   background: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
 }
 
 .strategies-table th:last-child {
@@ -355,6 +545,7 @@
   user-select: none;
   transition: all 0.2s ease;
   position: relative;
+  display: table-cell;
 }
 
 .strategies-table th.sortable:hover {
@@ -370,6 +561,8 @@
 .strategies-table tbody tr {
   border-bottom: 1px solid #f3f4f6;
   transition: all 0.2s ease;
+  position: relative;
+  overflow: visible;
 }
 
 .strategies-table tbody tr:nth-child(even) {
@@ -398,6 +591,15 @@
   font-weight: 500;
   font-size: 14px;
   line-height: 1.5;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 200px;
+  position: relative;
+}
+
+/* Only apply overflow hidden to specific cells that need text truncation */
+.strategies-table td:not(.market-cap-cell) {
+  overflow: hidden;
 }
 
 .strategies-table td:last-child {
@@ -407,9 +609,11 @@
 /* Tooltip Styles */
 .tooltip-container {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   cursor: help;
-  z-index: 1000;
+  z-index: 9999;
+  gap: 8px;
 }
 
 .tooltip-text {
@@ -417,14 +621,14 @@
   width: 240px;
   background-color: #1f2937;
   color: #fff;
-  text-align: center;
+  text-align: left;
   border-radius: 8px;
   padding: 12px 16px;
   position: absolute;
-  z-index: 2147483647;
-  bottom: 130%;
-  left: 50%;
-  margin-left: -120px;
+  z-index: 999999;
+  top: 50%;
+  left: calc(100% + 12px);
+  transform: translateY(-50%);
   opacity: 0;
   transition: all 0.3s ease;
   font-size: 13px;
@@ -432,52 +636,61 @@
   text-transform: none;
   letter-spacing: normal;
   line-height: 1.5;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(8px);
   border: 1px solid #374151;
   pointer-events: none;
+  white-space: normal;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
 }
 
-.tooltip-text::after {
+.tooltip-text::before {
   content: "";
   position: absolute;
-  top: 100%;
-  left: 50%;
-  margin-left: -6px;
-  border-width: 6px;
-  border-style: solid;
-  border-color: #1f2937 transparent transparent transparent;
+  top: 50%;
+  left: -6px;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-right-color: #1f2937;
 }
 
 .tooltip-container:hover .tooltip-text {
   visibility: visible;
   opacity: 1;
-  transform: translateY(-4px);
+  transform: translateY(-50%) translateX(4px);
 }
 
 /* Tooltip positioning adjustments for edge cases */
-.tooltip-container:first-child .tooltip-text {
-  left: 0;
-  margin-left: 0;
-  transform: translateY(-4px);
+.tooltip-container:last-child .tooltip-text {
+  left: auto;
+  right: calc(100% + 12px);
+  transform: translateY(-50%);
 }
 
-.tooltip-container:last-child .tooltip-text {
-  right: 0;
+.tooltip-container:last-child .tooltip-text::before {
   left: auto;
-  margin-left: 0;
-  transform: translateY(-4px);
+  right: -6px;
+  border-right-color: transparent;
+  border-left-color: #f8fafc;
+}
+
+.tooltip-container:last-child:hover .tooltip-text {
+  transform: translateY(-50%) translateX(-4px);
 }
 
 /* Ensure tooltips appear above table overflow */
 .table-wrapper {
   position: relative;
-  z-index: 0;
+  z-index: 1;
+  overflow: visible;
 }
 
 /* Collection Cell */
 .collection-cell {
   min-width: 220px;
+  max-width: 250px;
 }
 
 .collection-info {
@@ -493,6 +706,7 @@
   object-fit: cover;
   border: 2px solid #e5e7eb;
   transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .collection-image:hover {
@@ -506,12 +720,18 @@
   margin-bottom: 2px;
   font-size: 15px;
   line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .collection-twitter {
   font-size: 12px;
   color: #6b7280;
   font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Specific Cell Styles */
@@ -519,7 +739,18 @@
   font-weight: 600;
   color: #111827;
   min-width: 160px;
+  max-width: 180px;
   font-size: 15px;
+}
+
+.holdings-cell {
+  font-weight: 600;
+  color: #111827;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
+  text-align: center;
+  min-width: 80px;
+  max-width: 100px;
 }
 
 .price-cell {
@@ -528,6 +759,8 @@
   font-family: 'Space Grotesk', sans-serif;
   font-size: 15px;
   letter-spacing: -0.025em;
+  min-width: 100px;
+  max-width: 120px;
 }
 
 .change-cell {
@@ -535,6 +768,8 @@
   font-family: 'Space Grotesk', sans-serif;
   font-size: 14px;
   letter-spacing: -0.025em;
+  min-width: 100px;
+  max-width: 120px;
 }
 
 .change-cell.positive {
@@ -558,6 +793,8 @@
   color: #111827;
   font-weight: 600;
   font-size: 14px;
+  min-width: 80px;
+  max-width: 100px;
 }
 
 .holders-cell {
@@ -565,6 +802,8 @@
   color: #111827;
   font-weight: 600;
   font-size: 14px;
+  min-width: 80px;
+  max-width: 100px;
 }
 
 .market-cap-cell {
@@ -572,10 +811,16 @@
   color: #111827;
   font-weight: 600;
   font-size: 14px;
+  min-width: 120px;
+  max-width: 150px;
+  position: relative;
+  overflow: visible;
 }
 
 .actions-cell {
   text-align: center;
+  min-width: 100px;
+  max-width: 120px;
 }
 
 .view-button {
@@ -682,7 +927,7 @@
 /* Responsive Design */
 @media (max-width: 1200px) {
   .strategies-table-container {
-    padding: 16px;
+    padding: 12px;
   }
   
   .table-header h2 {
@@ -691,6 +936,25 @@
   
   .strategies-table {
     min-width: 1200px;
+    font-size: 13px;
+  }
+  
+  .strategies-table th,
+  .strategies-table td {
+    padding: 14px 16px;
+    font-size: 13px;
+  }
+  
+  .collection-name {
+    font-size: 14px;
+  }
+  
+  .strategy-cell {
+    font-size: 14px;
+  }
+  
+  .price-cell {
+    font-size: 14px;
   }
 }
 
@@ -726,6 +990,7 @@
   .strategies-table th,
   .strategies-table td {
     padding: 12px 8px;
+    font-size: 12px;
   }
   
   .collection-info {
@@ -759,7 +1024,11 @@
   
   .tooltip-text {
     width: 180px;
-    margin-left: -90px;
+    font-size: 11px;
+    padding: 8px 12px;
+  }
+  
+  .custom-tooltip .tooltip-content {
     font-size: 11px;
     padding: 8px 12px;
   }
@@ -792,6 +1061,7 @@
   .strategies-table th,
   .strategies-table td {
     padding: 10px 6px;
+    font-size: 11px;
   }
   
   .collection-cell {
@@ -824,7 +1094,11 @@
   
   .tooltip-text {
     width: 140px;
-    margin-left: -70px;
+    font-size: 10px;
+    padding: 6px 8px;
+  }
+  
+  .custom-tooltip .tooltip-content {
     font-size: 10px;
     padding: 6px 8px;
   }

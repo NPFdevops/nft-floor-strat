@@ -496,6 +496,8 @@ export const fetchCollectionDetails = async (collectionSlug) => {
           statsKeys: data.stats ? Object.keys(data.stats) : [],
           floorInfo: data.stats?.floorInfo,
           salesTemporality: data.stats?.salesTemporalityUsd,
+          floortemporalityusd: data.stats?.floortemporalityusd,
+          floortemporalityusd_diff24h: data.stats?.floortemporalityusd?.diff24h,
           totalOwners: data.stats?.totalOwners,
           totalSupply: data.stats?.totalSupply
         });
@@ -524,10 +526,13 @@ export const fetchCollectionDetails = async (collectionSlug) => {
             volume_7d_eth: data.stats?.salesTemporalityEth?.volume?.val7d || data.volume_7d_eth || data.volume7dEth,
             volume_7d_usd: data.stats?.salesTemporalityUsd?.volume?.val7d || data.volume_7d_usd || data.volume7dUsd,
             
-            // Price changes from stats
-            price_change_24h: data.stats?.floorInfo?.floorChange24h || data.price_change_24h || data.priceChange24h,
+            // Price changes from stats - using floortemporalityusd.diff24h as requested
+            price_change_24h: data.stats?.floortemporalityusd?.diff24h || data.stats?.floorInfo?.floorChange24h || data.price_change_24h || data.priceChange24h,
             price_change_7d: data.stats?.floorInfo?.floorChange7d || data.price_change_7d || data.priceChange7d,
             price_change_30d: data.stats?.floorInfo?.floorChange30d || data.price_change_30d || data.priceChange30d,
+            
+            // Include the full floorTemporalityUsd object for detailed display
+            floorTemporalityUsd: data.stats?.floortemporalityusd || null,
             
             // Collection stats
             total_supply: data.stats?.totalSupply || data.total_supply || data.totalSupply,
@@ -553,7 +558,10 @@ export const fetchCollectionDetails = async (collectionSlug) => {
           collectionName: result.collectionName,
           floorPrice: result.data.floor_price_eth,
           marketCap: result.data.market_cap_usd,
-          holders: result.data.holders_count
+          holders: result.data.holders_count,
+          price_change_24h: result.data.price_change_24h,
+          price_change_24h_source: data.stats?.floortemporalityusd?.diff24h ? 'floortemporalityusd.diff24h' : 
+                                   data.stats?.floorInfo?.floorChange24h ? 'floorInfo.floorChange24h' : 'fallback'
         });
         
         // Cache the result with 5-minute TTL

@@ -49,7 +49,7 @@ const SkeletonTable = ({ rows = 10 }) => {
       {/* Screen reader announcement */}
       <div 
         aria-live="polite" 
-        aria-atomic="true" 
+        aria-atomic={true} 
         className="sr-only"
         role="status"
       >
@@ -89,7 +89,7 @@ const SkeletonTable = ({ rows = 10 }) => {
           role="table"
           aria-labelledby="strategies-table-title"
           aria-describedby="skeleton-table-description"
-          aria-busy="true"
+          aria-busy={true}
         >
           <caption id="skeleton-table-description" className="sr-only">
             Loading NFT strategies data. Please wait while the table content is being fetched.

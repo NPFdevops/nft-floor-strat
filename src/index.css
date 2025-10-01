@@ -21,12 +21,27 @@
   --success: #10b981;
   
   /* Spacing */
+  --space-2xs: 0.125rem;
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;
   --space-md: 1rem;
   --space-lg: 1.5rem;
   --space-xl: 2rem;
   --space-2xl: 3rem;
+  --space-3xl: 4rem;
+  
+  /* Component Spacing */
+  --container-padding: var(--space-md);
+  --card-padding: var(--space-md);
+  --section-spacing: var(--space-xl);
+  --element-spacing: var(--space-md);
+  --table-cell-padding: var(--space-sm) var(--space-md);
+  
+  /* Responsive Spacing */
+  --mobile-container-padding: var(--space-sm);
+  --mobile-card-padding: var(--space-sm);
+  --mobile-section-spacing: var(--space-lg);
+  --mobile-element-spacing: var(--space-sm);
   
   /* Typography */
   --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
