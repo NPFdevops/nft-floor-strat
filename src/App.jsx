@@ -34,7 +34,20 @@ function App() {
 
   // Strategy URL initialization effect - handle strategy routing from URL
   useEffect(() => {
-    if (!strategyName || strategies.length === 0) return;
+    console.log('🔗 Route changed - strategyName:', strategyName, 'strategies loaded:', strategies.length > 0);
+    
+    // Clear selected strategy if no strategy in URL
+    if (!strategyName) {
+      console.log('🔗 No strategy in URL, clearing selected strategy');
+      setSelectedStrategy(null);
+      return;
+    }
+    
+    // Wait for strategies to load
+    if (strategies.length === 0) {
+      console.log('🔗 Waiting for strategies to load...');
+      return;
+    }
     
     console.log('🔗 Initializing strategy from route:', strategyName);
     
@@ -46,6 +59,7 @@ function App() {
     } else {
       console.warn('🔗 Strategy not found for route param:', strategyName);
       // If strategy not found, redirect to strategies list
+      setSelectedStrategy(null);
       navigate('/nftstrategies', { replace: true });
     }
   }, [strategyName, strategies, navigate]);
@@ -54,12 +68,12 @@ function App() {
   const handleStrategySelect = (strategy) => {
     console.log('📊 Strategy selected for detailed view:', strategy);
     
+    // Update state first to avoid race conditions
+    setSelectedStrategy(strategy);
+    
     // Navigate to strategy detail URL
     const strategyUrl = createStrategyUrl(strategy);
     navigate(strategyUrl);
-    
-    // Update state
-    setSelectedStrategy(strategy);
     
     // Track strategy selection analytics
     posthogService.trackStrategyEvent('selected', strategy, {
@@ -72,18 +86,18 @@ function App() {
   const handleBackToStrategies = () => {
     console.log('⬅️ Navigating back to strategies list');
     
-    // Navigate back to strategies list URL
-    const strategiesUrl = createStrategiesUrl();
-    navigate(strategiesUrl);
-    
-    // Update state
-    setSelectedStrategy(null);
-    
-    // Track back navigation analytics
+    // Track back navigation analytics before clearing state
     posthogService.trackStrategyEvent('detail_back', selectedStrategy, {
       source: 'strategy_detail',
       navigation_method: 'back_button'
     });
+    
+    // Update state first to avoid race conditions
+    setSelectedStrategy(null);
+    
+    // Navigate back to strategies list URL
+    const strategiesUrl = createStrategiesUrl();
+    navigate(strategiesUrl);
   };
 
   // Handle strategies data update from StrategiesDataTable

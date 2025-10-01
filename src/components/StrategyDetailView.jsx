@@ -3,10 +3,12 @@ import TradingViewChart from './TradingViewChart';
 import MockChart from './MockChart';
 import DexScreenerChart from './DexScreenerChart';
 import Holdings from './Holdings';
+import StrategyDetailSkeleton from './StrategyDetailSkeleton';
 import { nftStrategyService } from '../services/nftStrategyService';
 import { holdingsService } from '../services/holdingsService';
 import { fetchFloorPriceHistory, fetchCollectionDetails } from '../services/nftAPI';
 import { collectionMappingService } from '../services/collectionMappingService';
+import { strategyToSlugMappingService } from '../services/strategyToSlugMapping';
 import { getDefaultDateRange, dateToTimestamp, getOptimalGranularity } from '../utils/dateUtils';
 
 // Helper function to generate mock price data for testing
@@ -37,7 +39,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
   const [holdingsData, setHoldingsData] = useState(null);
   const [salesData, setSalesData] = useState(null);
   const [collectionDetails, setCollectionDetails] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Only for initial page load
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [loadingStates, setLoadingStates] = useState({
@@ -59,7 +61,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
     const fetchDetailedData = async () => {
       try {
         console.log('🔍 StrategyDetailView: Starting to fetch detailed data for strategy:', strategy);
-        setLoading(true);
+        // Don't block the initial render with setLoading(true) - show skeleton instead
         setError(null);
         
         // Reset loading states
@@ -71,24 +73,33 @@ const StrategyDetailView = ({ strategy, onBack }) => {
           collection: true
         });
 
-        // Use collection slug or derive from collection name
-        const collectionSlug = strategy.collectionSlug || 
-          strategy.collectionName?.toLowerCase()
-            .replace(/\s+/g, '-')
-            .replace(/[^a-z0-9-]/g, '');
+        // Set main loading to false immediately to show page with skeleton
+        setLoading(false);
 
-        console.log(`📊 Fetching data for collection: ${collectionSlug}`);
+        // Use strategy-to-slug mapping service for accurate NFTPriceFloor API slug
+        const mappedSlug = strategyToSlugMappingService.getSlugFromStrategyName(strategy.collectionName);
+        const collectionSlug = strategy.collectionSlug || mappedSlug;
+        
+        console.log(`🔄 Strategy mapping: "${strategy.collectionName}" -> "${mappedSlug}"`);
+        console.log(`📊 Using NFTPriceFloor slug: ${collectionSlug}`);
+        
+        // Also check if we have an OpenSea slug and map that too
+        const openSeaSlug = strategy.collectionOsSlug;
+        if (openSeaSlug && !mappedSlug) {
+          const osToNftpfSlug = strategyToSlugMappingService.getSlugFromOpenSeaSlug(openSeaSlug);
+          console.log(`🌊 OpenSea slug mapping: "${openSeaSlug}" -> "${osToNftpfSlug}"`);
+        }
 
         // Fetch all data in parallel for better performance
         const dataPromises = [];
 
-        // 1. Fetch NFT floor price history using RapidAPI endpoint
+        // 1. Fetch NFT floor price history using RapidAPI endpoint with mapped slug
+        console.log(`🔗 Fetching NFT price history from: https://nftpf-api-v0.p.rapidapi.com/projects/${collectionSlug}/charts/1d`);
         dataPromises.push(
-          // Use a hardcoded API key for testing purposes
           fetch(`https://nftpf-api-v0.p.rapidapi.com/projects/${collectionSlug}/charts/1d`, {
             method: 'GET',
             headers: {
-              'X-RapidAPI-Key': import.meta.env.VITE_RAPIDAPI_KEY || '3b8dd0c4c2mshb5c7f1ffac6f8f7p1f2402jsn8d8a046005a9',
+              'X-RapidAPI-Key': import.meta.env.VITE_RAPIDAPI_KEY || '8365737378msh545ccf17407a091p1adbfcjsn47252db2d5db',
               'X-RapidAPI-Host': 'nftpf-api-v0.p.rapidapi.com'
             }
           })
@@ -100,37 +111,84 @@ const StrategyDetailView = ({ strategy, onBack }) => {
             })
             .then(result => {
               console.log('📈 NFT Price History Result from RapidAPI:', result);
+              console.log('🔍 API Response structure check:', {
+                hasTimestamps: !!result?.timestamps,
+                timestampsLength: result?.timestamps?.length,
+                hasFloorNative: !!result?.floorNative,
+                floorNativeLength: result?.floorNative?.length,
+                sampleData: {
+                  timestamp: result?.timestamps?.[0],
+                  price: result?.floorNative?.[0]
+                }
+              });
               
-              // Check if result has the expected structure
-              if (result && Array.isArray(result.data) && result.data.length > 0) {
-                console.log('Sample data point:', result.data[0]);
+              // Check if result has the expected structure (timestamps and floorNative arrays)
+              if (result && Array.isArray(result.timestamps) && Array.isArray(result.floorNative) && 
+                  result.timestamps.length > 0 && result.floorNative.length > 0) {
+                console.log(`✅ Found ${result.timestamps.length} timestamps and ${result.floorNative.length} floor prices`);
                 
                 // Transform the data to match the expected format for the chart
-                // Adjust the property names based on the actual API response structure
-                const transformedData = result.data.map(point => {
-                  // Try different possible property names for the price
-                  const price = point.floor_price || point.floorPrice || point.price || 0;
-                  const timestamp = point.timestamp || point.date || Date.now()/1000;
+                // Combine timestamps with floor prices
+                const transformedData = result.timestamps.map((timestamp, index) => {
+                  const price = result.floorNative[index];
                   
-                  return {
-                    x: new Date(timestamp * 1000), // Convert timestamp to Date object
+                  // Skip invalid data points
+                  if (!timestamp || !price || price <= 0) {
+                    return null;
+                  }
+                  
+                  const dataPoint = {
+                    x: new Date(timestamp), // Timestamp is already in milliseconds
                     y: parseFloat(price)
                   };
-                }).filter(point => point.y > 0);
+                  
+                  // Log first few data points for debugging
+                  if (index < 3) {
+                    console.log(`📊 Data point ${index}:`, {
+                      originalTimestamp: timestamp,
+                      dateObject: dataPoint.x,
+                      dateString: dataPoint.x.toISOString(),
+                      price: dataPoint.y
+                    });
+                  }
+                  
+                  return dataPoint;
+                }).filter(point => point !== null && point.y > 0);
                 
-                console.log('Transformed data:', transformedData);
+                console.log(`🔄 Transformed ${transformedData.length} data points (showing first 3):`, 
+                  transformedData.slice(0, 3).map(p => ({ 
+                    date: p.x.toISOString().split('T')[0], 
+                    price: p.y 
+                  })));
                 
                 if (transformedData.length > 0) {
+                   console.log('📈 Setting NFT price data...');
                    setNftPriceData(transformedData);
-                   console.log(`✅ Transformed ${transformedData.length} NFT price data points from RapidAPI`);
+                   console.log(`✅ Successfully loaded ${transformedData.length} NFT price data points from RapidAPI`);
+                   
+                   // Additional validation
+                   console.log('🔍 Data validation:', {
+                     allHaveValidDates: transformedData.every(p => p.x instanceof Date && !isNaN(p.x.getTime())),
+                     allHaveValidPrices: transformedData.every(p => typeof p.y === 'number' && p.y > 0),
+                     dateRange: {
+                       first: transformedData[0]?.x?.toISOString?.()?.split('T')[0],
+                       last: transformedData[transformedData.length - 1]?.x?.toISOString?.()?.split('T')[0]
+                     },
+                     priceRange: {
+                       min: Math.min(...transformedData.map(p => p.y)),
+                       max: Math.max(...transformedData.map(p => p.y))
+                     }
+                   });
                  } else {
                    console.warn('⚠️ No valid price data points after transformation');
-                   // Set empty array when no valid data is available
                    setNftPriceData([]);
                  }
                } else {
-                 console.warn('⚠️ No NFT price data available from RapidAPI:', result?.error || 'Unknown error');
-                 // Set empty array when API response is invalid
+                 console.warn('⚠️ Invalid API response structure:', {
+                   hasTimestamps: result?.timestamps ? `Array(${result.timestamps.length})` : 'Missing',
+                   hasFloorNative: result?.floorNative ? `Array(${result.floorNative.length})` : 'Missing',
+                   error: result?.error || result?.message
+                 });
                  setNftPriceData([]);
               }
               setLoadingStates(prev => ({ ...prev, nftPrice: false }));
@@ -144,7 +202,8 @@ const StrategyDetailView = ({ strategy, onBack }) => {
             })
         );
 
-        // 2. Fetch collection details
+        // 2. Fetch collection details using mapped slug
+        console.log(`🏛️ Fetching collection details for slug: ${collectionSlug}`);
         dataPromises.push(
           fetchCollectionDetails(collectionSlug)
             .then(result => {
@@ -207,8 +266,11 @@ const StrategyDetailView = ({ strategy, onBack }) => {
         );
 
         // 5. Fetch historical sales data from NFT Strategy API
+        // Use OpenSea slug if available, otherwise use the mapped slug
+        const salesApiSlug = strategy.collectionOsSlug || collectionSlug;
+        console.log(`📊 Fetching sales data with slug: ${salesApiSlug}`);
         dataPromises.push(
-          fetch(`https://www.nftstrategy.fun/api/opensea/floor-price?collectionOsSlug=${collectionSlug}&contractAddress=${strategy.collection || strategy.contractAddress}`)
+          fetch(`https://www.nftstrategy.fun/api/opensea/floor-price?collectionOsSlug=${salesApiSlug}&contractAddress=${strategy.collection || strategy.contractAddress}`)
             .then(response => {
               if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -273,8 +335,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
       } catch (err) {
         console.error('❌ StrategyDetailView: Failed to fetch detailed strategy data:', err);
         setError(err.message);
-      } finally {
-        setLoading(false);
+        // Don't set loading to false here as it's already false
       }
     };
 
@@ -349,11 +410,9 @@ const StrategyDetailView = ({ strategy, onBack }) => {
   );
 
   const renderOverviewTab = () => {
-    // Get collection slug for NFTPricefloor URL
-    const collectionSlug = strategy.collectionSlug || 
-      strategy.collectionName?.toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '');
+    // Get properly mapped collection slug for NFTPricefloor URL
+    const mappedSlug = strategyToSlugMappingService.getSlugFromStrategyName(strategy.collectionName);
+    const collectionSlug = strategy.collectionSlug || mappedSlug;
 
     return (
       <div className="space-y-6">
@@ -388,7 +447,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
               </thead>
               <tbody>
                 <tr className="border-b border-gray-200 hover:bg-gray-50">
-                  <td className="py-4 px-6 font-medium text-gray-700">Price (Current)</td>
+                  <td className="py-4 px-6 font-medium text-gray-700">Price</td>
                   <td className="py-4 px-6">
                     {loadingStates.collection ? (
                       <div className="flex items-center">
@@ -406,6 +465,37 @@ const StrategyDetailView = ({ strategy, onBack }) => {
                   </td>
                   <td className="py-4 px-6">
                     <span className="font-medium">{formatCurrencyWithDecimals(strategy.poolData?.price_usd, 4)}</span>
+                  </td>
+                </tr>
+                <tr className="border-b border-gray-200 hover:bg-gray-50">
+                  <td className="py-4 px-6 font-medium text-gray-700">24h Change</td>
+                  <td className="py-4 px-6">
+                    {loadingStates.collection ? (
+                      <div className="flex items-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                        <span className="text-gray-500">Loading...</span>
+                      </div>
+                    ) : (() => {
+                      // Get 24h change data from floorTemporalityUsd.diff24h as requested
+                      const diff24h = collectionDetails?.floorTemporalityUsd?.diff24h;
+                      const priceChange24h = collectionDetails?.price_change_24h;
+                      const finalValue = diff24h !== undefined && diff24h !== null ? diff24h : priceChange24h;
+                      
+                      return (
+                        <span className={`font-medium ${
+                          finalValue >= 0 ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                          {formatPercentage(finalValue)}
+                        </span>
+                      );
+                    })()}
+                  </td>
+                  <td className="py-4 px-6">
+                    <span className={`font-medium ${
+                      strategy.poolData?.price_change_24h >= 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {formatPercentage(strategy.poolData?.price_change_24h)}
+                    </span>
                   </td>
                 </tr>
                 <tr className="border-b border-gray-200 hover:bg-gray-50">
@@ -430,31 +520,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
                   </td>
                 </tr>
                 <tr className="border-b border-gray-200 hover:bg-gray-50">
-                  <td className="py-4 px-6 font-medium text-gray-700">24h % Change</td>
-                  <td className="py-4 px-6">
-                    {loadingStates.collection ? (
-                      <div className="flex items-center">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
-                        <span className="text-gray-500">Loading...</span>
-                      </div>
-                    ) : (
-                      <span className={`font-medium ${
-                        collectionDetails?.price_change_24h >= 0 ? 'text-green-600' : 'text-red-600'
-                      }`}>
-                        {formatPercentage(collectionDetails?.price_change_24h)}
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-4 px-6">
-                    <span className={`font-medium ${
-                      strategy.poolData?.price_change_24h >= 0 ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {formatPercentage(strategy.poolData?.price_change_24h)}
-                    </span>
-                  </td>
-                </tr>
-                <tr className="border-b border-gray-200 hover:bg-gray-50">
-                  <td className="py-4 px-6 font-medium text-gray-700">Number of Holders</td>
+                  <td className="py-4 px-6 font-medium text-gray-700">Holders</td>
                   <td className="py-4 px-6">
                     {loadingStates.collection ? (
                       <div className="flex items-center">
@@ -602,16 +668,26 @@ const StrategyDetailView = ({ strategy, onBack }) => {
                       <p className="text-gray-500">Loading NFT price data...</p>
                     </div>
                   </div>
-                ) : nftPriceData && nftPriceData.length > 0 ? (
-                  <TradingViewChart
-                    collections={[{
-                      name: strategy.collectionName || 'NFT Collection',
-                      data: nftPriceData
-                    }]}
-                    title={`${strategy.collectionName} Floor Price`}
-                    height={320}
-                  />
-                ) : (
+                ) : nftPriceData && nftPriceData.length > 0 ? (() => {
+                  console.log('🎨 Rendering TradingViewChart with data:', {
+                    collectionName: strategy.collectionName,
+                    dataLength: nftPriceData.length,
+                    sampleData: nftPriceData.slice(0, 3),
+                    firstPoint: nftPriceData[0],
+                    lastPoint: nftPriceData[nftPriceData.length - 1]
+                  });
+                  
+                  return (
+                    <TradingViewChart
+                      collections={[{
+                        name: strategy.collectionName || 'NFT Collection',
+                        data: nftPriceData
+                      }]}
+                      title={`${strategy.collectionName} Floor Price`}
+                      height={320}
+                    />
+                  );
+                })() : (
                   <div className="flex items-center justify-center h-72 sm:h-80">
                     <div className="text-center">
                       <div className="text-gray-400 text-5xl mb-3">📊</div>
@@ -872,7 +948,10 @@ const StrategyDetailView = ({ strategy, onBack }) => {
     );
   };
 
-  if (loading) return renderLoadingState();
+  // Show skeleton during initial loading or when essential data is missing
+  const showSkeleton = loading || (!strategy && !error);
+  
+  if (showSkeleton) return <StrategyDetailSkeleton />;
   if (error) return renderErrorState();
   if (!strategy) {
     return (

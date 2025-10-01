@@ -5,6 +5,7 @@ import { fetchTopCollections } from '../services/nftAPI.js';
 import { holdingsService } from '../services/holdingsService.js';
 import SkeletonTable from './SkeletonTable.jsx';
 import { posthogService } from '../services/posthogService';
+import { strategyToSlugMappingService } from '../services/strategyToSlugMapping';
 
 const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
   const [strategies, setStrategies] = useState([]);
@@ -45,14 +46,30 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
         // Enhance data with holdings count for each strategy
         const finalData = await Promise.all(enhancedData.map(async (strategy) => {
           try {
-            // Get market cap from NFTpricefloor API using the pre-fetched collections data
+            // Get market cap from NFTpricefloor API using the mapping service for accurate matching
             let nftPriceFloorMarketCap = null;
             
             if (allCollections.length > 0) {
-              const project = allCollections.find(p => 
-                p.name.toLowerCase().includes(strategy.collectionName.toLowerCase()) ||
-                strategy.collectionName.toLowerCase().includes(p.name.toLowerCase())
-              );
+              // Use mapping service to get the correct NFTPriceFloor slug
+              const mappedSlug = strategyToSlugMappingService.getSlugFromStrategyName(strategy.collectionName);
+              console.log(`🔄 Mapping "${strategy.collectionName}" -> "${mappedSlug}"`);
+              
+              // Try to find collection by mapped slug first (most accurate)
+              let project = allCollections.find(p => p.slug === mappedSlug);
+              
+              // Fallback to name matching if slug match fails
+              if (!project) {
+                project = allCollections.find(p => 
+                  p.name.toLowerCase().includes(strategy.collectionName.toLowerCase()) ||
+                  strategy.collectionName.toLowerCase().includes(p.name.toLowerCase())
+                );
+                if (project) {
+                  console.log(`⚠️ Slug match failed, using name match for "${strategy.collectionName}": ${project.name}`);
+                }
+              } else {
+                console.log(`✅ Found exact slug match for "${strategy.collectionName}": ${project.slug}`);
+              }
+              
               if (project && project.marketCap) {
                 nftPriceFloorMarketCap = project.marketCap;
               }

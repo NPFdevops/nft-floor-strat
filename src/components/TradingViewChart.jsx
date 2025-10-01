@@ -30,7 +30,20 @@ const TradingViewChart = ({
   ];
 
   useEffect(() => {
-    if (!chartContainerRef.current) return;
+    console.log('📈 TradingViewChart useEffect triggered with collections:', {
+      collectionsCount: collections?.length,
+      collections: collections?.map(c => ({
+        name: c?.name,
+        dataLength: c?.data?.length,
+        hasValidData: c && c.data && Array.isArray(c.data) && c.data.length > 0,
+        sampleData: c?.data?.slice(0, 2)
+      }))
+    });
+    
+    if (!chartContainerRef.current) {
+      console.log('⚠️ TradingViewChart: No chart container ref');
+      return;
+    }
 
     // Clean up existing chart
     if (chartRef.current) {
@@ -112,7 +125,16 @@ const TradingViewChart = ({
 
     // Add line series for each collection
     collections.forEach((collection, index) => {
+      console.log(`📊 Processing collection ${index}:`, {
+        name: collection?.name,
+        hasData: !!collection?.data,
+        dataIsArray: Array.isArray(collection?.data),
+        dataLength: collection?.data?.length,
+        sampleData: collection?.data?.slice(0, 2)
+      });
+      
       if (collection && collection.data && Array.isArray(collection.data) && collection.data.length > 0) {
+        console.log(`✅ Collection ${index} (${collection.name}) has valid data, creating series...`);
         try {
           // Use v5.0 API with AreaSeries type for gradient fill
           const colorConfig = colors[index] || colors[0];
@@ -123,40 +145,83 @@ const TradingViewChart = ({
             lineWidth: 2,
             priceLineVisible: false, // Hide price line for cleaner look
           });
+          
+          console.log(`📊 Created area series for ${collection.name}`);
 
         // Convert data format for TradingView Lightweight Charts
         // Data format: [{ time: '2018-12-22', value: 32.51 }, ...]
-        const chartData = collection.data
-          .filter(point => {
-            return point && 
-                   point.x && 
-                   point.y !== undefined && 
-                   point.y !== null && 
-                   !isNaN(point.y) && 
-                   point.y > 0;
-          })
+        console.log(`🔄 Converting data for ${collection.name}:`, {
+          rawDataLength: collection.data.length,
+          firstRawPoint: collection.data[0],
+          lastRawPoint: collection.data[collection.data.length - 1]
+        });
+        
+        const filteredData = collection.data.filter(point => {
+          const isValid = point && 
+                         point.x && 
+                         point.y !== undefined && 
+                         point.y !== null && 
+                         !isNaN(point.y) && 
+                         point.y > 0;
+          if (!isValid && point) {
+            console.log('⚠️ Filtering out invalid point:', point);
+          }
+          return isValid;
+        });
+        
+        console.log(`🧽 Filtered data length: ${filteredData.length}`);
+        
+        const chartData = filteredData
           .map(point => {
             try {
-              // Convert to YYYY-MM-DD format as required by TradingView
-              const date = point.x instanceof Date ? point.x : new Date(point.x);
-              if (isNaN(date.getTime())) {
-                console.warn('Invalid date:', point.x);
-                return null;
+              // TradingView expects Unix timestamp in seconds, not milliseconds
+              let timestamp;
+              
+              if (point.x instanceof Date) {
+                timestamp = Math.floor(point.x.getTime() / 1000); // Convert to seconds
+              } else if (typeof point.x === 'number') {
+                // If it's already a timestamp, check if it's in milliseconds or seconds
+                timestamp = point.x > 1000000000000 ? Math.floor(point.x / 1000) : point.x;
+              } else {
+                const date = new Date(point.x);
+                if (isNaN(date.getTime())) {
+                  console.warn('❌ Invalid date:', point.x);
+                  return null;
+                }
+                timestamp = Math.floor(date.getTime() / 1000); // Convert to seconds
               }
-              const time = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+              
               const value = parseFloat(point.y);
-              return { time, value };
+              const converted = { time: timestamp, value };
+              
+              console.log('Converted timestamp:', {
+                original: point.x,
+                converted: timestamp,
+                date: new Date(timestamp * 1000).toISOString(),
+                value: value
+              });
+              
+              return converted;
             } catch (error) {
-              console.warn('Error processing data point:', point, error);
+              console.warn('❌ Error processing data point:', point, error);
               return null;
             }
           })
           .filter(point => point !== null && point.value > 0)
-          .sort((a, b) => new Date(a.time) - new Date(b.time));
+          .sort((a, b) => a.time - b.time); // Sort by Unix timestamp
+
+        console.log(`📊 Final chart data for ${collection.name}:`, {
+          length: chartData.length,
+          firstPoint: chartData[0],
+          lastPoint: chartData[chartData.length - 1],
+          samplePoints: chartData.slice(0, 3)
+        });
 
         if (chartData.length > 0) {
+          console.log(`📊 Setting data on area series for ${collection.name}...`);
           areaSeries.setData(chartData);
           seriesRefs.current[index] = areaSeries;
+          console.log(`✅ Successfully set ${chartData.length} data points on series`);
           
           // Add custom tooltip formatting
           areaSeries.applyOptions({
@@ -175,7 +240,15 @@ const TradingViewChart = ({
     });
 
     // Fit content to show all data
-    chart.timeScale().fitContent();
+    console.log('📊 Fitting chart content and checking series count...');
+    console.log('🗐️ Series created:', seriesRefs.current.length);
+    
+    if (seriesRefs.current.length > 0) {
+      console.log('🎯 Calling fitContent() on chart timeScale...');
+      chart.timeScale().fitContent();
+    } else {
+      console.warn('⚠️ No series created, chart may be empty');
+    }
 
     // Handle resize
     const handleResize = () => {
