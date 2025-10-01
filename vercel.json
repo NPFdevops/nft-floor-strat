@@ -17,6 +17,14 @@
   },
   "rewrites": [
     {
+      "source": "/api/strategies",
+      "destination": "/api/strategies"
+    },
+    {
+      "source": "/api/holdings",
+      "destination": "/api/holdings"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

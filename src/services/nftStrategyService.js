@@ -3,10 +3,8 @@ import { cacheService } from './cacheService.js';
 
 class NFTStrategyService {
   constructor() {
-    // Use direct external API in production, proxy in development
-    this.baseURL = import.meta.env.PROD 
-      ? 'https://www.nftstrategy.fun/api/strategies'
-      : '/api/strategies';
+    // Use relative API paths for both dev and production (handled by Vite proxy in dev, Vercel serverless functions in prod)
+    this.baseURL = '/api/strategies';
     this.cache = new Map();
     this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
     
@@ -58,8 +56,21 @@ class NFTStrategyService {
         timeout: 30000
       });
 
+      // Enhanced error detection for HTML responses (common in Vercel deployment issues)
+      const contentType = response.headers['content-type'] || '';
+      if (contentType.includes('text/html')) {
+        const htmlSnippet = typeof response.data === 'string' 
+          ? response.data.substring(0, 100) 
+          : String(response.data).substring(0, 100);
+        throw new Error(`Received HTML instead of JSON. This usually indicates a deployment/routing issue. Response: ${htmlSnippet}...`);
+      }
+
       if (!response.data || !Array.isArray(response.data)) {
-        throw new Error('Invalid response format from nftstrategy API');
+        const dataType = Array.isArray(response.data) ? 'array' : typeof response.data;
+        const dataSnippet = typeof response.data === 'string' 
+          ? response.data.substring(0, 100) 
+          : JSON.stringify(response.data).substring(0, 100);
+        throw new Error(`Invalid response format from nftstrategy API. Expected array, got ${dataType}. Data: ${dataSnippet}...`);
       }
 
       const strategies = response.data;
@@ -71,7 +82,13 @@ class NFTStrategyService {
       return strategies;
       
     } catch (error) {
-      console.error('❌ Failed to fetch strategies:', error.message);
+      console.error('❌ Failed to fetch strategies:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        url: this.baseURL,
+        headers: error.response?.headers
+      });
       
       // Return cached data if available, even if expired
       const cached = this.cache.get(cacheKey);
