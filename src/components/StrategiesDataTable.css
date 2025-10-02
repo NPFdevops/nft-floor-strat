@@ -545,7 +545,7 @@
 }
 
 .clickable-row:hover {
-  background-color: #000000;
+  background-color: #F11F9D;
   color: #ffffff;
   transform: translateY(-1px);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
@@ -640,15 +640,15 @@
 }
 
 .strategies-table tbody tr:hover {
-  background-color: #000000;
+  background-color: #F11F9D;
   color: #ffffff;
   transform: translateY(-1px);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
-/* Ensure collection cell gets black background on hover for all screen sizes */
+/* Ensure collection cell gets pink background on hover for all screen sizes */
 .strategies-table tbody tr:hover .collection-cell {
-  background-color: #000000 !important;
+  background-color: #F11F9D !important;
   color: #ffffff !important;
 }
 
@@ -1568,7 +1568,7 @@
   }
   
   .strategies-table tbody tr:hover .collection-cell {
-    background-color: #000000;
+    background-color: #F11F9D;
     color: #ffffff;
   }
   
@@ -1605,13 +1605,22 @@
   }
 }
 
-/* Make NFT collection name black */
+/* Make NFT collection name black by default, but white on hover */
 .collection-cell {
   color: #000000 !important;
 }
 
 .collection-cell .collection-name {
   color: #000000 !important;
+}
+
+/* Ensure collection name is white when row is hovered in light mode */
+.strategies-table tbody tr:hover .collection-cell .collection-name {
+  color: #ffffff !important;
+}
+
+.strategies-table tbody tr:hover .collection-cell .strategy-name {
+  color: #cccccc !important;
 }
 
 /* Error Message Styles */
