@@ -1,9 +1,9 @@
 /**
- * Strategy to NFTPriceFloor Slug Mapping Service
+ * Strategy to NFTPriceFloor Slug Mapping Service (Enhanced Version)
  * Maps NFT strategy collection names to their corresponding NFTPriceFloor API slugs
  * 
- * This service handles the mapping between strategy collection names from nftstrategy.fun
- * and the slugs used by the NFTPriceFloor API for fetching price history data.
+ * This enhanced version includes better logging and more robust error handling
+ * to help debug any issues with collection name mapping.
  */
 
 class StrategyToSlugMappingService {
@@ -18,6 +18,7 @@ class StrategyToSlugMappingService {
       'Moonbirds': 'proof-moonbirds',
       'moonbirds': 'proof-moonbirds',
       'Proof Moonbirds': 'proof-moonbirds',
+      'MOONBIRDS': 'proof-moonbirds',
       
       // Chromie Squiggles - Uses specific Art Blocks slug
       'Chromie Squiggles': 'chromie-squiggle-art-blocks-curated',
@@ -207,157 +208,7 @@ class StrategyToSlugMappingService {
       'CryptoKitties': 'cryptokitties',
       'cryptokitties': 'cryptokitties',
       'Crypto Kitties': 'cryptokitties',
-      'crypto kitties': 'cryptokitties',
-      
-      // Additional mappings for common variations and new collections
-      'Captainz': 'captainz',
-      'captainz': 'captainz',
-      'The Captainz': 'the-captainz',
-      'the captainz': 'the-captainz',
-      
-      // Tensorians
-      'Tensorians': 'tensorians',
-      'tensorians': 'tensorians',
-      
-      // Women Unite
-      'Women Unite': 'women-unite',
-      'women unite': 'women-unite',
-      
-      // Lazy Lions
-      'Lazy Lions': 'lazy-lions',
-      'lazy lions': 'lazy-lions',
-      
-      // Robotos
-      'Robotos Official': 'robotos-official',
-      'robotos official': 'robotos-official',
-      'Robotos': 'robotos-official',
-      'robotos': 'robotos-official',
-      
-      // Sneaky Vampire Syndicate
-      'Sneaky Vampire Syndicate': 'sneaky-vampire-syndicate',
-      'sneaky vampire syndicate': 'sneaky-vampire-syndicate',
-      
-      // Pudgy Rods
-      'Pudgy Rods': 'pudgy-rods',
-      'pudgy rods': 'pudgy-rods',
-      
-      // ENS Domains
-      'ENS Domains': 'ens-domains',
-      'ens domains': 'ens-domains',
-      'ENS': 'ens-domains',
-      'ens': 'ens-domains',
-      
-      // Sup Ducks
-      'Sup Ducks': 'sup-ducks',
-      'sup ducks': 'sup-ducks',
-      
-      // Penguins
-      'Penguins': 'penguins',
-      'penguins': 'penguins',
-      
-      // Bears Deluxe
-      'Bears Deluxe': 'bears-deluxe',
-      'bears deluxe': 'bears-deluxe',
-      
-      // Art Blocks variations
-      'Art Blocks Playground': 'art-blocks-playground',
-      'art blocks playground': 'art-blocks-playground',
-      
-      // CryptoCoven
-      'CryptoCoven': 'cryptocoven',
-      'cryptocoven': 'cryptocoven',
-      'Crypto Coven': 'cryptocoven',
-      'crypto coven': 'cryptocoven',
-      
-      // Foundation
-      'Foundation': 'foundation',
-      'foundation': 'foundation',
-      
-      // SuperRare
-      'SuperRare': 'superrare',
-      'superrare': 'superrare',
-      'Super Rare': 'superrare',
-      'super rare': 'superrare',
-      
-      // Async Art
-      'Async Art': 'async-art',
-      'async art': 'async-art',
-      
-      // KnownOrigin
-      'KnownOrigin': 'knownorigin',
-      'knownorigin': 'knownorigin',
-      'Known Origin': 'knownorigin',
-      'known origin': 'knownorigin',
-      
-      // MakersPlace
-      'MakersPlace': 'makersplace',
-      'makersplace': 'makersplace',
-      'Makers Place': 'makersplace',
-      'makers place': 'makersplace',
-      
-      // Nifty Gateway
-      'Nifty Gateway': 'nifty-gateway',
-      'nifty gateway': 'nifty-gateway',
-      
-      // Rarible
-      'Rarible': 'rarible',
-      'rarible': 'rarible',
-      
-      // More Loot variations
-      'Bloot': 'bloot',
-      'bloot': 'bloot',
-      'More Loot': 'more-loot',
-      'more loot': 'more-loot',
-      'Synthetic Loot': 'synthetic-loot',
-      'synthetic loot': 'synthetic-loot',
-      
-      // Fame Lady Squad
-      'Fame Lady Squad': 'fame-lady-squad',
-      'fame lady squad': 'fame-lady-squad',
-      
-      // Gutter Cat Gang
-      'Gutter Cat Gang': 'gutter-cat-gang',
-      'gutter cat gang': 'gutter-cat-gang',
-      
-      // HAPEPRIME
-      'HAPEPRIME': 'hapeprime',
-      'hapeprime': 'hapeprime',
-      'Hape Prime': 'hapeprime',
-      'hape prime': 'hapeprime',
-      
-      // Gaming collections
-      'Sorare': 'sorare',
-      'sorare': 'sorare',
-      'Gods Unchained Cards': 'gods-unchained-cards',
-      'gods unchained cards': 'gods-unchained-cards',
-      'Axie Infinity': 'axie-infinity',
-      'axie infinity': 'axie-infinity',
-      
-      // The Sandbox Assets
-      'The Sandbox Assets': 'the-sandbox-assets',
-      'the sandbox assets': 'the-sandbox-assets',
-      
-      // Virtual worlds
-      'Cryptovoxels': 'cryptovoxels',
-      'cryptovoxels': 'cryptovoxels',
-      'Somnium Space': 'somnium-space',
-      'somnium space': 'somnium-space',
-      
-      // Sports collections
-      'NBA Top Shot': 'nba-top-shot',
-      'nba top shot': 'nba-top-shot',
-      'UFC Strike': 'ufc-strike',
-      'ufc strike': 'ufc-strike',
-      'MLB Champions': 'mlb-champions',
-      'mlb champions': 'mlb-champions',
-      
-      // Digital collectibles
-      'VeVe Collectibles': 'veve-collectibles',
-      'veve collectibles': 'veve-collectibles',
-      'Ecomi Collectibles': 'ecomi-collectibles',
-      'ecomi collectibles': 'ecomi-collectibles',
-      'Terra Virtua Kolect': 'terra-virtua-kolect',
-      'terra virtua kolect': 'terra-virtua-kolect'
+      'crypto kitties': 'cryptokitties'
     };
 
     // Additional mapping for OpenSea slugs to NFTPriceFloor slugs
@@ -394,6 +245,10 @@ class StrategyToSlugMappingService {
       'deadfellaz': 'deadfellaz',
       'cyberkongz': 'cyberkongz'
     };
+
+    // Enable enhanced logging
+    this.debugMode = true;
+    this.lastUsedMappings = new Map();
   }
 
   /**
@@ -403,12 +258,23 @@ class StrategyToSlugMappingService {
    */
   getSlugFromStrategyName(strategyCollectionName) {
     if (!strategyCollectionName) {
+      if (this.debugMode) {
+        console.warn('🔍 [MAPPING] Empty collection name provided');
+      }
       return null;
+    }
+
+    if (this.debugMode) {
+      console.log(`🔍 [MAPPING] Looking up slug for: "${strategyCollectionName}"`);
     }
 
     // Try direct lookup first
     const directMatch = this.strategyToSlugMap[strategyCollectionName];
     if (directMatch) {
+      if (this.debugMode) {
+        console.log(`✅ [MAPPING] Direct match: "${strategyCollectionName}" -> "${directMatch}"`);
+      }
+      this.recordMapping(strategyCollectionName, directMatch, 'direct');
       return directMatch;
     }
 
@@ -416,6 +282,10 @@ class StrategyToSlugMappingService {
     const lowerCaseName = strategyCollectionName.toLowerCase();
     const caseInsensitiveMatch = this.strategyToSlugMap[lowerCaseName];
     if (caseInsensitiveMatch) {
+      if (this.debugMode) {
+        console.log(`✅ [MAPPING] Case-insensitive match: "${strategyCollectionName}" -> "${caseInsensitiveMatch}"`);
+      }
+      this.recordMapping(strategyCollectionName, caseInsensitiveMatch, 'case_insensitive');
       return caseInsensitiveMatch;
     }
 
@@ -424,15 +294,44 @@ class StrategyToSlugMappingService {
     for (const [key, slug] of Object.entries(this.strategyToSlugMap)) {
       const normalizedKey = key.toLowerCase();
       if (normalizedInput.includes(normalizedKey) || normalizedKey.includes(normalizedInput)) {
+        if (this.debugMode) {
+          console.log(`✅ [MAPPING] Fuzzy match: "${strategyCollectionName}" -> "${slug}" (via "${key}")`);
+        }
+        this.recordMapping(strategyCollectionName, slug, 'fuzzy');
         return slug;
       }
     }
 
+    // Special handling for Moonbirds variations
+    if (normalizedInput.includes('moonbird')) {
+      const moonbirdsSlug = 'proof-moonbirds';
+      if (this.debugMode) {
+        console.log(`🦅 [MAPPING] Special Moonbirds handling: "${strategyCollectionName}" -> "${moonbirdsSlug}"`);
+      }
+      this.recordMapping(strategyCollectionName, moonbirdsSlug, 'special_moonbirds');
+      return moonbirdsSlug;
+    }
+
     // If no match found, try to create a reasonable slug
     const generatedSlug = this.generateSlugFromName(strategyCollectionName);
-    console.warn(`⚠️ No mapping found for strategy "${strategyCollectionName}". Generated slug: "${generatedSlug}"`);
+    if (this.debugMode) {
+      console.warn(`⚠️ [MAPPING] No direct mapping found for "${strategyCollectionName}". Generated slug: "${generatedSlug}"`);
+      console.warn(`💡 [MAPPING] Consider adding this mapping to strategyToSlugMap: '${strategyCollectionName}': '${generatedSlug}'`);
+    }
     
+    this.recordMapping(strategyCollectionName, generatedSlug, 'generated');
     return generatedSlug;
+  }
+
+  /**
+   * Record mapping usage for debugging
+   */
+  recordMapping(input, output, method) {
+    this.lastUsedMappings.set(input, {
+      output,
+      method,
+      timestamp: new Date().toISOString()
+    });
   }
 
   /**
@@ -445,13 +344,23 @@ class StrategyToSlugMappingService {
       return null;
     }
 
+    if (this.debugMode) {
+      console.log(`🌊 [MAPPING] Looking up OpenSea slug: "${openSeaSlug}"`);
+    }
+
     // Try direct lookup in OpenSea slug map
     const directMatch = this.openSeaSlugMap[openSeaSlug.toLowerCase()];
     if (directMatch) {
+      if (this.debugMode) {
+        console.log(`✅ [MAPPING] OpenSea match: "${openSeaSlug}" -> "${directMatch}"`);
+      }
       return directMatch;
     }
 
     // Try using the OpenSea slug as-is (many are identical)
+    if (this.debugMode) {
+      console.log(`⚠️ [MAPPING] No OpenSea mapping found, using as-is: "${openSeaSlug}"`);
+    }
     return openSeaSlug.toLowerCase();
   }
 
@@ -481,12 +390,14 @@ class StrategyToSlugMappingService {
    */
   addMapping(strategyName, nftPriceFloorSlug) {
     if (!strategyName || !nftPriceFloorSlug) {
-      console.warn('⚠️ Cannot add mapping: both strategyName and nftPriceFloorSlug are required');
+      console.warn('⚠️ [MAPPING] Cannot add mapping: both strategyName and nftPriceFloorSlug are required');
       return;
     }
 
     this.strategyToSlugMap[strategyName] = nftPriceFloorSlug;
-    console.log(`✅ Added new mapping: "${strategyName}" -> "${nftPriceFloorSlug}"`);
+    if (this.debugMode) {
+      console.log(`✅ [MAPPING] Added new mapping: "${strategyName}" -> "${nftPriceFloorSlug}"`);
+    }
   }
 
   /**
@@ -503,17 +414,19 @@ class StrategyToSlugMappingService {
    * @returns {boolean} True if mapping exists
    */
   hasMapping(strategyName) {
-    return this.getSlugFromStrategyName(strategyName) !== null;
+    const slug = this.getSlugFromStrategyName(strategyName);
+    return slug !== null && slug !== 'unknown-collection';
   }
 
   /**
-   * Get mapping statistics
+   * Get mapping statistics and recent usage
    * @returns {Object} Mapping statistics
    */
   getStats() {
     return {
       totalMappings: Object.keys(this.strategyToSlugMap).length,
       totalOpenSeaMappings: Object.keys(this.openSeaSlugMap).length,
+      recentMappings: Array.from(this.lastUsedMappings.entries()).slice(-10),
       lastUpdated: new Date().toISOString()
     };
   }
@@ -534,8 +447,42 @@ class StrategyToSlugMappingService {
       hasMapping: this.hasMapping(name)
     }));
   }
+
+  /**
+   * Enable or disable debug logging
+   * @param {boolean} enabled - Whether to enable debug logging
+   */
+  setDebugMode(enabled) {
+    this.debugMode = enabled;
+    if (enabled) {
+      console.log('🔧 [MAPPING] Debug mode enabled');
+    }
+  }
+
+  /**
+   * Test specific problematic collection names
+   * @param {Array<string>} collectionNames - Collection names to test
+   */
+  testMappings(collectionNames) {
+    console.log('🧪 [MAPPING] Testing collection mappings...');
+    console.log('-'.repeat(50));
+    
+    collectionNames.forEach((name, index) => {
+      const slug = this.getSlugFromStrategyName(name);
+      const hasMapping = this.hasMapping(name);
+      console.log(`${index + 1}. "${name}" -> "${slug}" ${hasMapping ? '✅' : '⚠️'}`);
+    });
+  }
 }
 
-// Create and export a singleton instance
-export const strategyToSlugMappingService = new StrategyToSlugMappingService();
-export default strategyToSlugMappingService;
+// Create and export a singleton instance with enhanced logging
+const strategyToSlugMappingServiceV2 = new StrategyToSlugMappingService();
+
+// Enable debug mode by default to help troubleshoot issues
+strategyToSlugMappingServiceV2.setDebugMode(true);
+
+console.log('🚀 [MAPPING] Enhanced Strategy-to-Slug Mapping Service initialized');
+console.log('📊 [MAPPING] Loaded', strategyToSlugMappingServiceV2.getStats().totalMappings, 'mappings');
+
+export { strategyToSlugMappingServiceV2 };
+export default strategyToSlugMappingServiceV2;

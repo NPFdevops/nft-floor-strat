@@ -202,7 +202,7 @@ const SearchBar = ({
                   className="flex items-center p-3 cursor-pointer hover:bg-gray-50 border-b border-gray-200 last:border-b-0"
                   onClick={() => handleCollectionSelect(collection)}
                 >
-                  <div className="w-10 h-10 mr-3 flex-shrink-0">
+                  <div className="w-10 h-10 mr-4 sm:mr-5 flex-shrink-0">
                     <img 
                       src={collection.image} 
                       alt={collection.name}

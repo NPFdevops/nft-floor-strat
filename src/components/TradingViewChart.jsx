@@ -86,7 +86,7 @@ const TradingViewChart = ({
             top: 0.1,
             bottom: 0.1,
           },
-          // Format price scale to show ETH suffix
+          // Format price scale to show ETH suffix with 2 decimal places
           priceFormat: {
             type: 'price',
             precision: 2,
@@ -97,22 +97,22 @@ const TradingViewChart = ({
           borderVisible: false,
           timeVisible: true,
           secondsVisible: false,
-          // Disable interaction to keep chart static
-          rightBarStaysOnScroll: true,
-          lockVisibleTimeRangeOnResize: true,
+          // Enable interaction for zoom and pan
+          rightBarStaysOnScroll: false,
+          lockVisibleTimeRangeOnResize: false,
         },
-        // Disable interactions to make chart static
+        // Enable interactions for interactive chart
         handleScroll: {
-          mouseWheel: false,
-          pressedMouseMove: false,
-          horzTouchDrag: false,
-          vertTouchDrag: false,
+          mouseWheel: true,
+          pressedMouseMove: true,
+          horzTouchDrag: true,
+          vertTouchDrag: true,
         },
         handleScale: {
-          mouseWheel: false,
-          pinch: false,
-          axisPressedMouseMove: false,
-          axisDoubleClickReset: false,
+          mouseWheel: true,
+          pinch: true,
+          axisPressedMouseMove: true,
+          axisDoubleClickReset: true,
         },
         watermark: {
           visible: false, // Disable text watermark since we'll use image overlay
@@ -223,12 +223,12 @@ const TradingViewChart = ({
           seriesRefs.current[index] = areaSeries;
           console.log(`✅ Successfully set ${chartData.length} data points on series`);
           
-          // Add custom tooltip formatting
+          // Add custom tooltip formatting with 2 decimal places
           areaSeries.applyOptions({
             priceFormat: {
               type: 'custom',
               formatter: (price) => {
-                return `${parseFloat(price).toFixed(4)} ETH`;
+                return `${parseFloat(price).toFixed(2)} ETH`;
               },
             },
           });

@@ -6,8 +6,10 @@ import { holdingsService } from '../services/holdingsService.js';
 import SkeletonTable from './SkeletonTable.jsx';
 import { posthogService } from '../services/posthogService';
 import { strategyToSlugMappingService } from '../services/strategyToSlugMapping';
+import { useTheme } from '../contexts/ThemeContext';
 
 const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
+  const { isDark } = useTheme();
   const [strategies, setStrategies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -299,7 +301,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
     const isRateLimitError = error.includes('429') || error.includes('rate limit');
     
     return (
-      <div className="strategies-table-container">
+      <div className={`strategies-table-container ${isDark ? 'dark' : ''}`}>
         <div className="error-message">
           <h3>🚫 Unable to Load Strategies</h3>
           <p className="error-details">{error}</p>
@@ -368,7 +370,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
   }
 
   return (
-    <div className="strategies-table-container">
+    <div className={`strategies-table-container ${isDark ? 'dark' : ''}`}>
       <div className="table-wrapper">
         <table 
           className="strategies-table"
@@ -548,7 +550,10 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                         }}
                       />
                     )}
-                    <span className="collection-name">{strategy.collectionName || 'Unknown'}</span>
+                    <div className="collection-text-content">
+                      <div className="collection-name">{strategy.collectionName || 'Unknown'}</div>
+                      <div className="strategy-name">{strategy.tokenName || 'N/A'}</div>
+                    </div>
                   </div>
                 </td>
                 <td className="strategy-cell" role="gridcell">
@@ -621,6 +626,21 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
             ))}
           </tbody>
         </table>
+      </div>
+      
+      {/* Data Attribution */}
+      <div className="mt-4 text-center">
+        <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+          Data by{' '}
+          <a 
+            href="https://nftstrategy.fun" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className={`${isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'} underline transition-colors`}
+          >
+            NFTStrategy.fun
+          </a>
+        </p>
       </div>
     </div>
   );
