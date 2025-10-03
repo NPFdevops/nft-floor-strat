@@ -13,10 +13,44 @@
 
 .strategies-table-container {
   width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: var(--container-padding);
+  margin: 0;
+  padding: 0;
   font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+/* Dark mode styles */
+.strategies-table-container.dark {
+  color: #ffffff;
+}
+
+.strategies-table-container.dark .table-header h2 {
+  color: #ffffff;
+}
+
+.strategies-table-container.dark .search-input {
+  background: #1f2937;
+  border-color: #374151;
+  color: #ffffff;
+}
+
+.strategies-table-container.dark .search-input:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.1);
+}
+
+.strategies-table-container.dark .items-per-page label {
+  color: #d1d5db;
+}
+
+.strategies-table-container.dark .items-per-page select {
+  background: #1f2937;
+  border-color: #374151;
+  color: #ffffff;
+}
+
+.strategies-table-container.dark .items-per-page select:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.1);
 }
 
 @media (max-width: 768px) {
@@ -73,7 +107,7 @@
 .search-input {
   padding: var(--space-sm) var(--space-md);
   border: 2px solid #e5e7eb;
-  border-radius: 8px;
+  border-radius: 2px;
   font-size: 14px;
   font-weight: 500;
   width: 280px;
@@ -101,7 +135,7 @@
 .items-per-page select {
   padding: var(--space-xs) var(--space-sm);
   border: 2px solid #e5e7eb;
-  border-radius: 8px;
+  border-radius: 2px;
   font-size: 14px;
   font-weight: 500;
   background: white;
@@ -158,6 +192,12 @@
   font-family: 'Space Grotesk', sans-serif;
 }
 
+.strategies-table-container.dark .error-message {
+  background: #1f1f1f;
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
 .error-message h3 {
   margin: 0 0 16px 0;
   color: #dc2626;
@@ -172,6 +212,14 @@
   font-size: 15px;
   line-height: 1.6;
   font-weight: 500;
+}
+
+.strategies-table-container.dark .error-message h3 {
+  color: #ef4444;
+}
+
+.strategies-table-container.dark .error-message p {
+  color: #f87171;
 }
 
 .error-message button {
@@ -195,13 +243,7 @@
   box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
 }
 
-/* Table Wrapper */
-.table-wrapper {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  margin: 0 -8px;
-  padding: 0 8px;
-}
+/* Table Wrapper - moved to line 689 for better organization */
 
 @media (max-width: 1024px) {
   .table-header {
@@ -259,44 +301,39 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
-  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
   color: white;
   border-radius: 50%;
-  font-size: 12px;
-  font-weight: 800;
+  font-size: 10px;
+  font-weight: 700;
   cursor: help;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s ease;
   font-family: 'Space Grotesk', sans-serif;
-  box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   position: relative;
+  flex-shrink: 0;
 }
 
 .tooltip-icon:hover {
-  background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
-  transform: scale(1.15) rotate(5deg);
-  box-shadow: 
-    0 4px 16px rgba(0, 0, 0, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  transform: scale(1.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .tooltip-icon:active {
-  transform: scale(1.05) rotate(2deg);
+  transform: scale(0.95);
   transition-duration: 0.1s;
 }
 
 /* Keyboard navigation and focus states */
 .tooltip-icon:focus {
   outline: 2px solid #3b82f6;
-  outline-offset: 2px;
+  outline-offset: 1px;
   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  box-shadow: 
-    0 4px 16px rgba(59, 130, 246, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 .tooltip-icon:focus-visible {
@@ -488,6 +525,19 @@
   overflow: visible;
 }
 
+/* Responsive table width adjustments */
+@media (min-width: 1024px) {
+  .strategies-table {
+    min-width: 100%;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .strategies-table {
+    min-width: 900px;
+  }
+}
+
 /* Clickable row styles */
 .clickable-row {
   cursor: pointer;
@@ -495,9 +545,10 @@
 }
 
 .clickable-row:hover {
-  background-color: rgba(59, 130, 246, 0.05);
+  background-color: #F11F9D;
+  color: #ffffff;
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
 .clickable-row:active {
@@ -518,6 +569,11 @@
   z-index: 5;
 }
 
+.strategies-table-container.dark .strategies-table thead {
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  color: #e5e7eb;
+}
+
 .strategies-table th {
   padding: 16px 20px;
   text-align: left;
@@ -525,20 +581,42 @@
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  border-bottom: 2px solid #e5e7eb;
-  border-right: 1px solid #f3f4f6;
+  border-bottom: 2px solid #000000;
+  border-top: 2px solid #000000;
+  border-right: none;
   position: relative;
   color: #374151;
-  background: inherit;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 200px;
 }
 
-.strategies-table th:last-child {
+.strategies-table-container.dark .strategies-table th {
+  border-bottom: 2px solid #ffffff;
+  border-top: 2px solid #ffffff;
   border-right: none;
+  color: #e5e7eb;
 }
+
+/* First header column (NFT Collection) - left border */
+.strategies-table th:first-child {
+  border-left: 2px solid #000000;
+}
+
+.strategies-table-container.dark .strategies-table th:first-child {
+  border-left: 2px solid #ffffff;
+}
+
+/* Last header column (Market Cap) - right border */
+.strategies-table th:last-child {
+  border-right: 2px solid #000000;
+}
+
+.strategies-table-container.dark .strategies-table th:last-child {
+  border-right: 2px solid #ffffff;
+}
+
 
 .strategies-table th.sortable {
   cursor: pointer;
@@ -554,12 +632,27 @@
   transform: translateY(-1px);
 }
 
+.strategies-table-container.dark .strategies-table th.sortable:hover {
+  background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+  color: #f3f4f6;
+}
+
 .strategies-table th.sortable:active {
   transform: translateY(0);
 }
 
+/* Active/selected sortable header styling */
+.strategies-table th.sortable.active {
+  color: #DD5994;
+}
+
+.strategies-table-container.dark .strategies-table th.sortable.active {
+  color: #DD5994;
+}
+
 .strategies-table tbody tr {
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 2px solid #000000;
+  margin-bottom: 4px;
   transition: all 0.2s ease;
   position: relative;
   overflow: visible;
@@ -570,23 +663,81 @@
 }
 
 .strategies-table tbody tr:nth-child(odd) {
-  background-color: #fafbfc;
+  background-color: #ffffff;
 }
 
 .strategies-table tbody tr:hover {
-  background-color: #f0f9ff;
+  background-color: #F11F9D;
+  color: #ffffff;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+/* Ensure collection cell gets pink background on hover for all screen sizes */
+.strategies-table tbody tr:hover .collection-cell {
+  background-color: #F11F9D !important;
+  color: #ffffff !important;
+}
+
+/* Keep 24h change column with original styling on hover */
+.strategies-table tbody tr:hover .change-cell.positive {
+  color: #059669 !important;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%) !important;
+}
+
+.strategies-table tbody tr:hover .change-cell.negative {
+  color: #dc2626 !important;
+  background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%) !important;
+}
+
+.strategies-table-container.dark .strategies-table tbody tr {
+  border-bottom: 2px solid #ffffff;
+  margin-bottom: 4px;
+}
+
+.strategies-table-container.dark .strategies-table tbody tr:nth-child(even) {
+  background-color: #000000;
+}
+
+.strategies-table-container.dark .strategies-table tbody tr:nth-child(odd) {
+  background-color: #000000;
+}
+
+.strategies-table-container.dark .strategies-table tbody tr:hover {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+/* Ensure collection cell gets black background on hover in dark mode */
+.strategies-table-container.dark .strategies-table tbody tr:hover .collection-cell {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Keep 24h change column with original styling on hover in dark mode */
+.strategies-table-container.dark .strategies-table tbody tr:hover .change-cell.positive,
+.strategies-table-container.dark .strategies-table tbody tr:hover .change-cell.negative {
+  color: #FFFFFF !important;
+  background: #F11F9D !important;
+}
+
+.strategies-table-container.dark .clickable-row:hover {
+  background-color: #000000;
+  color: #ffffff;
 }
 
 .strategies-table tbody tr:last-child {
-  border-bottom: none;
+  border-bottom: 2px solid #000000;
+}
+
+.strategies-table-container.dark .strategies-table tbody tr:last-child {
+  border-bottom: 2px solid #ffffff;
 }
 
 .strategies-table td {
   padding: 16px 20px;
   vertical-align: middle;
-  border-right: 1px solid #f8fafc;
+  border-right: none;
   color: #111827;
   font-weight: 500;
   font-size: 14px;
@@ -597,14 +748,30 @@
   position: relative;
 }
 
+.strategies-table-container.dark .strategies-table td {
+  border-right: none;
+  color: #ffffff;
+}
+
+.strategies-table-container.dark .collection-name {
+  color: #ffffff !important;
+}
+
+/* Dark mode: Custom color and background for 24h change column */
+.strategies-table-container.dark .change-cell.positive,
+.strategies-table-container.dark .change-cell.negative {
+  color: #FFFFFF !important;
+  background: #F11F9D !important;
+  border-radius: 2px;
+  padding: 4px 8px;
+  margin: -4px -8px;
+}
+
 /* Only apply overflow hidden to specific cells that need text truncation */
 .strategies-table td:not(.market-cap-cell) {
   overflow: hidden;
 }
 
-.strategies-table td:last-child {
-  border-right: none;
-}
 
 /* Tooltip Styles */
 .tooltip-container {
@@ -636,7 +803,7 @@
   text-transform: none;
   letter-spacing: normal;
   line-height: 1.5;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(8px);
   border: 1px solid #374151;
   pointer-events: none;
@@ -684,25 +851,51 @@
 .table-wrapper {
   position: relative;
   z-index: 1;
-  overflow: visible;
+  /* Keep horizontal scrolling for responsiveness, allow vertical overflow for tooltips */
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  margin: 0;
+  padding: 0;
 }
 
 /* Collection Cell */
 .collection-cell {
-  min-width: 220px;
-  max-width: 250px;
+  min-width: 180px;
+  max-width: 280px;
+  width: auto;
+  border-left: 2px solid #000000;
+}
+
+.strategies-table-container.dark .collection-cell {
+  border-left: 2px solid #ffffff;
+}
+
+@media (min-width: 1024px) {
+  .collection-cell {
+    width: 18%;
+    min-width: 200px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .collection-cell {
+    min-width: 160px;
+    max-width: 200px;
+  }
 }
 
 .collection-info {
   display: flex;
   align-items: center;
   gap: 14px;
+  height: 44px; /* Match image height */
 }
 
 .collection-image {
   width: 44px;
   height: 44px;
-  border-radius: 8px;
+  border-radius: 2px;
   object-fit: cover;
   border: 2px solid #e5e7eb;
   transition: all 0.2s ease;
@@ -714,33 +907,62 @@
   border-color: #3b82f6;
 }
 
+/* New text content container */
+.collection-text-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 44px; /* Match image height */
+  flex: 1;
+  min-width: 0; /* Allow content to shrink */
+}
+
 .collection-name {
   font-weight: 600;
   color: #111827;
-  margin-bottom: 2px;
-  font-size: 15px;
-  line-height: 1.4;
+  font-size: 14px;
+  line-height: 1.2;
+  margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.collection-twitter {
-  font-size: 12px;
-  color: #6b7280;
+.strategy-name {
   font-weight: 500;
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.2;
+  margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  display: none; /* Hidden on desktop by default */
 }
+
 
 /* Specific Cell Styles */
 .strategy-cell {
   font-weight: 600;
   color: #111827;
-  min-width: 160px;
-  max-width: 180px;
+  min-width: 120px;
+  max-width: 200px;
   font-size: 15px;
+  width: auto;
+}
+
+@media (min-width: 1024px) {
+  .strategy-cell {
+    width: 15%;
+    min-width: 140px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .strategy-cell {
+    min-width: 110px;
+    max-width: 150px;
+  }
 }
 
 .holdings-cell {
@@ -749,8 +971,23 @@
   font-family: 'Space Grotesk', sans-serif;
   font-size: 15px;
   text-align: center;
-  min-width: 80px;
+  min-width: 60px;
   max-width: 100px;
+  width: auto;
+}
+
+@media (min-width: 1024px) {
+  .holdings-cell {
+    width: 8%;
+    min-width: 70px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .holdings-cell {
+    min-width: 55px;
+    max-width: 80px;
+  }
 }
 
 .price-cell {
@@ -759,8 +996,23 @@
   font-family: 'Space Grotesk', sans-serif;
   font-size: 15px;
   letter-spacing: -0.025em;
-  min-width: 100px;
-  max-width: 120px;
+  min-width: 80px;
+  max-width: 130px;
+  width: auto;
+}
+
+@media (min-width: 1024px) {
+  .price-cell {
+    width: 10%;
+    min-width: 90px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .price-cell {
+    min-width: 75px;
+    max-width: 110px;
+  }
 }
 
 .change-cell {
@@ -768,14 +1020,29 @@
   font-family: 'Space Grotesk', sans-serif;
   font-size: 14px;
   letter-spacing: -0.025em;
-  min-width: 100px;
-  max-width: 120px;
+  min-width: 80px;
+  max-width: 130px;
+  width: auto;
+}
+
+@media (min-width: 1024px) {
+  .change-cell {
+    width: 10%;
+    min-width: 90px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .change-cell {
+    min-width: 75px;
+    max-width: 110px;
+  }
 }
 
 .change-cell.positive {
   color: #059669;
   background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-  border-radius: 6px;
+  border-radius: 2px;
   padding: 4px 8px;
   margin: -4px -8px;
 }
@@ -783,7 +1050,7 @@
 .change-cell.negative {
   color: #dc2626;
   background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
-  border-radius: 6px;
+  border-radius: 2px;
   padding: 4px 8px;
   margin: -4px -8px;
 }
@@ -793,8 +1060,23 @@
   color: #111827;
   font-weight: 600;
   font-size: 14px;
-  min-width: 80px;
-  max-width: 100px;
+  min-width: 60px;
+  max-width: 110px;
+  width: auto;
+}
+
+@media (min-width: 1024px) {
+  .burn-cell {
+    width: 8%;
+    min-width: 70px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .burn-cell {
+    min-width: 55px;
+    max-width: 85px;
+  }
 }
 
 .holders-cell {
@@ -802,8 +1084,16 @@
   color: #111827;
   font-weight: 600;
   font-size: 14px;
-  min-width: 80px;
-  max-width: 100px;
+  min-width: 70px;
+  max-width: 110px;
+  width: auto;
+}
+
+@media (min-width: 1400px) {
+  .holders-cell {
+    width: 8%;
+    min-width: 80px;
+  }
 }
 
 .market-cap-cell {
@@ -811,16 +1101,64 @@
   color: #111827;
   font-weight: 600;
   font-size: 14px;
-  min-width: 120px;
-  max-width: 150px;
+  min-width: 100px;
+  max-width: 160px;
   position: relative;
   overflow: visible;
+  width: auto;
+}
+
+@media (min-width: 1024px) {
+  .market-cap-cell {
+    width: 12%;
+    min-width: 110px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .market-cap-cell {
+    min-width: 90px;
+    max-width: 130px;
+  }
+}
+
+/* Ensure tooltip icon inherits the correct font size context */
+.market-cap-cell .tooltip-icon {
+  font-size: 0.75em;
+  width: 1.2em;
+  height: 1.2em;
+  min-width: 14px;
+  min-height: 14px;
+}
+
+/* Market Cap Value Cell (last column) */
+.strategies-table .market-cap-value-cell {
+  font-family: 'Space Grotesk', sans-serif;
+  color: #111827;
+  font-weight: 600;
+  font-size: 14px;
+  min-width: 80px;
+  max-width: 130px;
+  width: auto;
+  border-right: 2px solid #000000 !important;
+}
+
+.strategies-table-container.dark .strategies-table .market-cap-value-cell {
+  border-right: 2px solid #ffffff !important;
 }
 
 .actions-cell {
   text-align: center;
-  min-width: 100px;
-  max-width: 120px;
+  min-width: 90px;
+  max-width: 130px;
+  width: auto;
+}
+
+@media (min-width: 1400px) {
+  .actions-cell {
+    width: 10%;
+    min-width: 100px;
+  }
 }
 
 .view-button {
@@ -828,7 +1166,7 @@
   background: linear-gradient(135deg, #E3579A 0%, #E3579A 100%);
   color: white;
   border: 2px solid #FFECF5;
-  border-radius: 8px;
+  border-radius: 2px;
   cursor: pointer;
   font-size: 13px;
   font-weight: 600;
@@ -884,7 +1222,7 @@
   border: 2px solid #e5e7eb;
   background: white;
   color: #374151;
-  border-radius: 8px;
+  border-radius: 2px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
@@ -902,14 +1240,14 @@
   border-color: #3b82f6;
   color: #3b82f6;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.1);
 }
 
 .pagination-button.active {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: white;
   border-color: #3b82f6;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
 }
 
 .pagination-button:disabled {
@@ -924,24 +1262,31 @@
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
 }
 
-/* Responsive Design */
-@media (max-width: 1200px) {
-  .strategies-table-container {
-    padding: 12px;
+/* Responsive Design - Updated for better tablet/desktop experience */
+@media (min-width: 1024px) {
+  .table-header h2 {
+    font-size: 32px;
   }
   
+  .strategies-table th,
+  .strategies-table td {
+    padding: 16px 16px;
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
   .table-header h2 {
     font-size: 28px;
   }
   
   .strategies-table {
-    min-width: 1200px;
     font-size: 13px;
   }
   
   .strategies-table th,
   .strategies-table td {
-    padding: 14px 16px;
+    padding: 12px 10px;
     font-size: 13px;
   }
   
@@ -960,7 +1305,7 @@
 
 @media (max-width: 768px) {
   .strategies-table-container {
-    padding: 12px;
+    padding: 0;
   }
   
   .table-header {
@@ -984,7 +1329,7 @@
   
   .strategies-table {
     font-size: 12px;
-    min-width: 1000px;
+    min-width: 800px;
   }
   
   .strategies-table th,
@@ -993,20 +1338,6 @@
     font-size: 12px;
   }
   
-  .collection-info {
-    flex-direction: row;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .collection-image {
-    width: 36px;
-    height: 36px;
-  }
-  
-  .collection-name {
-    font-size: 13px;
-  }
   
   .strategy-cell {
     min-width: 120px;
@@ -1055,7 +1386,7 @@
   
   .strategies-table {
     font-size: 11px;
-    min-width: 900px;
+    min-width: 700px;
   }
   
   .strategies-table th,
@@ -1064,18 +1395,6 @@
     font-size: 11px;
   }
   
-  .collection-cell {
-    min-width: 140px;
-  }
-  
-  .collection-image {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .collection-name {
-    font-size: 12px;
-  }
   
   .strategy-cell {
     min-width: 100px;
@@ -1136,12 +1455,25 @@
     border-color: #374151;
   }
   
-  .strategies-table tbody tr:hover {
+.strategies-table tbody tr:hover {
+    background-color: #FFECF5;
+  }
+  
+  .strategies-table tbody tr:hover .collection-cell {
     background-color: #FFECF5;
   }
   
   .collection-name {
     color: #f9fafb;
+  }
+  
+  .strategy-name {
+    color: #d1d5db;
+  }
+  
+  /* Dark mode for sticky positioning */
+  .strategies-table tbody tr {
+    background-color: #1f2937;
   }
   
   .pagination-button {
@@ -1229,20 +1561,116 @@
 }
 
 /* Hide components as requested */
-.table-header h2,
-.search-container,
-.items-per-page,
-.pagination {
-  display: none !important;
+/* Mobile: hide only the search control as requested */
+@media (max-width: 768px) {
+  .search-container { display: none !important; }
+  
+  /* Hide strategy column header and cells on mobile */
+  .strategies-table th:nth-child(2) {
+    display: none;
+  }
+  
+  .strategies-table td:nth-child(2) {
+    display: none;
+  }
+  
+  /* Lock the collection image when scrolling horizontally */
+  .collection-cell {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background-color: inherit;
+  }
+  
+  /* Keep collection cell layout consistent on mobile */
+  .collection-cell .collection-info {
+    flex-direction: row;
+    align-items: center;
+    gap: 14px; /* Match desktop spacing */
+  }
+  
+  .collection-cell .collection-image {
+    width: 36px;
+    height: 36px;
+    position: sticky;
+    left: 8px;
+    z-index: 11;
+  }
+  
+  .collection-cell .collection-text-content {
+    height: 36px; /* Match smaller mobile image height */
+  }
+  
+  .collection-cell .collection-name {
+    font-size: 12px;
+    color: #000000 !important;
+  }
+  
+  .collection-cell .strategy-name {
+    display: block; /* Show on mobile */
+    font-size: 11px;
+    color: #666666;
+  }
+  
+  /* Ensure background color inheritance for sticky positioning */
+  .strategies-table tbody tr {
+    background-color: white;
+  }
+  
+  .strategies-table tbody tr:hover .collection-cell {
+    background-color: #F11F9D;
+    color: #ffffff;
+  }
+  
+  /* Additional mobile improvements */
+  .collection-cell {
+    min-width: 160px;
+    max-width: 200px;
+  }
 }
 
-/* Make NFT collection name black */
+@media (max-width: 480px) {
+  /* Override collection cell styling for smaller screens */
+  .collection-cell {
+    min-width: 140px !important;
+    max-width: 180px !important;
+  }
+  
+  .collection-cell .collection-image {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  
+  .collection-cell .collection-text-content {
+    height: 32px !important; /* Match smaller image height */
+  }
+  
+  .collection-cell .collection-name {
+    font-size: 11px !important;
+  }
+  
+  .collection-cell .strategy-name {
+    display: block !important; /* Show on small mobile */
+    font-size: 10px !important;
+  }
+}
+
+/* Make NFT collection name black by default, but white on hover */
 .collection-cell {
   color: #000000 !important;
 }
 
 .collection-cell .collection-name {
   color: #000000 !important;
+}
+
+/* Ensure collection name is white when row is hovered in light mode */
+.strategies-table tbody tr:hover .collection-cell .collection-name {
+  color: #ffffff !important;
+}
+
+.strategies-table tbody tr:hover .collection-cell .strategy-name {
+  color: #cccccc !important;
 }
 
 /* Error Message Styles */

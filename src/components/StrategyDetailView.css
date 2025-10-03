@@ -1,0 +1,897 @@
+/* StrategyDetailView.css - Dark mode support following StrategiesDataTable patterns */
+
+.strategy-detail-container {
+  width: 100%;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  transition: all 0.2s ease;
+}
+
+/* Dark mode main container */
+.strategy-detail-container.dark {
+  background-color: #111827;
+  color: #ffffff;
+}
+
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 16px;
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  width: 100%;
+  min-width: 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.strategy-detail-container.dark .tab-navigation {
+  background: none;
+  border: none;
+  border-bottom: 1px solid #374151;
+}
+
+.tab-button {
+  padding: 16px 24px;
+  border-radius: 0;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  min-height: auto;
+  flex: none;
+  justify-content: center;
+  align-items: center;
+  min-width: 0;
+  cursor: pointer;
+  border: none;
+  background: none;
+  position: relative;
+  color: #6b7280;
+  margin-bottom: -1px;
+}
+
+.tab-button.active {
+  background: none;
+  color: #000000;
+  box-shadow: none;
+  border-bottom: 2px solid #FFAADD;
+}
+
+.tab-button:not(.active) {
+  color: #6b7280;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-button:not(.active):hover {
+  color: #000000;
+}
+
+.strategy-detail-container.dark .tab-button.active {
+  background: none;
+  color: #ffffff;
+  box-shadow: none;
+  border-bottom-color: #FFAADD;
+}
+
+.strategy-detail-container.dark .tab-button:not(.active) {
+  color: #9ca3af;
+  border-bottom-color: transparent;
+}
+
+.strategy-detail-container.dark .tab-button:not(.active):hover {
+  color: #ffffff;
+}
+
+/* Comparison Table */
+.comparison-table-container {
+  border-radius: 0;
+  border: 2px solid #000000;
+  background: white;
+  overflow: hidden;
+  width: 100%;
+}
+
+.strategy-detail-container.dark .comparison-table-container {
+  background: #1f2937;
+  border-color: #ffffff;
+}
+
+
+.comparison-table {
+  width: 100%;
+  min-width: 0;
+}
+
+.comparison-table thead tr {
+  border-bottom: 2px solid #000000;
+  background: #f9fafb;
+}
+
+.strategy-detail-container.dark .comparison-table thead tr {
+  background: #111827;
+  border-bottom-color: #ffffff;
+}
+
+.comparison-table th {
+  text-align: left;
+  padding: 12px 24px;
+  font-weight: 700;
+  color: #000000;
+  font-size: 16px;
+}
+
+.strategy-detail-container.dark .comparison-table th {
+  color: #ffffff;
+}
+
+.comparison-table tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.comparison-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.strategy-detail-container.dark .comparison-table tbody tr {
+  border-bottom-color: #374151;
+}
+
+.strategy-detail-container.dark .comparison-table tbody tr:hover {
+  background: #374151;
+}
+
+.comparison-table td {
+  padding: 12px 24px;
+  color: #374151;
+  font-size: 14px;
+}
+
+.strategy-detail-container.dark .comparison-table td {
+  color: #e5e7eb;
+}
+
+.metric-label {
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.strategy-detail-container.dark .metric-label {
+  color: #d1d5db;
+}
+
+/* Key Metrics Cards */
+.metric-card {
+  border-radius: 0;
+  border: 2px solid #000000;
+  background: white;
+  padding: 16px;
+}
+
+@media (min-width: 1024px) {
+  .metric-card {
+    padding: 24px;
+  }
+}
+
+.strategy-detail-container.dark .metric-card {
+  background: #1f2937;
+  border-color: #ffffff;
+}
+
+/* Preserve Tailwind text color classes but add dark mode overrides */
+.strategy-detail-container.dark .metric-card h4,
+.strategy-detail-container.dark .metric-card .text-xl,
+.strategy-detail-container.dark .metric-card .text-2xl,
+.strategy-detail-container.dark .metric-card .text-3xl {
+  color: #ffffff !important;
+}
+
+.strategy-detail-container.dark .metric-card .text-xs,
+.strategy-detail-container.dark .metric-card .text-sm,
+.strategy-detail-container.dark .metric-card p {
+  color: #d1d5db !important;
+}
+
+/* Loading states in metric cards */
+.strategy-detail-container.dark .metric-card .text-gray-500 {
+  color: #d1d5db !important;
+}
+
+/* Holdings component dark mode overrides - Maximum specificity and comprehensive coverage */
+/* Override ALL text colors in Holdings component */
+.strategy-detail-container.dark h1,
+.strategy-detail-container.dark h2,
+.strategy-detail-container.dark h3,
+.strategy-detail-container.dark h4,
+.strategy-detail-container.dark h5,
+.strategy-detail-container.dark h6,
+.strategy-detail-container.dark p,
+.strategy-detail-container.dark span,
+.strategy-detail-container.dark div,
+.strategy-detail-container.dark .text-black {
+  color: #ffffff !important;
+}
+
+/* Tailwind text size classes - Primary text (white) */
+.strategy-detail-container.dark .text-xs.font-bold,
+.strategy-detail-container.dark .text-sm.font-bold,
+.strategy-detail-container.dark .text-base.font-bold,
+.strategy-detail-container.dark .text-lg.font-bold,
+.strategy-detail-container.dark .text-xl.font-bold,
+.strategy-detail-container.dark .text-2xl.font-bold,
+.strategy-detail-container.dark .text-3xl.font-bold,
+.strategy-detail-container.dark .font-bold {
+  color: #ffffff !important;
+}
+
+/* Tailwind text size classes - Secondary text (light gray) */
+.strategy-detail-container.dark .text-xs.font-medium,
+.strategy-detail-container.dark .text-sm.font-medium,
+.strategy-detail-container.dark .text-base.font-medium,
+.strategy-detail-container.dark .font-medium {
+  color: #d1d5db !important;
+}
+
+/* All Tailwind color classes override */
+.strategy-detail-container.dark .text-gray-900,
+.strategy-detail-container.dark .text-gray-800,
+.strategy-detail-container.dark .text-gray-700,
+.strategy-detail-container.dark .text-gray-600,
+.strategy-detail-container.dark .text-gray-500,
+.strategy-detail-container.dark .text-gray-400 {
+  color: #d1d5db !important;
+}
+
+.strategy-detail-container.dark .text-gray-300,
+.strategy-detail-container.dark .text-gray-200,
+.strategy-detail-container.dark .text-gray-100 {
+  color: #f3f4f6 !important;
+}
+
+/* All text size classes to white for main content */
+.strategy-detail-container.dark .text-xs,
+.strategy-detail-container.dark .text-sm,
+.strategy-detail-container.dark .text-base,
+.strategy-detail-container.dark .text-lg,
+.strategy-detail-container.dark .text-xl,
+.strategy-detail-container.dark .text-2xl,
+.strategy-detail-container.dark .text-3xl,
+.strategy-detail-container.dark .text-4xl,
+.strategy-detail-container.dark .text-5xl,
+.strategy-detail-container.dark .text-6xl {
+  color: #ffffff !important;
+}
+
+/* Override any remaining text colors with universal selector for Holdings */
+.strategy-detail-container.dark * {
+  color: inherit !important;
+}
+
+.strategy-detail-container.dark {
+  color: #ffffff !important;
+}
+
+/* Ensure all card backgrounds in Holdings are properly styled */
+.strategy-detail-container.dark .bg-gray-50,
+.strategy-detail-container.dark .bg-white {
+  background-color: #374151 !important;
+}
+
+.strategy-detail-container.dark .bg-gray-200 {
+  background-color: #4b5563 !important;
+}
+
+.strategy-detail-container.dark .bg-gray-800 {
+  background-color: #1f2937 !important;
+}
+
+.strategy-detail-container.dark .bg-gray-700 {
+  background-color: #374151 !important;
+}
+
+.strategy-detail-container.dark .bg-gray-600 {
+  background-color: #4b5563 !important;
+}
+
+/* Border color overrides */
+.strategy-detail-container.dark .border-black {
+  border-color: #ffffff !important;
+}
+
+/* Shadow overrides for Holdings cards */
+.strategy-detail-container.dark .shadow-\[4px_4px_0px_\#000000\] {
+  box-shadow: 4px 4px 0px #FFFFFF !important;
+}
+
+.strategy-detail-container.dark .shadow-\[6px_6px_0px_\#000000\] {
+  box-shadow: 6px 6px 0px #FFFFFF !important;
+}
+
+.strategy-detail-container.dark .shadow-\[8px_8px_0px_\#000000\] {
+  box-shadow: 8px 8px 0px #FFFFFF !important;
+}
+
+/* Hover shadow overrides */
+.strategy-detail-container.dark .hover\:shadow-\[6px_6px_0px_\#000000\]:hover {
+  box-shadow: 6px 6px 0px #FFFFFF !important;
+}
+
+/* Dark mode support for original tooltips */
+.strategy-detail-container.dark .text-gray-400 {
+  color: #9ca3af !important;
+}
+
+/* Dark mode support for section headers */
+.strategy-detail-container.dark .text-gray-600 {
+  color: #d1d5db !important;
+}
+
+.strategy-detail-container.dark .bg-black {
+  background-color: #ffffff !important;
+}
+
+.strategy-detail-container.dark .text-white {
+  color: #000000 !important;
+}
+
+/* Chart Containers */
+.strategy-detail-container.dark h2 {
+  color: #ffffff !important;
+}
+
+.chart-container {
+  border-radius: 0;
+  border: 2px solid #000000;
+  background: white;
+}
+
+.strategy-detail-container.dark .chart-container {
+  background: #1f2937;
+  border-color: #ffffff;
+}
+
+/* Chart section border colors in dark mode */
+.strategy-detail-container.dark .border-t {
+  border-color: #374151 !important;
+}
+
+.strategy-detail-container.dark .border-gray-200 {
+  border-color: #374151 !important;
+}
+
+.chart-header {
+  border-bottom: 2px solid #000000;
+  padding: 16px 24px;
+  background: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.strategy-detail-container.dark .chart-header {
+  background: #111827;
+  border-bottom-color: #ffffff;
+}
+
+.chart-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000000;
+  margin: 0;
+}
+
+.strategy-detail-container.dark .chart-title {
+  color: #ffffff;
+}
+
+.chart-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.strategy-detail-container.dark .chart-subtitle {
+  color: #d1d5db;
+}
+
+.chart-powered-by {
+  text-align: right;
+}
+
+.chart-powered-label {
+  font-size: 12px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.strategy-detail-container.dark .chart-powered-label {
+  color: #9ca3af;
+}
+
+.chart-powered-source {
+  font-size: 14px;
+  font-weight: 500;
+  color: #000000;
+  margin: 0;
+}
+
+.strategy-detail-container.dark .chart-powered-source {
+  color: #ffffff;
+}
+
+.chart-body {
+  padding: 16px 24px;
+}
+
+@media (min-width: 640px) {
+  .chart-body {
+    padding: 24px;
+  }
+}
+
+/* Loading States */
+.chart-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+  text-align: center;
+}
+
+.chart-loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 4px solid #e5e7eb;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+.strategy-detail-container.dark .chart-loading-spinner {
+  border-color: #374151;
+  border-top-color: #60a5fa;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.chart-loading p {
+  color: #6b7280;
+  margin: 0;
+}
+
+.strategy-detail-container.dark .chart-loading p {
+  color: #d1d5db;
+}
+
+/* Empty States */
+.chart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+  text-align: center;
+}
+
+.chart-empty-icon {
+  width: 48px;
+  height: 48px;
+  color: #9ca3af;
+  margin-bottom: 12px;
+}
+
+.strategy-detail-container.dark .chart-empty-icon {
+  color: #6b7280;
+}
+
+.chart-empty-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0 0 4px 0;
+}
+
+.strategy-detail-container.dark .chart-empty-title {
+  color: #d1d5db;
+}
+
+.chart-empty-subtitle {
+  font-size: 14px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.strategy-detail-container.dark .chart-empty-subtitle {
+  color: #9ca3af;
+}
+
+/* Error States */
+.error-container {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.strategy-detail-container.dark .error-container {
+  background: #1f1f1f;
+  border-color: #ef4444;
+}
+
+.error-header {
+  display: flex;
+  align-items: flex-start;
+}
+
+.error-icon {
+  width: 20px;
+  height: 20px;
+  color: #ef4444;
+  flex-shrink: 0;
+}
+
+.error-content {
+  margin-left: 12px;
+  flex: 1;
+}
+
+.error-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #dc2626;
+  margin: 0 0 4px 0;
+}
+
+.strategy-detail-container.dark .error-title {
+  color: #ef4444;
+}
+
+.error-message {
+  font-size: 14px;
+  color: #b91c1c;
+  margin: 0;
+}
+
+.strategy-detail-container.dark .error-message {
+  color: #f87171;
+}
+
+/* Action Buttons */
+.action-button {
+  width: 100%;
+  padding: 12px 16px;
+  background: #FFAADD;
+  color: #000000;
+  border: 2px solid #000000;
+  border-radius: 0;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+}
+
+@media (min-width: 1024px) {
+  .action-button {
+    padding: 16px;
+    font-size: 16px;
+  }
+}
+
+.action-button:hover {
+  background: #FF88CC;
+}
+
+.strategy-detail-container.dark .action-button {
+  background: #FFAADD;
+  color: #000000;
+  border-color: #ffffff;
+}
+
+.strategy-detail-container.dark .action-button:hover {
+  background: #FF88CC;
+}
+
+.action-button-primary {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+}
+
+.action-button-primary:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.strategy-detail-container.dark .action-button-primary {
+  background: #60a5fa;
+  border-color: #60a5fa;
+  color: #000000;
+}
+
+.strategy-detail-container.dark .action-button-primary:hover {
+  background: #3b82f6;
+  border-color: #3b82f6;
+}
+
+/* NFTPricefloor Button */
+.nft-pricefloor-button {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 0;
+  border: 2px solid #000000;
+  background: #FFAADD;
+  color: #000000;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.25;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.nft-pricefloor-button:hover {
+  background: #FF88CC;
+  transform: translateY(-1px);
+}
+
+.strategy-detail-container.dark .nft-pricefloor-button {
+  background: #FFAADD;
+  color: #000000;
+  border-color: #ffffff;
+}
+
+.strategy-detail-container.dark .nft-pricefloor-button:hover {
+  background: #FF88CC;
+  color: #000000;
+}
+
+/* Content Sections */
+.content-section {
+  width: 100%;
+}
+
+/* Sales Grid */
+.sales-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 640px) {
+  .sales-summary-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.sales-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.sales-item {
+  border: 2px solid #000000;
+  background: white;
+  border-radius: 0;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.strategy-detail-container.dark .sales-item {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.sales-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 0px #000000;
+}
+
+.strategy-detail-container.dark .sales-item:hover {
+  box-shadow: 4px 4px 0px #374151;
+}
+
+.sales-item-image {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+}
+
+.sales-item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sales-item-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: #f3f4f6;
+}
+
+.strategy-detail-container.dark .sales-item-fallback {
+  background: #374151;
+}
+
+.sales-item-fallback-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.sales-item-fallback-text {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.strategy-detail-container.dark .sales-item-fallback-text {
+  color: #d1d5db;
+}
+
+.sales-item-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.strategy-detail-container.dark .sales-item-badge {
+  background: rgba(255, 255, 255, 0.9);
+  color: #000000;
+}
+
+.sales-item-details {
+  padding: 12px;
+}
+
+.sales-item-price-label {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0 0 4px 0;
+}
+
+.strategy-detail-container.dark .sales-item-price-label {
+  color: #d1d5db;
+}
+
+.sales-item-price-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
+  margin: 0;
+}
+
+.strategy-detail-container.dark .sales-item-price-value {
+  color: #ffffff;
+}
+
+/* Cards */
+.card {
+  border: 2px solid #000000;
+  background: white;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.strategy-detail-container.dark .card {
+  background: #1f2937;
+  border-color: #ffffff;
+}
+
+.card-header {
+  border-bottom: 2px solid #000000;
+  padding: 16px 24px;
+  background: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.strategy-detail-container.dark .card-header {
+  background: #111827;
+  border-bottom-color: #ffffff;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000000;
+  margin: 0;
+}
+
+.strategy-detail-container.dark .card-title {
+  color: #ffffff;
+}
+
+.card-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.strategy-detail-container.dark .card-subtitle {
+  color: #d1d5db;
+}
+
+.card-body {
+  padding: 24px;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .strategy-detail-container {
+    padding: 16px;
+  }
+
+  .tab-button {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  .table-header,
+  .chart-header,
+  .card-header {
+    padding: 12px 16px;
+  }
+
+  .comparison-table th,
+  .comparison-table td {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
+  .metric-card {
+    padding: 12px 16px;
+  }
+
+  .chart-body,
+  .card-body {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .sales-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .sales-grid {
+    grid-template-columns: 1fr;
+  }
+}

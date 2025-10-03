@@ -10,7 +10,16 @@
     "sync:manual": "node src/scripts/manualSync.js",
     "sync:initial": "node src/scripts/initialSetup.js",
     "sync:full-year": "node src/scripts/fullYearSync.js",
-    "db:status": "node src/scripts/dbStatus.js"
+    "db:status": "node src/scripts/dbStatus.js",
+    "build:analyze": "vite build --mode analyze",
+    "build:production": "NODE_ENV=production vite build",
+    "build:staging": "NODE_ENV=staging vite build",
+    "test:health": "curl -f http://localhost:3000/api/health || exit 1",
+    "lint": "echo 'Linting not configured yet'",
+    "typecheck": "echo 'Type checking not configured yet'",
+    "deploy:staging": "vercel --target staging",
+    "deploy:production": "vercel --prod",
+    "postbuild": "echo 'Build completed successfully'"
   },
   "keywords": [],
   "author": "",
@@ -34,6 +43,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.7.0",
+    "terser": "^5.44.0",
     "vite": "^6.3.5"
   }
 }

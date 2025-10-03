@@ -6,19 +6,29 @@
 }
 
 :root {
-  /* Color Variables */
-  --primary-color: #8b5cf6;
-  --secondary-color: #10b981;
+  /* Color Variables - Light Mode */
+  --primary-color: #007AFF;
+  --secondary-color: #34C759;
   --background: #ffffff;
-  --surface: #f8fafc;
-  --surface-hover: #f1f5f9;
-  --border: #e2e8f0;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --text-muted: #94a3b8;
-  --error: #ef4444;
-  --warning: #f59e0b;
-  --success: #10b981;
+  --surface: #f2f2f7;
+  --surface-hover: #e5e5ea;
+  --border: #d1d1d6;
+  --text-primary: #000000;
+  --text-secondary: #3c3c43;
+  --text-tertiary: #3c3c434d;
+  --text-quaternary: #3c3c432e;
+  --error: #FF3B30;
+  --warning: #FF9500;
+  --success: #34C759;
+  --fill-primary: #3c3c43;
+  --fill-secondary: #3c3c4399;
+  --fill-tertiary: #3c3c434d;
+  --fill-quaternary: #3c3c432e;
+  --material-regular: rgba(255, 255, 255, 0.8);
+  --material-thick: rgba(255, 255, 255, 0.95);
+  --material-thin: rgba(255, 255, 255, 0.6);
+  --separator-opaque: #c6c6c8;
+  --separator-non-opaque: #3c3c434a;
   
   /* Spacing */
   --space-2xs: 0.125rem;
@@ -66,6 +76,32 @@
   --radius-xl: 1rem;
 }
 
+/* Dark Mode Variables */
+.dark {
+  --primary-color: #0A84FF;
+  --secondary-color: #32D74B;
+  --background: #000000;
+  --surface: #1c1c1e;
+  --surface-hover: #2c2c2e;
+  --border: #38383a;
+  --text-primary: #ffffff;
+  --text-secondary: #ebebf5;
+  --text-tertiary: #ebebf599;
+  --text-quaternary: #ebebf54d;
+  --error: #FF453A;
+  --warning: #FF9F0A;
+  --success: #32D74B;
+  --fill-primary: #ebebf5;
+  --fill-secondary: #ebebf599;
+  --fill-tertiary: #ebebf54d;
+  --fill-quaternary: #ebebf52e;
+  --material-regular: rgba(28, 28, 30, 0.8);
+  --material-thick: rgba(28, 28, 30, 0.95);
+  --material-thin: rgba(28, 28, 30, 0.6);
+  --separator-opaque: #38383a;
+  --separator-non-opaque: #54545899;
+}
+
 body {
   font-family: var(--font-family);
   line-height: 1.6;
@@ -73,6 +109,7 @@ body {
   background-color: var(--background);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 #root {
@@ -91,4 +128,13 @@ body {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none; /* WebKit */
+}
+
+/* Thick Border Utility Classes */
+.thick-border-light {
+  border: 2px solid #000000;
+}
+
+.thick-border-dark {
+  border: 2px solid #ffffff;
 }

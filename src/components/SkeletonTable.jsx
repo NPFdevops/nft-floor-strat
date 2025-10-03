@@ -7,13 +7,21 @@ const SkeletonRow = () => (
     <td className="skeleton-cell collection-cell" role="gridcell">
       <div className="skeleton-collection-info">
         <div className="skeleton-image" aria-label="Loading collection image"></div>
-        <div className="skeleton-text skeleton-collection-name" aria-label="Loading collection name"></div>
+        <div className="collection-merged-content">
+          <div className="skeleton-text skeleton-collection-name" aria-label="Loading collection name"></div>
+          <div className="skeleton-text strategy-name-mobile" style={{width: '80px', height: '12px', marginTop: '2px'}} aria-label="Loading strategy name"></div>
+        </div>
       </div>
     </td>
     
     {/* Strategy Cell */}
     <td className="skeleton-cell strategy-cell" role="gridcell">
       <div className="skeleton-badge" aria-label="Loading strategy type"></div>
+    </td>
+    
+    {/* Holdings Cell */}
+    <td className="skeleton-cell holdings-cell" role="gridcell">
+      <div className="skeleton-text skeleton-holdings" aria-label="Loading holdings count"></div>
     </td>
     
     {/* Price Cell */}
@@ -33,12 +41,12 @@ const SkeletonRow = () => (
     
     {/* Market Cap Ratio Cell */}
     <td className="skeleton-cell market-cap-cell" role="gridcell">
-      <div className="skeleton-text skeleton-market-cap" aria-label="Loading market cap ratio"></div>
+      <div className="skeleton-text skeleton-market-cap-ratio" aria-label="Loading market cap ratio"></div>
     </td>
     
-    {/* Action Cell */}
-    <td className="skeleton-cell action-cell" role="gridcell">
-      <div className="skeleton-button" aria-label="Loading action button"></div>
+    {/* Market Cap Cell */}
+    <td className="skeleton-cell market-cap-value-cell" role="gridcell">
+      <div className="skeleton-text skeleton-market-cap" aria-label="Loading market cap"></div>
     </td>
   </tr>
 );
@@ -104,6 +112,9 @@ const SkeletonTable = ({ rows = 10 }) => {
               <th role="columnheader" aria-label="Strategy">
                 Strategy
               </th>
+              <th role="columnheader" aria-label="Holdings">
+                Holdings
+              </th>
               <th role="columnheader" aria-label="Price">
                 Price
               </th>
@@ -114,10 +125,10 @@ const SkeletonTable = ({ rows = 10 }) => {
                 % Burn
               </th>
               <th role="columnheader" aria-label="Market cap ratio">
-                MarketCap Ratio
+                Market Cap Ratio
               </th>
-              <th role="columnheader" aria-label="Actions">
-                Action
+              <th role="columnheader" aria-label="Market cap">
+                Market Cap
               </th>
             </tr>
           </thead>

@@ -106,6 +106,11 @@
 }
 
 /* Text Skeletons with varying widths */
+.skeleton-holdings {
+  height: 16px;
+  width: 40px;
+}
+
 .skeleton-price {
   height: 16px;
   width: 70px;
@@ -119,6 +124,11 @@
 .skeleton-burn {
   height: 16px;
   width: 50px;
+}
+
+.skeleton-market-cap-ratio {
+  height: 16px;
+  width: 60px;
 }
 
 .skeleton-market-cap {
@@ -203,9 +213,17 @@
     width: 100px;
   }
   
+  .skeleton-holdings {
+    width: 30px;
+  }
+  
   .skeleton-price,
   .skeleton-change,
   .skeleton-burn {
+    width: 50px;
+  }
+  
+  .skeleton-market-cap-ratio {
     width: 50px;
   }
   
@@ -216,11 +234,44 @@
   .skeleton-pagination-text {
     width: 120px;
   }
+  
+  /* Mobile-specific skeleton for merged column layout */
+  .skeleton-collection-info {
+    flex-direction: row;
+    align-items: center;
+    gap: 14px; /* Match desktop and main table spacing */
+  }
+  
+  .collection-merged-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    width: 100%;
+  }
+  
+  .strategy-name-mobile {
+    opacity: 0.7;
+  }
+  
+  /* Hide strategy column skeleton on mobile */
+  .skeleton-table th:nth-child(2),
+  .skeleton-table td:nth-child(2) {
+    display: none;
+  }
+  
+  /* Lock collection cell positioning */
+  .skeleton-cell.collection-cell {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background-color: white;
+  }
 }
 
 @media (max-width: 480px) {
   .skeleton-collection-info {
-    gap: 8px;
+    gap: 14px; /* Keep consistent spacing even on smaller screens */
   }
   
   .skeleton-image {
