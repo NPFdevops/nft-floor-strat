@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HelmetProvider } from 'react-helmet-async'
 import App from './App.jsx'
 import './index.css'
 import { posthogService } from './services/posthogService.js'
@@ -9,11 +10,13 @@ import { posthogService } from './services/posthogService.js'
 posthogService.init();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <BrowserRouter>
-    <Routes>
-      <Route path="/" element={<App />} />
-      <Route path="/nftstrategies" element={<App />} />
-      <Route path="/nftstrategies/:strategyName" element={<App />} />
-    </Routes>
-  </BrowserRouter>
+  <HelmetProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<App />} />
+        <Route path="/nftstrategies" element={<App />} />
+        <Route path="/nftstrategies/:strategyName" element={<App />} />
+      </Routes>
+    </BrowserRouter>
+  </HelmetProvider>
 )

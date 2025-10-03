@@ -4,6 +4,7 @@ import StrategiesDataTable from './components/StrategiesDataTable';
 import StrategyDetailView from './components/StrategyDetailView';
 import InfoCards from './components/InfoCards';
 import SettingsModal from './components/SettingsModal';
+import SEO from './components/SEO';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { createStrategyUrl, createStrategiesUrl, findStrategyByEncodedName } from './utils/urlUtils';
 import { posthogService } from './services/posthogService';
@@ -112,6 +113,12 @@ function AppContent() {
 
   return (
     <div className={`relative flex size-full min-h-screen flex-col overflow-x-hidden transition-colors duration-200`} style={{fontFamily: '"Space Grotesk", sans-serif', backgroundColor: isDark ? '#000000' : '#FFF6FB'}}>
+      {/* SEO Meta Tags */}
+      <SEO 
+        strategy={selectedStrategy}
+        pageType={selectedStrategy ? 'strategy' : 'dashboard'}
+      />
+      
       <div className="layout-container flex h-full grow flex-col">
         {/* Header */}
         <header className={`${isDark ? 'bg-black border-gray-800' : 'bg-white'} md:sticky md:top-0 md:z-50 md:shadow-sm w-full overflow-hidden ${isDark ? 'border-b border-gray-800' : ''}`}>
