@@ -129,14 +129,14 @@ function AppContent() {
               
               {/* Desktop navigation - Centered */}
               <nav className="hidden md:flex items-center gap-3 lg:gap-6 text-sm font-medium flex-1 justify-center">
-                <a href="https://nftpricefloor.com" target="_blank" rel="noopener noreferrer" className={`${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-[#F11F9D] transition-colors whitespace-nowrap flex-shrink-0 flex items-center gap-2`}>
+                <a href="https://nftpricefloor.com" target="_blank" rel="noopener noreferrer" className={`${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-[#DD5994] transition-colors whitespace-nowrap flex-shrink-0 flex items-center gap-2`}>
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M2 20h6v-6H2v6zm8-10h6v10h-6V10zm8 4h6v6h-6v-6z"/>
                     <path d="M2 19h6v1H2v-1zm8 1h6v-1h-6v1zm8-3h6v1h-6v-1z"/>
                   </svg>
                   Rankings
                 </a>
-                <a href="https://nftpricefloor.com/nft-drops" target="_blank" rel="noopener noreferrer" className={`${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-[#F11F9D] transition-colors whitespace-nowrap flex-shrink-0 flex items-center gap-2`}>
+                <a href="https://nftpricefloor.com/nft-drops" target="_blank" rel="noopener noreferrer" className={`${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-[#DD5994] transition-colors whitespace-nowrap flex-shrink-0 flex items-center gap-2`}>
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2L8.5 8.5L2 12l6.5 3.5L12 22l3.5-6.5L22 12l-6.5-3.5L12 2zm0 3.83L14.17 12L12 18.17L9.83 12L12 5.83z"/>
                   </svg>
@@ -144,7 +144,7 @@ function AppContent() {
                 </a>
                 <button 
                   onClick={() => navigate('/nftstrategies')} 
-                  className={`${location.pathname.includes('/nftstrategies') || location.pathname === '/' ? 'text-[#F11F9D]' : isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-[#F11F9D] font-medium transition-colors cursor-pointer whitespace-nowrap flex-shrink-0`}
+                  className={`${location.pathname.includes('/nftstrategies') || location.pathname === '/' ? 'text-[#DD5994]' : isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-[#DD5994] font-medium transition-colors cursor-pointer whitespace-nowrap flex-shrink-0`}
                 >
                   Strategies™
                 </button>
@@ -181,7 +181,7 @@ function AppContent() {
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 flex flex-col flex-1 min-w-0">
             {/* Breadcrumb Navigation (hidden on mobile) */}
             <nav className={`hidden md:flex items-center gap-2 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} mb-6`}>
-              <a href="https://nftpricefloor.com" target="_blank" rel="noopener noreferrer" className={`hover:text-[#F11F9D] transition-colors`}>
+              <a href="https://nftpricefloor.com" target="_blank" rel="noopener noreferrer" className={`hover:text-[#DD5994] transition-colors`}>
                 Home
               </a>
               <span>-</span>
@@ -189,13 +189,13 @@ function AppContent() {
                 <>
                   <button
                     onClick={handleBackToStrategies}
-                    className={`hover:text-[#F11F9D] transition-colors`}
+                    className={`hover:text-[#DD5994] transition-colors`}
                   >
                     NFT Strategies
                   </button>
                   <span>-</span>
                   <span className={`${isDark ? 'text-white' : 'text-black'} font-medium`}>
-                    {selectedStrategy.collectionName}
+                    {selectedStrategy.collectionName} - {selectedStrategy.tokenName}
                   </span>
                 </>
               ) : (
@@ -210,7 +210,7 @@ function AppContent() {
               <div className="mb-4">
                 <button
                   onClick={handleBackToStrategies}
-                  className={`flex items-center gap-2 ${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-[#F11F9D] transition-colors`}
+                  className={`flex items-center gap-2 ${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-[#DD5994] transition-colors`}
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -228,7 +228,7 @@ function AppContent() {
                   {selectedStrategy ? (
                     <div>
                       <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'} mb-2 break-words`}>
-                        {selectedStrategy.collectionName}
+                        {selectedStrategy.collectionName} - {selectedStrategy.tokenName}
                       </h1>
                     </div>
                   ) : (
@@ -265,14 +265,14 @@ function AppContent() {
       {/* Mobile Bottom Navigation */}
       <nav className={`md:hidden fixed bottom-0 left-0 right-0 ${isDark ? 'bg-black border-gray-800' : 'bg-white border-black'} border-t-2 border-solid px-4 py-3 z-[1000000]`} style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))' }}>
         <div className="flex items-center justify-around gap-2">
-          <a href="https://nftpricefloor.com" target="_blank" rel="noopener noreferrer" className={`flex flex-col items-center gap-1 ${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-[#F11F9D] transition-colors min-w-0`}>
+          <a href="https://nftpricefloor.com" target="_blank" rel="noopener noreferrer" className={`flex flex-col items-center gap-1 ${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-[#DD5994] transition-colors min-w-0`}>
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M2 20h6v-6H2v6zm8-10h6v10h-6V10zm8 4h6v6h-6v-6z"/>
               <path d="M2 19h6v1H2v-1zm8 1h6v-1h-6v1zm8-3h6v1h-6v-1z"/>
             </svg>
             <span className="text-xs font-medium truncate">Rankings</span>
           </a>
-          <a href="https://nftpricefloor.com/nft-drops" target="_blank" rel="noopener noreferrer" className={`flex flex-col items-center gap-1 ${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-[#F11F9D] transition-colors min-w-0`}>
+          <a href="https://nftpricefloor.com/nft-drops" target="_blank" rel="noopener noreferrer" className={`flex flex-col items-center gap-1 ${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-[#DD5994] transition-colors min-w-0`}>
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 2L8.5 8.5L2 12l6.5 3.5L12 22l3.5-6.5L22 12l-6.5-3.5L12 2zm0 3.83L14.17 12L12 18.17L9.83 12L12 5.83z"/>
             </svg>
@@ -280,7 +280,7 @@ function AppContent() {
           </a>
           <button 
             onClick={() => navigate('/nftstrategies')} 
-            className={`flex flex-col items-center gap-1 ${location.pathname.includes('/nftstrategies') || location.pathname === '/' ? 'text-[#F11F9D]' : isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-[#F11F9D] font-medium transition-colors min-w-0 cursor-pointer`}
+            className={`flex flex-col items-center gap-1 ${location.pathname.includes('/nftstrategies') || location.pathname === '/' ? 'text-[#DD5994]' : isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-[#DD5994] font-medium transition-colors min-w-0 cursor-pointer`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
@@ -341,10 +341,10 @@ function AppContent() {
             <div className="col-span-1">
               <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-black'} text-sm uppercase tracking-wide mb-4`}>Explore</h3>
               <ul className="space-y-3">
-                <li><a href="https://nftpricefloor.com" className="text-gray-600 dark:text-gray-400 hover:text-[#F11F9D] text-sm transition-colors">Rankings</a></li>
-                <li><a href="https://nftpricefloor.com/nft-drops" className="text-gray-600 dark:text-gray-400 hover:text-[#F11F9D] text-sm transition-colors">NFT Drops</a></li>
-                <li><a href="https://nftpricefloor.com/nft-news" className="text-gray-600 dark:text-gray-400 hover:text-[#F11F9D] text-sm transition-colors">Live News</a></li>
-                <li><a href="https://nftpricefloor.com/wallet-tracker" className="text-gray-600 dark:text-gray-400 hover:text-[#F11F9D] text-sm transition-colors">Wallet Tracker</a></li>
+                <li><a href="https://nftpricefloor.com" className="text-gray-600 dark:text-gray-400 hover:text-[#DD5994] text-sm transition-colors">Rankings</a></li>
+                <li><a href="https://nftpricefloor.com/nft-drops" className="text-gray-600 dark:text-gray-400 hover:text-[#DD5994] text-sm transition-colors">NFT Drops</a></li>
+                <li><a href="https://nftpricefloor.com/nft-news" className="text-gray-600 dark:text-gray-400 hover:text-[#DD5994] text-sm transition-colors">Live News</a></li>
+                <li><a href="https://nftpricefloor.com/wallet-tracker" className="text-gray-600 dark:text-gray-400 hover:text-[#DD5994] text-sm transition-colors">Wallet Tracker</a></li>
               </ul>
             </div>
             
@@ -352,10 +352,10 @@ function AppContent() {
             <div className="col-span-1">
               <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-black'} text-sm uppercase tracking-wide mb-4`}>More</h3>
               <ul className="space-y-3">
-                <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-[#F11F9D] text-sm transition-colors">Price Comparison</a></li>
-                <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-[#F11F9D] text-sm transition-colors">Brokerage</a></li>
-                <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-[#F11F9D] text-sm transition-colors">API</a></li>
-                <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-[#F11F9D] text-sm transition-colors">Ads</a></li>
+                <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-[#DD5994] text-sm transition-colors">Price Comparison</a></li>
+                <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-[#DD5994] text-sm transition-colors">Brokerage</a></li>
+                <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-[#DD5994] text-sm transition-colors">API</a></li>
+                <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-[#DD5994] text-sm transition-colors">Ads</a></li>
               </ul>
             </div>
             
@@ -366,9 +366,9 @@ function AppContent() {
             <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6">
               <p className="text-gray-600 dark:text-gray-400 text-sm">© 2025 NFTPriceFloor. All rights reserved.</p>
               <div className="flex space-x-6">
-                <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-[#F11F9D] text-sm transition-colors">Privacy Policy</a>
-                <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-[#F11F9D] text-sm transition-colors">Terms of Service</a>
-                <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-[#F11F9D] text-sm transition-colors">Contact</a>
+                <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-[#DD5994] text-sm transition-colors">Privacy Policy</a>
+                <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-[#DD5994] text-sm transition-colors">Terms of Service</a>
+                <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-[#DD5994] text-sm transition-colors">Contact</a>
               </div>
             </div>
             <div className="mt-4 md:mt-0">

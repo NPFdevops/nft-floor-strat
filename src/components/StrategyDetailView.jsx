@@ -525,25 +525,26 @@ const StrategyDetailView = ({ strategy, onBack }) => {
 
     return (
       <div className="space-y-6">
-        {/* Comparative Table */}
-        <div className="comparison-table-container">
-          <div className="table-header">
-            <h3>Strategy vs Collection Comparison</h3>
-            <p>Side-by-side comparison of NFT collection and strategy metrics</p>
-            {errorStates.collection && (
-              <div className="error-container">
-                <div className="error-header">
-                  <svg className="error-icon" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule={"evenodd"} />
-                  </svg>
-                  <div className="error-content">
-                    <p className="error-message">{errorStates.collection}</p>
-                  </div>
+        {/* Strategy vs Collection Comparison Section */}
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold">Strategy vs Collection Comparison</h2>
+          <p className="text-gray-600 dark:text-gray-400">Side-by-side comparison of NFT collection and strategy metrics</p>
+          
+          {errorStates.collection && (
+            <div className="error-container">
+              <div className="error-header">
+                <svg className="error-icon" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule={"evenodd"} />
+                </svg>
+                <div className="error-content">
+                  <p className="error-message">{errorStates.collection}</p>
                 </div>
               </div>
-            )}
-          </div>
-          <div className="w-full">
+            </div>
+          )}
+          
+          <div className="comparison-table-container">
+            <div className="w-full">
             <table className="comparison-table">
               <thead>
                 <tr>
@@ -649,6 +650,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
                 </tr>
               </tbody>
             </table>
+            </div>
           </div>
         </div>
 
@@ -1052,7 +1054,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
   }
 
   return (
-    <div className={`strategy-detail-container w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-8 pb-24 min-w-0 overflow-x-hidden ${isDark ? 'dark' : ''}`} style={{ paddingBottom: 'calc(96px + env(safe-area-inset-bottom, 0px))' }}>
+    <div className={`strategy-detail-container w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-8 pb-24 min-w-0 overflow-x-hidden ${isDark ? 'dark' : ''}`} style={{ paddingBottom: 'calc(96px + env(safe-area-inset-bottom, 0px))', backgroundColor: isDark ? '#000000' : '#FFF6FB' }}>
 
       {/* Tab Navigation */}
       <div className="tab-navigation">

@@ -56,7 +56,7 @@
   background: none;
   color: #000000;
   box-shadow: none;
-  border-bottom: 2px solid #000000;
+  border-bottom: 2px solid #FFAADD;
 }
 
 .tab-button:not(.active) {
@@ -72,7 +72,7 @@
   background: none;
   color: #ffffff;
   box-shadow: none;
-  border-bottom-color: #ffffff;
+  border-bottom-color: #FFAADD;
 }
 
 .strategy-detail-container.dark .tab-button:not(.active) {
@@ -89,7 +89,6 @@
   border-radius: 0;
   border: 2px solid #000000;
   background: white;
-  box-shadow: 8px 8px 0px #000000;
   overflow: hidden;
   width: 100%;
 }
@@ -97,40 +96,8 @@
 .strategy-detail-container.dark .comparison-table-container {
   background: #1f2937;
   border-color: #ffffff;
-  box-shadow: 8px 8px 0px #ffffff;
 }
 
-.table-header {
-  border-bottom: 2px solid #000000;
-  padding: 16px 24px;
-  background: #f9fafb;
-}
-
-.strategy-detail-container.dark .table-header {
-  background: #111827;
-  border-bottom-color: #ffffff;
-}
-
-.table-header h3 {
-  font-size: 20px;
-  font-weight: 700;
-  color: #000000;
-  margin: 0;
-}
-
-.strategy-detail-container.dark .table-header h3 {
-  color: #ffffff;
-}
-
-.table-header p {
-  font-size: 14px;
-  color: #6b7280;
-  margin: 4px 0 0 0;
-}
-
-.strategy-detail-container.dark .table-header p {
-  color: #d1d5db;
-}
 
 .comparison-table {
   width: 100%;
@@ -200,7 +167,6 @@
   border-radius: 0;
   border: 2px solid #000000;
   background: white;
-  box-shadow: 8px 8px 0px #000000;
   padding: 16px;
 }
 
@@ -213,7 +179,6 @@
 .strategy-detail-container.dark .metric-card {
   background: #1f2937;
   border-color: #ffffff;
-  box-shadow: 8px 8px 0px #ffffff;
 }
 
 /* Preserve Tailwind text color classes but add dark mode overrides */
@@ -359,6 +324,11 @@
   color: #9ca3af !important;
 }
 
+/* Dark mode support for section headers */
+.strategy-detail-container.dark .text-gray-600 {
+  color: #d1d5db !important;
+}
+
 .strategy-detail-container.dark .bg-black {
   background-color: #ffffff !important;
 }
@@ -376,13 +346,11 @@
   border-radius: 0;
   border: 2px solid #000000;
   background: white;
-  box-shadow: 8px 8px 0px #000000;
 }
 
 .strategy-detail-container.dark .chart-container {
   background: #1f2937;
   border-color: #ffffff;
-  box-shadow: 8px 8px 0px #ffffff;
 }
 
 /* Chart section border colors in dark mode */
@@ -603,8 +571,8 @@
 .action-button {
   width: 100%;
   padding: 12px 16px;
-  background: #000000;
-  color: white;
+  background: #FFAADD;
+  color: #000000;
   border: 2px solid #000000;
   border-radius: 0;
   transition: all 0.2s ease;
@@ -626,19 +594,17 @@
 }
 
 .action-button:hover {
-  background: #374151;
-  border-color: #374151;
+  background: #FF88CC;
 }
 
 .strategy-detail-container.dark .action-button {
-  background: #ffffff;
+  background: #FFAADD;
   color: #000000;
   border-color: #ffffff;
 }
 
 .strategy-detail-container.dark .action-button:hover {
-  background: #e5e7eb;
-  border-color: #e5e7eb;
+  background: #FF88CC;
 }
 
 .action-button-primary {
@@ -669,8 +635,8 @@
   padding: 12px 16px;
   border-radius: 0;
   border: 2px solid #000000;
-  background: #3b82f6;
-  color: white;
+  background: #FFAADD;
+  color: #000000;
   font-weight: 700;
   font-size: 14px;
   line-height: 1.25;
@@ -680,27 +646,23 @@
   justify-content: center;
   gap: 8px;
   transition: all 0.2s ease;
-  box-shadow: 4px 4px 0px #000000;
   min-height: 44px;
 }
 
 .nft-pricefloor-button:hover {
-  background: #2563eb;
-  box-shadow: 6px 6px 0px #000000;
+  background: #FF88CC;
   transform: translateY(-1px);
 }
 
 .strategy-detail-container.dark .nft-pricefloor-button {
-  background: #60a5fa;
+  background: #FFAADD;
   color: #000000;
   border-color: #ffffff;
-  box-shadow: 4px 4px 0px #ffffff;
 }
 
 .strategy-detail-container.dark .nft-pricefloor-button:hover {
-  background: #3b82f6;
-  color: white;
-  box-shadow: 6px 6px 0px #ffffff;
+  background: #FF88CC;
+  color: #000000;
 }
 
 /* Content Sections */
@@ -838,14 +800,12 @@
   border: 2px solid #000000;
   background: white;
   border-radius: 0;
-  box-shadow: 8px 8px 0px #000000;
   overflow: hidden;
 }
 
 .strategy-detail-container.dark .card {
   background: #1f2937;
   border-color: #ffffff;
-  box-shadow: 8px 8px 0px #ffffff;
 }
 
 .card-header {

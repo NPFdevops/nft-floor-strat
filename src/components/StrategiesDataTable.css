@@ -581,8 +581,8 @@
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  border-bottom: 2px solid #e5e7eb;
-  border-right: 1px solid #f3f4f6;
+  border-bottom: 2px solid #000000;
+  border-right: none;
   position: relative;
   color: #374151;
   white-space: nowrap;
@@ -592,14 +592,11 @@
 }
 
 .strategies-table-container.dark .strategies-table th {
-  border-bottom: 2px solid #374151;
-  border-right: 1px solid #4b5563;
+  border-bottom: 2px solid #ffffff;
+  border-right: none;
   color: #e5e7eb;
 }
 
-.strategies-table th:last-child {
-  border-right: none;
-}
 
 .strategies-table th.sortable {
   cursor: pointer;
@@ -625,7 +622,8 @@
 }
 
 .strategies-table tbody tr {
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 2px solid #000000;
+  margin-bottom: 4px;
   transition: all 0.2s ease;
   position: relative;
   overflow: visible;
@@ -664,7 +662,8 @@
 }
 
 .strategies-table-container.dark .strategies-table tbody tr {
-  border-bottom: 1px solid #374151;
+  border-bottom: 2px solid #ffffff;
+  margin-bottom: 4px;
 }
 
 .strategies-table-container.dark .strategies-table tbody tr:nth-child(even) {
@@ -705,7 +704,7 @@
 .strategies-table td {
   padding: 16px 20px;
   vertical-align: middle;
-  border-right: 1px solid #f8fafc;
+  border-right: none;
   color: #111827;
   font-weight: 500;
   font-size: 14px;
@@ -717,7 +716,7 @@
 }
 
 .strategies-table-container.dark .strategies-table td {
-  border-right: 1px solid #374151;
+  border-right: none;
   color: #e5e7eb;
 }
 
@@ -740,9 +739,6 @@
   overflow: hidden;
 }
 
-.strategies-table td:last-child {
-  border-right: none;
-}
 
 /* Tooltip Styles */
 .tooltip-container {

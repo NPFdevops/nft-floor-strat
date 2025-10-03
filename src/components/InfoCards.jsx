@@ -56,7 +56,7 @@ const InfoCards = ({ strategies = [] }) => {
       value: formatCurrency(totalMarketCap),
       subtitle: 'Combined value',
       bgColor: isDark ? 'bg-gradient-to-br from-gray-800 to-gray-900' : 'bg-gradient-to-br from-pink-50 to-rose-50',
-      borderColor: isDark ? 'border-gray-700' : 'border-pink-200',
+      borderColor: isDark ? 'border-white border-2' : 'border-black border-2',
       textColor: isDark ? 'text-pink-400' : 'text-pink-600',
       valueColor: isDark ? 'text-pink-300' : 'text-pink-700'
     },
@@ -66,7 +66,7 @@ const InfoCards = ({ strategies = [] }) => {
       value: liveStrategiesCount.toString(),
       subtitle: 'Active strategies',
       bgColor: isDark ? 'bg-gradient-to-br from-gray-800 to-gray-900' : 'bg-gradient-to-br from-pink-50 to-pink-100',
-      borderColor: isDark ? 'border-gray-700' : 'border-pink-300',
+      borderColor: isDark ? 'border-white border-2' : 'border-black border-2',
       textColor: isDark ? 'text-pink-400' : 'text-pink-700',
       valueColor: isDark ? 'text-pink-300' : 'text-pink-800'
     },
@@ -76,7 +76,7 @@ const InfoCards = ({ strategies = [] }) => {
       value: formatPercentage(punkDominancePercentage),
       subtitle: punkstrategies.length > 0 ? `${punkstrategies.length} strategies` : 'No punk strategies',
       bgColor: isDark ? 'bg-gradient-to-br from-gray-800 to-gray-900' : 'bg-gradient-to-br from-rose-50 to-pink-50',
-      borderColor: isDark ? 'border-gray-700' : 'border-rose-200',
+      borderColor: isDark ? 'border-white border-2' : 'border-black border-2',
       textColor: isDark ? 'text-rose-400' : 'text-rose-600',
       valueColor: isDark ? 'text-rose-300' : 'text-rose-700'
     }
@@ -89,7 +89,7 @@ const InfoCards = ({ strategies = [] }) => {
         {cards.map((card) => (
           <div
             key={card.id}
-            className={`${card.bgColor} ${card.borderColor} border rounded-lg p-3 lg:p-4 transition-all duration-200 hover:shadow-md hover:scale-[1.02]`}
+            className={`${card.bgColor} ${card.borderColor} rounded-lg p-3 lg:p-4 transition-all duration-200 hover:shadow-md hover:scale-[1.02]`}
           >
             <div className="text-center">
               <h3 className={`text-xs lg:text-sm font-semibold ${card.textColor} mb-1 uppercase tracking-wide`}>
@@ -112,7 +112,7 @@ const InfoCards = ({ strategies = [] }) => {
           {cards.map((card) => (
             <div
               key={card.id}
-              className={`${card.bgColor} ${card.borderColor} border rounded-lg p-3 flex-shrink-0 w-36 transition-all duration-200 active:scale-95`}
+              className={`${card.bgColor} ${card.borderColor} rounded-lg p-3 flex-shrink-0 w-36 transition-all duration-200 active:scale-95`}
               style={{ minWidth: '144px' }} // Ensure consistent width
             >
               <div className="text-center">
