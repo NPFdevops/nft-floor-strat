@@ -1,16 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { holdingsService } from '../services/holdingsService';
 import { useTheme } from '../contexts/ThemeContext';
+import { strategyToSlugMappingService } from '../services/strategyToSlugMapping';
 
-const Holdings = ({ strategyAddress, nftAddress, collectionName }) => {
+const Holdings = ({ strategyAddress, nftAddress, collectionName, holdingsData, strategy }) => {
   const { isDark } = useTheme();
   const [holdings, setHoldings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [summary, setSummary] = useState(null);
+  const [sortBy, setSortBy] = useState('price'); // 'price' or 'tokenId'
+  const [sortOrder, setSortOrder] = useState('asc'); // 'asc' or 'desc'
 
   useEffect(() => {
     const fetchHoldings = async () => {
+      // If holdingsData is passed as prop, use it directly
+      if (holdingsData) {
+        try {
+          setLoading(true);
+          setError(null);
+          
+          const summaryData = holdingsService.getHoldingsSummary(holdingsData);
+          
+          setHoldings(holdingsData);
+          setSummary(summaryData);
+          
+        } catch (err) {
+          console.error('❌ Failed to process holdings data:', err);
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+        return;
+      }
+
+      // Otherwise, fetch holdings if we have the required addresses
       if (!strategyAddress || !nftAddress) {
         setLoading(false);
         return;
@@ -20,10 +44,10 @@ const Holdings = ({ strategyAddress, nftAddress, collectionName }) => {
         setLoading(true);
         setError(null);
         
-        const holdingsData = await holdingsService.fetchHoldings(strategyAddress, nftAddress);
-        const summaryData = holdingsService.getHoldingsSummary(holdingsData);
+        const fetchedHoldingsData = await holdingsService.fetchHoldings(strategyAddress, nftAddress);
+        const summaryData = holdingsService.getHoldingsSummary(fetchedHoldingsData);
         
-        setHoldings(holdingsData);
+        setHoldings(fetchedHoldingsData);
         setSummary(summaryData);
         
       } catch (err) {
@@ -35,7 +59,7 @@ const Holdings = ({ strategyAddress, nftAddress, collectionName }) => {
     };
 
     fetchHoldings();
-  }, [strategyAddress, nftAddress]);
+  }, [strategyAddress, nftAddress, holdingsData]);
 
   const formatCurrency = (value, currency = 'USD') => {
     if (!value || value === '0') return '$0.00';
@@ -50,6 +74,75 @@ const Holdings = ({ strategyAddress, nftAddress, collectionName }) => {
   const formatEth = (value) => {
     if (!value || value === '0') return '0 ETH';
     return `${parseFloat(value).toFixed(4)} ETH`;
+  };
+
+  // Sort holdings based on current sort settings
+  const sortedHoldings = useMemo(() => {
+    if (!holdings || holdings.length === 0) return holdings;
+
+    return [...holdings].sort((a, b) => {
+      let aValue, bValue;
+
+      if (sortBy === 'price') {
+        aValue = parseFloat(a.priceInEth) || 0;
+        bValue = parseFloat(b.priceInEth) || 0;
+      } else { // tokenId
+        aValue = parseInt(a.tokenId) || 0;
+        bValue = parseInt(b.tokenId) || 0;
+      }
+
+      if (sortOrder === 'asc') {
+        return aValue - bValue;
+      } else {
+        return bValue - aValue;
+      }
+    });
+  }, [holdings, sortBy, sortOrder]);
+
+  // Handle sort change
+  const handleSortChange = (newSortBy) => {
+    if (sortBy === newSortBy) {
+      // Toggle sort order if same sort type
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Change sort type and reset to default order
+      setSortBy(newSortBy);
+      setSortOrder(newSortBy === 'price' ? 'asc' : 'asc'); // Price defaults to asc (lowest first), tokenId defaults to asc
+    }
+  };
+
+  // Handle NFT item click to open NFTPriceFloor page
+  const handleNftClick = (holding) => {
+    try {
+      // Get the correct NFTPriceFloor slug for this collection
+      let collectionSlug = '';
+      
+      if (strategy) {
+        // First try to get from strategy data
+        collectionSlug = strategy.collectionSlug || 
+                        strategyToSlugMappingService.getSlugFromStrategyName(strategy.collectionName);
+      }
+      
+      // Fallback: try to map from collection name
+      if (!collectionSlug && collectionName) {
+        collectionSlug = strategyToSlugMappingService.getSlugFromStrategyName(collectionName);
+      }
+      
+      // Additional fallback: use collection name in lowercase with dashes
+      if (!collectionSlug && collectionName) {
+        collectionSlug = collectionName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      }
+      
+      if (collectionSlug && holding.tokenId) {
+        const nftUrl = `https://nftpricefloor.com/${collectionSlug}/${holding.tokenId}`;
+        console.log(`🔗 Opening NFT page: ${nftUrl}`);
+        window.open(nftUrl, '_blank', 'noopener,noreferrer');
+      } else {
+        console.warn('⚠️ Unable to construct NFT URL:', { collectionSlug, tokenId: holding.tokenId });
+      }
+    } catch (error) {
+      console.error('❌ Error opening NFT page:', error);
+    }
   };
 
   const renderLoadingState = () => (
@@ -105,39 +198,76 @@ const Holdings = ({ strategyAddress, nftAddress, collectionName }) => {
     <div className="space-y-6">
       {/* Holdings Summary */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className={`rounded-none border-2 ${isDark ? 'border-white bg-gray-800 shadow-[4px_4px_0px_#FFFFFF]' : 'border-black bg-white shadow-[4px_4px_0px_#000000]'} p-4`}>
+        <div className={`rounded-none ${isDark ? 'thick-border-dark bg-gray-800' : 'thick-border-light bg-white'} p-4`}>
           <h3 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'} mb-1`}>Total NFTs</h3>
           <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>{summary?.totalCount || 0}</p>
         </div>
         
-        <div className={`rounded-none border-2 ${isDark ? 'border-white bg-gray-800 shadow-[4px_4px_0px_#FFFFFF]' : 'border-black bg-white shadow-[4px_4px_0px_#000000]'} p-4`}>
+        <div className={`rounded-none ${isDark ? 'thick-border-dark bg-gray-800' : 'thick-border-light bg-white'} p-4`}>
           <h3 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'} mb-1`}>Total Value (ETH)</h3>
           <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>{formatEth(summary?.totalValueEth)}</p>
         </div>
         
-        <div className={`rounded-none border-2 ${isDark ? 'border-white bg-gray-800 shadow-[4px_4px_0px_#FFFFFF]' : 'border-black bg-white shadow-[4px_4px_0px_#000000]'} p-4`}>
+        <div className={`rounded-none ${isDark ? 'thick-border-dark bg-gray-800' : 'thick-border-light bg-white'} p-4`}>
           <h3 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'} mb-1`}>Total Value (USD)</h3>
           <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>{formatCurrency(summary?.totalValueUsd)}</p>
         </div>
         
-        <div className={`rounded-none border-2 ${isDark ? 'border-white bg-gray-800 shadow-[4px_4px_0px_#FFFFFF]' : 'border-black bg-white shadow-[4px_4px_0px_#000000]'} p-4`}>
+        <div className={`rounded-none ${isDark ? 'thick-border-dark bg-gray-800' : 'thick-border-light bg-white'} p-4`}>
           <h3 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'} mb-1`}>Average Value</h3>
           <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>{formatCurrency(summary?.averageValueUsd)}</p>
         </div>
       </div>
 
       {/* Holdings Grid */}
-      <div className={`rounded-none border-2 ${isDark ? 'border-white bg-gray-800 shadow-[8px_8px_0px_#FFFFFF]' : 'border-black bg-white shadow-[8px_8px_0px_#000000]'} p-6`}>
-        <div className="flex items-center justify-between mb-6">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
           <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>Current NFT Holdings</h3>
-          <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{holdings.length} items</span>
+          <div className="flex items-center gap-4">
+            {/* Sort Controls */}
+            <div className="flex items-center gap-2">
+              <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Sort by:</span>
+              <div className={`flex ${isDark ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg p-1`}>
+                <button
+                  onClick={() => handleSortChange('price')}
+                  className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
+                    sortBy === 'price'
+                      ? isDark
+                        ? 'bg-white text-black shadow-sm'
+                        : 'bg-black text-white shadow-sm'
+                      : isDark
+                        ? 'text-gray-300 hover:text-white hover:bg-gray-600'
+                        : 'text-gray-600 hover:text-black hover:bg-gray-200'
+                  }`}
+                >
+                  Price {sortBy === 'price' && (sortOrder === 'desc' ? '↓' : '↑')}
+                </button>
+                <button
+                  onClick={() => handleSortChange('tokenId')}
+                  className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
+                    sortBy === 'tokenId'
+                      ? isDark
+                        ? 'bg-white text-black shadow-sm'
+                        : 'bg-black text-white shadow-sm'
+                      : isDark
+                        ? 'text-gray-300 hover:text-white hover:bg-gray-600'
+                        : 'text-gray-600 hover:text-black hover:bg-gray-200'
+                  }`}
+                >
+                  Token ID {sortBy === 'tokenId' && (sortOrder === 'desc' ? '↓' : '↑')}
+                </button>
+              </div>
+            </div>
+            <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{holdings.length} items</span>
+          </div>
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {holdings.map((holding, index) => (
+          {sortedHoldings.map((holding, index) => (
             <div 
               key={`${holding.tokenId}-${index}`}
-              className={`rounded-none border-2 ${isDark ? 'border-white bg-gray-700 shadow-[4px_4px_0px_#FFFFFF] hover:shadow-[6px_6px_0px_#FFFFFF]' : 'border-black bg-gray-50 shadow-[4px_4px_0px_#000000] hover:shadow-[6px_6px_0px_#000000]'} overflow-hidden transition-all duration-200`}
+              onClick={() => handleNftClick(holding)}
+              className={`rounded-none ${isDark ? 'thick-border-dark bg-gray-700' : 'thick-border-light bg-gray-50'} overflow-hidden transition-all duration-200 cursor-pointer hover:scale-[1.02] active:scale-[0.98]`}
             >
               {/* NFT Image */}
               <div className={`aspect-square ${isDark ? 'bg-gray-600 border-b-2 border-white' : 'bg-gray-200 border-b-2 border-black'} relative overflow-hidden`}>

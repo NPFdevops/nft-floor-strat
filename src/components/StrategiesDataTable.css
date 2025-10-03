@@ -582,6 +582,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   border-bottom: 2px solid #000000;
+  border-top: 2px solid #000000;
   border-right: none;
   position: relative;
   color: #374151;
@@ -593,8 +594,27 @@
 
 .strategies-table-container.dark .strategies-table th {
   border-bottom: 2px solid #ffffff;
+  border-top: 2px solid #ffffff;
   border-right: none;
   color: #e5e7eb;
+}
+
+/* First header column (NFT Collection) - left border */
+.strategies-table th:first-child {
+  border-left: 2px solid #000000;
+}
+
+.strategies-table-container.dark .strategies-table th:first-child {
+  border-left: 2px solid #ffffff;
+}
+
+/* Last header column (Market Cap) - right border */
+.strategies-table th:last-child {
+  border-right: 2px solid #000000;
+}
+
+.strategies-table-container.dark .strategies-table th:last-child {
+  border-right: 2px solid #ffffff;
 }
 
 
@@ -621,6 +641,15 @@
   transform: translateY(0);
 }
 
+/* Active/selected sortable header styling */
+.strategies-table th.sortable.active {
+  color: #DD5994;
+}
+
+.strategies-table-container.dark .strategies-table th.sortable.active {
+  color: #DD5994;
+}
+
 .strategies-table tbody tr {
   border-bottom: 2px solid #000000;
   margin-bottom: 4px;
@@ -634,7 +663,7 @@
 }
 
 .strategies-table tbody tr:nth-child(odd) {
-  background-color: #fafbfc;
+  background-color: #ffffff;
 }
 
 .strategies-table tbody tr:hover {
@@ -667,11 +696,11 @@
 }
 
 .strategies-table-container.dark .strategies-table tbody tr:nth-child(even) {
-  background-color: #1f2937;
+  background-color: #000000;
 }
 
 .strategies-table-container.dark .strategies-table tbody tr:nth-child(odd) {
-  background-color: #111827;
+  background-color: #000000;
 }
 
 .strategies-table-container.dark .strategies-table tbody tr:hover {
@@ -698,7 +727,11 @@
 }
 
 .strategies-table tbody tr:last-child {
-  border-bottom: none;
+  border-bottom: 2px solid #000000;
+}
+
+.strategies-table-container.dark .strategies-table tbody tr:last-child {
+  border-bottom: 2px solid #ffffff;
 }
 
 .strategies-table td {
@@ -717,7 +750,7 @@
 
 .strategies-table-container.dark .strategies-table td {
   border-right: none;
-  color: #e5e7eb;
+  color: #ffffff;
 }
 
 .strategies-table-container.dark .collection-name {
@@ -831,6 +864,11 @@
   min-width: 180px;
   max-width: 280px;
   width: auto;
+  border-left: 2px solid #000000;
+}
+
+.strategies-table-container.dark .collection-cell {
+  border-left: 2px solid #ffffff;
 }
 
 @media (min-width: 1024px) {
@@ -1091,6 +1129,22 @@
   height: 1.2em;
   min-width: 14px;
   min-height: 14px;
+}
+
+/* Market Cap Value Cell (last column) */
+.strategies-table .market-cap-value-cell {
+  font-family: 'Space Grotesk', sans-serif;
+  color: #111827;
+  font-weight: 600;
+  font-size: 14px;
+  min-width: 80px;
+  max-width: 130px;
+  width: auto;
+  border-right: 2px solid #000000 !important;
+}
+
+.strategies-table-container.dark .strategies-table .market-cap-value-cell {
+  border-right: 2px solid #ffffff !important;
 }
 
 .actions-cell {

@@ -121,7 +121,7 @@ function AppContent() {
       
       <div className="layout-container flex h-full grow flex-col">
         {/* Header */}
-        <header className={`${isDark ? 'bg-black border-gray-800' : 'bg-white'} md:sticky md:top-0 md:z-50 md:shadow-sm w-full overflow-hidden ${isDark ? 'border-b border-gray-800' : ''}`}>
+        <header className={`${isDark ? 'bg-black border-gray-800' : 'bg-white'} md:fixed md:top-0 md:left-0 md:right-0 md:z-50 md:shadow-sm md:backdrop-blur-sm w-full overflow-hidden ${isDark ? 'border-b border-gray-800' : ''}`}>
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
             {/* Main header row */}
             <div className="flex items-center justify-between py-4 min-w-0">
@@ -184,14 +184,14 @@ function AppContent() {
         </header>
         
         {/* Main Content */}
-        <div className="flex flex-1 flex-col py-4 sm:py-8 pb-20 md:pb-8 w-full overflow-x-hidden">
+        <div className="flex flex-1 flex-col py-4 sm:py-8 pb-20 md:pb-8 md:pt-20 w-full overflow-x-hidden">
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 flex flex-col flex-1 min-w-0">
             {/* Breadcrumb Navigation (hidden on mobile) */}
-            <nav className={`hidden md:flex items-center gap-2 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} mb-6`}>
+            <nav className={`hidden md:flex items-center gap-2 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'} mb-6 mt-4`}>
               <a href="https://nftpricefloor.com" target="_blank" rel="noopener noreferrer" className={`hover:text-[#DD5994] transition-colors`}>
                 Home
               </a>
-              <span>-</span>
+              <span>→</span>
               {selectedStrategy ? (
                 <>
                   <button
@@ -200,7 +200,7 @@ function AppContent() {
                   >
                     NFT Strategies
                   </button>
-                  <span>-</span>
+                  <span>→</span>
                   <span className={`${isDark ? 'text-white' : 'text-black'} font-medium`}>
                     {selectedStrategy.collectionName} - {selectedStrategy.tokenName}
                   </span>
@@ -212,9 +212,9 @@ function AppContent() {
               )}
             </nav>
             
-            {/* Back to Strategies Button */}
+            {/* Back to Strategies Button (mobile only) */}
             {selectedStrategy && (
-              <div className="mb-4">
+              <div className="mb-4 md:hidden">
                 <button
                   onClick={handleBackToStrategies}
                   className={`flex items-center gap-2 ${isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-[#DD5994] transition-colors`}
@@ -231,7 +231,7 @@ function AppContent() {
             <div className="flex flex-1 w-full min-w-0">
               {/* View Header */}
               <div className="w-full min-w-0">
-                <div className="mb-6">
+                <div className="mb-3">
                   {selectedStrategy ? (
                     <div>
                       <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'} mb-2 break-words`}>

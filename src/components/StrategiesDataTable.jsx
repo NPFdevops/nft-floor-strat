@@ -383,7 +383,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
           <thead>
             <tr role="row">
               <th 
-                className="sortable" 
+                className={`sortable ${sortConfig.key === 'collectionName' ? 'active' : ''}`}
                 onClick={() => handleSort('collectionName')}
                 onKeyDown={(e) => e.key === 'Enter' && handleSort('collectionName')}
                 tabIndex="0"
@@ -398,7 +398,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 NFT Collection {getSortIcon('collectionName')}
               </th>
               <th 
-                className="sortable" 
+                className={`sortable ${sortConfig.key === 'tokenName' ? 'active' : ''}`}
                 onClick={() => handleSort('tokenName')}
                 onKeyDown={(e) => e.key === 'Enter' && handleSort('tokenName')}
                 tabIndex="0"
@@ -413,7 +413,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 Strategy {getSortIcon('tokenName')}
               </th>
               <th 
-                className="sortable" 
+                className={`sortable ${sortConfig.key === 'holdingsCount' ? 'active' : ''}`}
                 onClick={() => handleSort('holdingsCount')}
                 onKeyDown={(e) => e.key === 'Enter' && handleSort('holdingsCount')}
                 tabIndex="0"
@@ -428,7 +428,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 Holdings {getSortIcon('holdingsCount')}
               </th>
               <th 
-                className="sortable" 
+                className={`sortable ${sortConfig.key === 'poolData.price_usd' ? 'active' : ''}`}
                 onClick={() => handleSort('poolData.price_usd')}
                 onKeyDown={(e) => e.key === 'Enter' && handleSort('poolData.price_usd')}
                 tabIndex="0"
@@ -443,7 +443,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 Price {getSortIcon('poolData.price_usd')}
               </th>
               <th 
-                className="sortable" 
+                className={`sortable ${sortConfig.key === 'poolData.price_change_24h' ? 'active' : ''}`}
                 onClick={() => handleSort('poolData.price_change_24h')}
                 onKeyDown={(e) => e.key === 'Enter' && handleSort('poolData.price_change_24h')}
                 tabIndex="0"
@@ -458,7 +458,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 24h Change {getSortIcon('poolData.price_change_24h')}
               </th>
               <th 
-                className="sortable" 
+                className={`sortable ${sortConfig.key === 'burnPercentage' ? 'active' : ''}`}
                 onClick={() => handleSort('burnPercentage')}
                 onKeyDown={(e) => e.key === 'Enter' && handleSort('burnPercentage')}
                 tabIndex="0"
@@ -473,7 +473,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 % Burn {getSortIcon('burnPercentage')}
               </th>
               <th 
-                className="sortable" 
+                className={`sortable ${sortConfig.key === 'floorMarketCapRatio' ? 'active' : ''}`}
                 onClick={() => handleSort('floorMarketCapRatio')}
                 onKeyDown={(e) => e.key === 'Enter' && handleSort('floorMarketCapRatio')}
                 tabIndex="0"
@@ -485,10 +485,10 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 }
                 aria-label="Sort by market cap ratio"
               >
-                Market Cap Ratio {getSortIcon('floorMarketCapRatio')}
+                MC Ratio {getSortIcon('floorMarketCapRatio')}
               </th>
               <th 
-                className="sortable" 
+                className={`sortable ${sortConfig.key === 'nftStrategyMarketCap' ? 'active' : ''}`}
                 onClick={() => handleSort('nftStrategyMarketCap')}
                 onKeyDown={(e) => e.key === 'Enter' && handleSort('nftStrategyMarketCap')}
                 tabIndex="0"
@@ -629,7 +629,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
       </div>
       
       {/* Data Attribution */}
-      <div className="mt-4 text-center">
+      <div className="mt-4 text-right">
         <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
           Data by{' '}
           <a 

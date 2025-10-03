@@ -30,10 +30,10 @@ class StrategyToSlugMappingService {
       'cryptodickbutts': 'cryptodickbutts-s3',
       
       // CrypToadz by GREMPLIN
-      'CrypToadz by GREMPLIN': 'cryptoadz-by-gremplin',
-      'cryptoadz by gremplin': 'cryptoadz-by-gremplin',
-      'CrypToadz': 'cryptoadz-by-gremplin',
-      'cryptoadz': 'cryptoadz-by-gremplin',
+      'CrypToadz by GREMPLIN': 'cryptoadz',
+      'cryptoadz by gremplin': 'cryptoadz',
+      'CrypToadz': 'cryptoadz',
+      'cryptoadz': 'cryptoadz',
       
       // Bored Ape Yacht Club
       'Bored Ape Yacht Club': 'bored-ape-yacht-club',
@@ -231,7 +231,7 @@ class StrategyToSlugMappingService {
       'bored-ape-kennel-club': 'bored-ape-kennel-club',
       'the-sandbox': 'the-sandbox',
       'decentraland': 'decentraland',
-      'cryptoadz-by-gremplin': 'cryptoadz-by-gremplin',
+      'cryptoadz-by-gremplin': 'cryptoadz',
       'chromie-squiggle-by-snowfro': 'chromie-squiggle-art-blocks-curated',
       'cryptodickbutts-s3': 'cryptodickbutts-s3',
       'hashmasks': 'hashmasks',

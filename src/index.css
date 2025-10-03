@@ -129,3 +129,12 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none; /* WebKit */
 }
+
+/* Thick Border Utility Classes */
+.thick-border-light {
+  border: 2px solid #000000;
+}
+
+.thick-border-dark {
+  border: 2px solid #ffffff;
+}

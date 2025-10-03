@@ -892,6 +892,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
             nftAddress={strategy.collection}
             collectionName={strategy.collectionName}
             holdingsData={holdingsData}
+            strategy={strategy}
           />
         )}
       </div>
@@ -1054,7 +1055,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
   }
 
   return (
-    <div className={`strategy-detail-container w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-8 pb-24 min-w-0 overflow-x-hidden ${isDark ? 'dark' : ''}`} style={{ paddingBottom: 'calc(96px + env(safe-area-inset-bottom, 0px))', backgroundColor: isDark ? '#000000' : '#FFF6FB' }}>
+    <div className={`strategy-detail-container w-full min-w-0 overflow-x-hidden ${isDark ? 'dark' : ''}`} style={{ paddingBottom: 'calc(96px + env(safe-area-inset-bottom, 0px))', backgroundColor: isDark ? '#000000' : '#FFF6FB' }}>
 
       {/* Tab Navigation */}
       <div className="tab-navigation">
