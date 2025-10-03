@@ -1,9 +1,9 @@
-import React from 'react';
-import { Helmet } from 'react-helmet-async';
+import React, { useEffect } from 'react';
 import { seoService } from '../services/seoService';
 
 /**
  * SEO Component for managing page metadata, OpenGraph tags, and structured data
+ * React 19 compatible version using direct DOM manipulation
  * 
  * @param {Object} props - Component props
  * @param {Object} props.strategy - Strategy data for dynamic SEO generation
@@ -17,122 +17,187 @@ export function SEO({
   pageType = 'dashboard',
   customMeta = {}
 }) {
-  // Generate appropriate metadata based on page type
-  const getMeta = () => {
-    let baseMeta;
+  useEffect(() => {
+    // Generate appropriate metadata based on page type
+    const getMeta = () => {
+      let baseMeta;
+      
+      if (pageType === 'strategy' && strategy) {
+        baseMeta = seoService.generateStrategyMeta(strategy, performanceData);
+      } else {
+        baseMeta = seoService.generateDashboardMeta();
+      }
+
+      // Merge with custom overrides
+      return {
+        ...baseMeta,
+        ...customMeta,
+        openGraph: {
+          ...baseMeta.openGraph,
+          ...customMeta.openGraph
+        },
+        twitter: {
+          ...baseMeta.twitter,
+          ...customMeta.twitter
+        }
+      };
+    };
+
+    const meta = getMeta();
+    const siteConfig = seoService.getSiteConfig();
+
+    // Function to update or create meta tag
+    const updateMetaTag = (name, content, property = false) => {
+      if (!content) return;
+      
+      const selector = property ? `meta[property="${name}"]` : `meta[name="${name}"]`;
+      let metaTag = document.querySelector(selector);
+      
+      if (!metaTag) {
+        metaTag = document.createElement('meta');
+        if (property) {
+          metaTag.setAttribute('property', name);
+        } else {
+          metaTag.setAttribute('name', name);
+        }
+        document.head.appendChild(metaTag);
+      }
+      
+      metaTag.setAttribute('content', content);
+    };
+
+    // Function to update link tag
+    const updateLinkTag = (rel, href) => {
+      if (!href) return;
+      
+      let linkTag = document.querySelector(`link[rel="${rel}"]`);
+      
+      if (!linkTag) {
+        linkTag = document.createElement('link');
+        linkTag.setAttribute('rel', rel);
+        document.head.appendChild(linkTag);
+      }
+      
+      linkTag.setAttribute('href', href);
+    };
+
+    // Function to update or create script tag
+    const updateScriptTag = (id, content) => {
+      if (!content) return;
+      
+      let scriptTag = document.querySelector(`script[data-seo-id="${id}"]`);
+      
+      if (!scriptTag) {
+        scriptTag = document.createElement('script');
+        scriptTag.setAttribute('type', 'application/ld+json');
+        scriptTag.setAttribute('data-seo-id', id);
+        document.head.appendChild(scriptTag);
+      }
+      
+      scriptTag.textContent = JSON.stringify(content);
+    };
+
+    // Update page title
+    document.title = meta.title;
+
+    // Update basic meta tags
+    updateMetaTag('description', meta.description);
+    updateMetaTag('keywords', meta.keywords);
+    updateMetaTag('author', 'NFT Strategy Dashboard');
+    updateMetaTag('robots', 'index, follow, max-image-preview:large');
+    updateMetaTag('googlebot', 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1');
     
-    if (pageType === 'strategy' && strategy) {
-      baseMeta = seoService.generateStrategyMeta(strategy, performanceData);
-    } else {
-      baseMeta = seoService.generateDashboardMeta();
+    // Update theme colors
+    updateMetaTag('theme-color', '#FFAADD');
+    updateMetaTag('msapplication-TileColor', '#FFAADD');
+    
+    // Update canonical URL
+    updateLinkTag('canonical', meta.canonical);
+    
+    // Update Open Graph meta tags
+    updateMetaTag('og:title', meta.openGraph.title, true);
+    updateMetaTag('og:description', meta.openGraph.description, true);
+    updateMetaTag('og:url', meta.openGraph.url, true);
+    updateMetaTag('og:type', meta.openGraph.type, true);
+    updateMetaTag('og:image', meta.openGraph.image, true);
+    updateMetaTag('og:image:width', '1200', true);
+    updateMetaTag('og:image:height', '630', true);
+    updateMetaTag('og:image:alt', meta.openGraph.title, true);
+    updateMetaTag('og:site_name', meta.openGraph.siteName, true);
+    updateMetaTag('og:locale', meta.openGraph.locale, true);
+    
+    // Update article-specific OG tags for strategy pages
+    if (meta.openGraph.article) {
+      updateMetaTag('article:section', meta.openGraph.article.section, true);
+      
+      // Remove existing article:tag meta tags
+      document.querySelectorAll('meta[property="article:tag"]').forEach(tag => tag.remove());
+      
+      // Add new article:tag meta tags
+      meta.openGraph.article.tag.forEach(tag => {
+        const metaTag = document.createElement('meta');
+        metaTag.setAttribute('property', 'article:tag');
+        metaTag.setAttribute('content', tag);
+        document.head.appendChild(metaTag);
+      });
+    }
+    
+    // Update Twitter Card meta tags
+    updateMetaTag('twitter:card', meta.twitter.card);
+    updateMetaTag('twitter:site', meta.twitter.site);
+    updateMetaTag('twitter:title', meta.twitter.title);
+    updateMetaTag('twitter:description', meta.twitter.description);
+    updateMetaTag('twitter:image', meta.twitter.image);
+    updateMetaTag('twitter:image:alt', meta.twitter.title);
+    
+    // Update structured data
+    if (meta.jsonLd) {
+      updateScriptTag('strategy', meta.jsonLd);
+    }
+    
+    // Update dashboard JSON-LD for homepage
+    if (pageType === 'dashboard') {
+      updateScriptTag('dashboard', seoService.generateDashboardJsonLd());
     }
 
-    // Merge with custom overrides
-    return {
-      ...baseMeta,
-      ...customMeta,
-      openGraph: {
-        ...baseMeta.openGraph,
-        ...customMeta.openGraph
-      },
-      twitter: {
-        ...baseMeta.twitter,
-        ...customMeta.twitter
+    // Add preconnect links if they don't exist
+    const preconnectLinks = [
+      'https://fonts.googleapis.com',
+      'https://fonts.gstatic.com',
+      'https://nftpf-api-v0.p.rapidapi.com'
+    ];
+
+    preconnectLinks.forEach(href => {
+      if (!document.querySelector(`link[rel="preconnect"][href="${href}"]`)) {
+        const link = document.createElement('link');
+        link.setAttribute('rel', 'preconnect');
+        link.setAttribute('href', href);
+        if (href.includes('gstatic.com')) {
+          link.setAttribute('crossorigin', '');
+        }
+        document.head.appendChild(link);
       }
-    };
-  };
+    });
 
-  const meta = getMeta();
-  const siteConfig = seoService.getSiteConfig();
+    // Add DNS prefetch links if they don't exist
+    const dnsPrefetchLinks = [
+      '//nftpricefloor.com',
+      '//opensea.io'
+    ];
 
-  return (
-    <Helmet>
-      {/* Basic Meta Tags */}
-      <title>{meta.title}</title>
-      <meta name="description" content={meta.description} />
-      <meta name="keywords" content={meta.keywords} />
-      <meta name="author" content="NFT Strategy Dashboard" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      
-      {/* Canonical URL */}
-      <link rel="canonical" href={meta.canonical} />
-      
-      {/* Open Graph Meta Tags */}
-      <meta property="og:title" content={meta.openGraph.title} />
-      <meta property="og:description" content={meta.openGraph.description} />
-      <meta property="og:url" content={meta.openGraph.url} />
-      <meta property="og:type" content={meta.openGraph.type} />
-      <meta property="og:image" content={meta.openGraph.image} />
-      <meta property="og:image:width" content="1200" />
-      <meta property="og:image:height" content="630" />
-      <meta property="og:image:alt" content={meta.openGraph.title} />
-      <meta property="og:site_name" content={meta.openGraph.siteName} />
-      <meta property="og:locale" content={meta.openGraph.locale} />
-      
-      {/* Article specific OG tags for strategy pages */}
-      {meta.openGraph.article && (
-        <>
-          <meta property="article:section" content={meta.openGraph.article.section} />
-          {meta.openGraph.article.tag.map((tag, index) => (
-            <meta key={index} property="article:tag" content={tag} />
-          ))}
-        </>
-      )}
-      
-      {/* Twitter Card Meta Tags */}
-      <meta name="twitter:card" content={meta.twitter.card} />
-      <meta name="twitter:site" content={meta.twitter.site} />
-      <meta name="twitter:title" content={meta.twitter.title} />
-      <meta name="twitter:description" content={meta.twitter.description} />
-      <meta name="twitter:image" content={meta.twitter.image} />
-      <meta name="twitter:image:alt" content={meta.twitter.title} />
-      
-      {/* Additional SEO Meta Tags */}
-      <meta name="robots" content="index, follow, max-image-preview:large" />
-      <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
-      
-      {/* Theme Colors */}
-      <meta name="theme-color" content="#FFAADD" />
-      <meta name="msapplication-TileColor" content="#FFAADD" />
-      
-      {/* Structured Data (JSON-LD) */}
-      {meta.jsonLd && (
-        <script type="application/ld+json">
-          {JSON.stringify(meta.jsonLd)}
-        </script>
-      )}
-      
-      {/* Dashboard JSON-LD for homepage */}
-      {pageType === 'dashboard' && (
-        <script type="application/ld+json">
-          {JSON.stringify(seoService.generateDashboardJsonLd())}
-        </script>
-      )}
-      
-      {/* Preconnect to external domains for performance */}
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-      <link rel="preconnect" href="https://nftpf-api-v0.p.rapidapi.com" />
-      
-      {/* DNS Prefetch for additional domains */}
-      <link rel="dns-prefetch" href="//nftpricefloor.com" />
-      <link rel="dns-prefetch" href="//opensea.io" />
-      
-      {/* Favicon and Icons */}
-      <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-      <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-      <link rel="manifest" href="/site.webmanifest" />
-      
-      {/* Additional Security and Performance Headers */}
-      <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
-      <meta httpEquiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
-      
-      {/* Language and Content */}
-      <html lang="en" />
-    </Helmet>
-  );
+    dnsPrefetchLinks.forEach(href => {
+      if (!document.querySelector(`link[rel="dns-prefetch"][href="${href}"]`)) {
+        const link = document.createElement('link');
+        link.setAttribute('rel', 'dns-prefetch');
+        link.setAttribute('href', href);
+        document.head.appendChild(link);
+      }
+    });
+
+  }, [strategy, performanceData, pageType, customMeta]);
+
+  // This component only manages head tags, so it renders nothing
+  return null;
 }
 
 export default SEO;

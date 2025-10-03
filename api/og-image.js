@@ -1,8 +1,6 @@
-import { createCanvas, loadImage, registerFont } from 'canvas';
-import path from 'path';
-
 /**
  * Generate dynamic OpenGraph images for NFT strategies
+ * Vercel-compatible version using SVG generation
  * 
  * Usage:
  * - GET /api/og-image/dashboard - Dashboard overview image
@@ -33,28 +31,12 @@ export default async function handler(req, res) {
       type = 'strategy'
     } = query;
 
-    // Create canvas
-    const canvas = createCanvas(OG_WIDTH, OG_HEIGHT);
-    const ctx = canvas.getContext('2d');
-
-    // Clear canvas with background
-    ctx.fillStyle = BACKGROUND_COLOR;
-    ctx.fillRect(0, 0, OG_WIDTH, OG_HEIGHT);
-
-    // Add brand gradient background
-    const gradient = ctx.createLinearGradient(0, 0, OG_WIDTH, OG_HEIGHT);
-    gradient.addColorStop(0, 'rgba(255, 170, 221, 0.1)');
-    gradient.addColorStop(1, 'rgba(255, 170, 221, 0.05)');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, OG_WIDTH, OG_HEIGHT);
-
-    // Add decorative elements
-    drawDecorativeElements(ctx);
-
+    let svg;
+    
     if (type === 'dashboard') {
-      drawDashboardContent(ctx);
+      svg = generateDashboardSVG();
     } else {
-      drawStrategyContent(ctx, {
+      svg = generateStrategySVG({
         collection,
         returnPercent,
         value,
@@ -62,15 +44,11 @@ export default async function handler(req, res) {
       });
     }
 
-    // Add footer branding
-    drawFooter(ctx);
-
-    // Convert to buffer and send
-    const buffer = canvas.toBuffer('image/png');
-    
-    res.setHeader('Content-Type', 'image/png');
+    // Set appropriate headers for SVG
+    res.setHeader('Content-Type', 'image/svg+xml');
     res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
-    res.send(buffer);
+    
+    res.status(200).send(svg);
 
   } catch (error) {
     console.error('Error generating OG image:', error);
@@ -78,111 +56,75 @@ export default async function handler(req, res) {
   }
 }
 
-function drawDecorativeElements(ctx) {
-  // Add subtle geometric patterns
-  ctx.save();
-  ctx.globalAlpha = 0.1;
-  ctx.strokeStyle = BRAND_COLOR;
-  ctx.lineWidth = 2;
-
-  // Draw decorative lines and shapes
-  for (let i = 0; i < 3; i++) {
-    const y = 150 + (i * 100);
-    ctx.beginPath();
-    ctx.moveTo(50, y);
-    ctx.lineTo(150, y);
-    ctx.stroke();
-  }
-
-  // Add circles
-  for (let i = 0; i < 4; i++) {
-    ctx.beginPath();
-    ctx.arc(1050 + (i * 30), 100 + (i * 20), 8, 0, 2 * Math.PI);
-    ctx.stroke();
-  }
-
-  ctx.restore();
+function generateDashboardSVG() {
+  const svg = `
+    <svg width="${OG_WIDTH}" height="${OG_HEIGHT}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:rgba(255,170,221,0.1);stop-opacity:1" />
+          <stop offset="100%" style="stop-color:rgba(255,170,221,0.05);stop-opacity:1" />
+        </linearGradient>
+        <style>
+          .title { font: bold 64px Arial, sans-serif; fill: ${TEXT_COLOR}; }
+          .subtitle { font: 32px Arial, sans-serif; fill: #666666; }
+          .feature { font: 24px Arial, sans-serif; fill: ${TEXT_COLOR}; }
+          .footer { font: 18px Arial, sans-serif; fill: #666666; text-anchor: middle; }
+          .footer-small { font: 14px Arial, sans-serif; fill: #999999; text-anchor: middle; }
+        </style>
+      </defs>
+      
+      <!-- Background -->
+      <rect width="${OG_WIDTH}" height="${OG_HEIGHT}" fill="${BACKGROUND_COLOR}"/>
+      <rect width="${OG_WIDTH}" height="${OG_HEIGHT}" fill="url(#bgGradient)"/>
+      
+      <!-- Decorative elements -->
+      <g stroke="${BRAND_COLOR}" stroke-width="2" opacity="0.1">
+        <line x1="50" y1="150" x2="150" y2="150"/>
+        <line x1="50" y1="250" x2="150" y2="250"/>
+        <line x1="50" y1="350" x2="150" y2="350"/>
+        <circle cx="1050" cy="100" r="8" fill="none"/>
+        <circle cx="1080" cy="120" r="8" fill="none"/>
+        <circle cx="1110" cy="140" r="8" fill="none"/>
+        <circle cx="1140" cy="160" r="8" fill="none"/>
+      </g>
+      
+      <!-- Main title -->
+      <text x="80" y="180" class="title">NFT Strategy</text>
+      <text x="80" y="260" class="title">Dashboard</text>
+      
+      <!-- Subtitle -->
+      <text x="80" y="320" class="subtitle">Comprehensive strategy analysis</text>
+      <text x="80" y="360" class="subtitle">&amp; performance tracking</text>
+      
+      <!-- Features -->
+      <text x="80" y="450" class="feature">📊 Real-time Data</text>
+      <text x="380" y="450" class="feature">📈 Performance Metrics</text>
+      <text x="80" y="490" class="feature">⚡ Interactive Charts</text>
+      <text x="380" y="490" class="feature">🎯 Strategy Comparison</text>
+      
+      <!-- Logo -->
+      <rect x="850" y="120" width="120" height="120" fill="${BRAND_COLOR}"/>
+      <text x="910" y="170" font="bold 24px Arial" text-anchor="middle" fill="${ACCENT_COLOR}">NFT</text>
+      <text x="910" y="200" font="bold 24px Arial" text-anchor="middle" fill="${ACCENT_COLOR}">STRAT</text>
+      
+      <!-- Footer -->
+      <rect x="0" y="${OG_HEIGHT - 80}" width="${OG_WIDTH}" height="80" fill="rgba(0,0,0,0.05)"/>
+      <text x="${OG_WIDTH/2}" y="${OG_HEIGHT - 35}" class="footer">nftstrategy.fun • Real-time NFT Strategy Analysis</text>
+      <text x="${OG_WIDTH/2}" y="${OG_HEIGHT - 10}" class="footer-small">Updated ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</text>
+    </svg>
+  `;
+  
+  return svg;
 }
 
-function drawDashboardContent(ctx) {
-  // Main title
-  ctx.fillStyle = TEXT_COLOR;
-  ctx.font = 'bold 64px Arial, sans-serif';
-  ctx.textAlign = 'left';
-  ctx.fillText('NFT Strategy', 80, 180);
-  
-  ctx.font = 'bold 64px Arial, sans-serif';
-  ctx.fillText('Dashboard', 80, 260);
-
-  // Subtitle
-  ctx.font = '32px Arial, sans-serif';
-  ctx.fillStyle = '#666666';
-  ctx.fillText('Comprehensive strategy analysis', 80, 320);
-  ctx.fillText('& performance tracking', 80, 360);
-
-  // Feature highlights
-  const features = [
-    '📊 Real-time Data',
-    '📈 Performance Metrics', 
-    '⚡ Interactive Charts',
-    '🎯 Strategy Comparison'
-  ];
-
-  ctx.font = '24px Arial, sans-serif';
-  ctx.fillStyle = TEXT_COLOR;
-  
-  features.forEach((feature, index) => {
-    const x = 80 + (index % 2) * 300;
-    const y = 450 + Math.floor(index / 2) * 40;
-    ctx.fillText(feature, x, y);
-  });
-
-  // Add logo placeholder
-  drawLogoPlaceholder(ctx, 850, 120);
-}
-
-function drawStrategyContent(ctx, { collection, returnPercent, value, floor }) {
-  // Collection name (main title)
-  ctx.fillStyle = TEXT_COLOR;
-  ctx.font = 'bold 56px Arial, sans-serif';
-  ctx.textAlign = 'left';
-  
+function generateStrategySVG({ collection, returnPercent, value, floor }) {
   // Truncate long collection names
   const maxLength = 20;
   const displayCollection = collection.length > maxLength 
     ? collection.substring(0, maxLength) + '...' 
     : collection;
-  
-  ctx.fillText(displayCollection, 80, 160);
-  
-  // Strategy subtitle
-  ctx.font = '32px Arial, sans-serif';
-  ctx.fillStyle = '#666666';
-  ctx.fillText('NFT Strategy Analysis', 80, 210);
-
-  // Performance metrics container
-  if (returnPercent || value || floor) {
-    drawMetricsContainer(ctx, { returnPercent, value, floor });
-  }
-
-  // Add trend visualization
-  drawTrendChart(ctx, returnPercent);
-  
-  // Add logo
-  drawLogoPlaceholder(ctx, 850, 80);
-}
-
-function drawMetricsContainer(ctx, { returnPercent, value, floor }) {
-  // Container background
-  ctx.fillStyle = 'rgba(255, 170, 221, 0.15)';
-  ctx.fillRect(80, 280, 1040, 180);
-  
-  // Container border
-  ctx.strokeStyle = BRAND_COLOR;
-  ctx.lineWidth = 3;
-  ctx.strokeRect(80, 280, 1040, 180);
-
-  // Metrics
+    
+  // Build metrics if available
   const metrics = [];
   
   if (returnPercent !== null) {
@@ -210,95 +152,101 @@ function drawMetricsContainer(ctx, { returnPercent, value, floor }) {
     });
   }
 
-  // Draw metrics
-  const metricsPerRow = Math.min(metrics.length, 3);
-  const metricWidth = 1040 / metricsPerRow;
-  
-  metrics.forEach((metric, index) => {
-    const x = 80 + (index * metricWidth) + (metricWidth / 2);
-    const y = 330;
+  // Generate metrics SVG elements
+  let metricsElements = '';
+  if (metrics.length > 0) {
+    const metricsPerRow = Math.min(metrics.length, 3);
+    const metricWidth = 1040 / metricsPerRow;
     
-    // Label
-    ctx.font = '20px Arial, sans-serif';
-    ctx.fillStyle = '#666666';
-    ctx.textAlign = 'center';
-    ctx.fillText(metric.label, x, y);
+    metricsElements = `
+      <!-- Metrics container -->
+      <rect x="80" y="280" width="1040" height="180" fill="rgba(255,170,221,0.15)" stroke="${BRAND_COLOR}" stroke-width="3"/>
+    `;
     
-    // Value
-    ctx.font = 'bold 36px Arial, sans-serif';
-    ctx.fillStyle = metric.color;
-    ctx.fillText(metric.value, x, y + 50);
-  });
-}
-
-function drawTrendChart(ctx, returnPercent) {
-  if (!returnPercent) return;
-
-  const isPositive = parseFloat(returnPercent) >= 0;
-  const chartX = 650;
-  const chartY = 120;
-  const chartWidth = 160;
-  const chartHeight = 60;
-
-  // Simple trend line
-  ctx.strokeStyle = isPositive ? '#22c55e' : '#ef4444';
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  
-  const points = 8;
-  const trend = isPositive ? 1 : -1;
-  
-  for (let i = 0; i < points; i++) {
-    const x = chartX + (i * (chartWidth / (points - 1)));
-    const baseY = chartY + chartHeight / 2;
-    const variation = (Math.random() - 0.5) * 20;
-    const trendOffset = (i / points) * trend * 30;
-    const y = baseY + variation + trendOffset;
-    
-    if (i === 0) {
-      ctx.moveTo(x, y);
-    } else {
-      ctx.lineTo(x, y);
-    }
+    metrics.forEach((metric, index) => {
+      const x = 80 + (index * metricWidth) + (metricWidth / 2);
+      metricsElements += `
+        <text x="${x}" y="330" font="20px Arial" text-anchor="middle" fill="#666666">${metric.label}</text>
+        <text x="${x}" y="380" font="bold 36px Arial" text-anchor="middle" fill="${metric.color}">${metric.value}</text>
+      `;
+    });
   }
   
-  ctx.stroke();
-}
+  // Generate trend chart if return percent is available
+  let trendChart = '';
+  if (returnPercent !== null) {
+    const isPositive = parseFloat(returnPercent) >= 0;
+    const color = isPositive ? '#22c55e' : '#ef4444';
+    const trend = isPositive ? 1 : -1;
+    
+    let pathData = '';
+    for (let i = 0; i < 8; i++) {
+      const x = 650 + (i * 20);
+      const baseY = 150;
+      const trendOffset = (i / 8) * trend * 30;
+      const y = baseY + trendOffset;
+      
+      if (i === 0) {
+        pathData += `M ${x} ${y}`;
+      } else {
+        pathData += ` L ${x} ${y}`;
+      }
+    }
+    
+    trendChart = `<path d="${pathData}" stroke="${color}" stroke-width="4" fill="none"/>`;
+  }
 
-function drawLogoPlaceholder(ctx, x, y) {
-  // Logo container
-  const logoSize = 120;
-  ctx.fillStyle = BRAND_COLOR;
-  ctx.fillRect(x, y, logoSize, logoSize);
+  const svg = `
+    <svg width="${OG_WIDTH}" height="${OG_HEIGHT}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:rgba(255,170,221,0.1);stop-opacity:1" />
+          <stop offset="100%" style="stop-color:rgba(255,170,221,0.05);stop-opacity:1" />
+        </linearGradient>
+        <style>
+          .main-title { font: bold 56px Arial, sans-serif; fill: ${TEXT_COLOR}; }
+          .subtitle { font: 32px Arial, sans-serif; fill: #666666; }
+          .footer { font: 18px Arial, sans-serif; fill: #666666; text-anchor: middle; }
+          .footer-small { font: 14px Arial, sans-serif; fill: #999999; text-anchor: middle; }
+        </style>
+      </defs>
+      
+      <!-- Background -->
+      <rect width="${OG_WIDTH}" height="${OG_HEIGHT}" fill="${BACKGROUND_COLOR}"/>
+      <rect width="${OG_WIDTH}" height="${OG_HEIGHT}" fill="url(#bgGradient)"/>
+      
+      <!-- Decorative elements -->
+      <g stroke="${BRAND_COLOR}" stroke-width="2" opacity="0.1">
+        <line x1="50" y1="150" x2="150" y2="150"/>
+        <line x1="50" y1="250" x2="150" y2="250"/>
+        <line x1="50" y1="350" x2="150" y2="350"/>
+        <circle cx="1050" cy="100" r="8" fill="none"/>
+        <circle cx="1080" cy="120" r="8" fill="none"/>
+        <circle cx="1110" cy="140" r="8" fill="none"/>
+        <circle cx="1140" cy="160" r="8" fill="none"/>
+      </g>
+      
+      <!-- Collection title -->
+      <text x="80" y="160" class="main-title">${displayCollection}</text>
+      <text x="80" y="210" class="subtitle">NFT Strategy Analysis</text>
+      
+      <!-- Trend chart -->
+      ${trendChart}
+      
+      <!-- Metrics -->
+      ${metricsElements}
+      
+      <!-- Logo -->
+      <rect x="850" y="80" width="120" height="120" fill="${BRAND_COLOR}"/>
+      <text x="910" y="130" font="bold 24px Arial" text-anchor="middle" fill="${ACCENT_COLOR}">NFT</text>
+      <text x="910" y="160" font="bold 24px Arial" text-anchor="middle" fill="${ACCENT_COLOR}">STRAT</text>
+      
+      <!-- Footer -->
+      <rect x="0" y="${OG_HEIGHT - 80}" width="${OG_WIDTH}" height="80" fill="rgba(0,0,0,0.05)"/>
+      <text x="${OG_WIDTH/2}" y="${OG_HEIGHT - 35}" class="footer">nftstrategy.fun • Real-time NFT Strategy Analysis</text>
+      <text x="${OG_WIDTH/2}" y="${OG_HEIGHT - 10}" class="footer-small">Updated ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</text>
+    </svg>
+  `;
   
-  // Logo text
-  ctx.fillStyle = ACCENT_COLOR;
-  ctx.font = 'bold 24px Arial, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('NFT', x + logoSize/2, y + logoSize/2 - 10);
-  ctx.fillText('STRAT', x + logoSize/2, y + logoSize/2 + 20);
-}
-
-function drawFooter(ctx) {
-  // Footer background
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-  ctx.fillRect(0, OG_HEIGHT - 80, OG_WIDTH, 80);
-  
-  // Footer text
-  ctx.fillStyle = '#666666';
-  ctx.font = '18px Arial, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('nftstrategy.fun • Real-time NFT Strategy Analysis', OG_WIDTH/2, OG_HEIGHT - 35);
-  
-  // Add timestamp
-  const now = new Date();
-  const timeString = now.toLocaleDateString('en-US', { 
-    month: 'short', 
-    day: 'numeric', 
-    year: 'numeric' 
-  });
-  
-  ctx.font = '14px Arial, sans-serif';
-  ctx.fillStyle = '#999999';
-  ctx.fillText(`Updated ${timeString}`, OG_WIDTH/2, OG_HEIGHT - 10);
+  return svg;
 }
