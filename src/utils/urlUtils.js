@@ -175,7 +175,7 @@ export const createShareableUrl = ({ collection1, collection2, timeframe, layout
  * @returns {string} - Base strategies URL
  */
 export const createStrategiesUrl = () => {
-  return '/nftstrategies';
+  return '/';
 };
 
 /**
@@ -184,10 +184,10 @@ export const createStrategiesUrl = () => {
  * @returns {string} - Strategy detail URL
  */
 export const createStrategyUrl = (strategy) => {
-  if (!strategy) return '/nftstrategies';
+  if (!strategy) return '/';
   
   const strategySlug = encodeStrategyName(strategy.collectionName + ' ' + strategy.tokenName);
-  return `/nftstrategies/${strategySlug}`;
+  return `/${strategySlug}`;
 };
 
 /**

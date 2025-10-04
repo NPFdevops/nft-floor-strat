@@ -19,7 +19,7 @@ function AppContent() {
   
   // Extract strategy name from URL path
   const pathParts = location.pathname.split('/');
-  const strategyName = pathParts[2]; // /nftstrategies/strategy-name
+  const strategyName = pathParts[1]; // /strategy-name
   
   const [selectedStrategy, setSelectedStrategy] = useState(null); // Track selected strategy for detail view
   const [strategies, setStrategies] = useState([]); // Store strategies for URL-based lookup
@@ -150,8 +150,8 @@ function AppContent() {
                   Drops
                 </a>
                 <button 
-                  onClick={() => navigate('/nftstrategies')} 
-                  className={`${location.pathname.includes('/nftstrategies') || location.pathname === '/' ? 'text-[#DD5994]' : isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-[#DD5994] font-medium transition-colors cursor-pointer whitespace-nowrap flex-shrink-0`}
+                  onClick={() => navigate('/')} 
+                  className={`${location.pathname === '/' ? 'text-[#DD5994]' : isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-[#DD5994] font-medium transition-colors cursor-pointer whitespace-nowrap flex-shrink-0`}
                 >
                   Strategies™
                 </button>
@@ -286,8 +286,8 @@ function AppContent() {
             <span className="text-xs font-medium truncate">Drops</span>
           </a>
           <button 
-            onClick={() => navigate('/nftstrategies')} 
-            className={`flex flex-col items-center gap-1 ${location.pathname.includes('/nftstrategies') || location.pathname === '/' ? 'text-[#DD5994]' : isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-[#DD5994] font-medium transition-colors min-w-0 cursor-pointer`}
+            onClick={() => navigate('/')} 
+            className={`flex flex-col items-center gap-1 ${location.pathname === '/' ? 'text-[#DD5994]' : isDark ? 'text-gray-400' : 'text-gray-600'} hover:text-[#DD5994] font-medium transition-colors min-w-0 cursor-pointer`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />

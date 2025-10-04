@@ -20,13 +20,12 @@ export class SitemapGenerator {
 
     // Add main pages
     urls.push(this.createUrl('/', currentDate, 'daily', '1.0'));
-    urls.push(this.createUrl('/nftstrategies', currentDate, 'hourly', '0.9'));
 
     // Add strategy pages
     strategies.forEach(strategy => {
       if (strategy && strategy.collectionName) {
         const strategySlug = this.generateSlug(strategy.collectionName);
-        const strategyUrl = `/nftstrategies/${strategySlug}`;
+        const strategyUrl = `/${strategySlug}`;
         urls.push(this.createUrl(strategyUrl, currentDate, 'hourly', '0.8'));
       }
     });
@@ -108,7 +107,7 @@ export class SitemapGenerator {
           '@type': 'FinancialProduct',
           name: `${strategy.collectionName} Strategy`,
           description: `NFT trading strategy for ${strategy.collectionName}`,
-          url: `${this.siteConfig.siteUrl}/nftstrategies/${this.generateSlug(strategy.collectionName)}`,
+          url: `${this.siteConfig.siteUrl}/${this.generateSlug(strategy.collectionName)}`,
           provider: {
             '@type': 'Organization',
             name: this.siteConfig.siteName,

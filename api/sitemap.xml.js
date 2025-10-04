@@ -52,8 +52,7 @@ export default async function handler(req, res) {
 
     // Add main pages
     const urls = [
-      { loc: siteUrl, priority: '1.0', changefreq: 'daily' },
-      { loc: `${siteUrl}/nftstrategies`, priority: '0.9', changefreq: 'hourly' }
+      { loc: siteUrl, priority: '1.0', changefreq: 'daily' }
     ];
 
     // Add strategy pages
@@ -61,7 +60,7 @@ export default async function handler(req, res) {
       if (strategy && strategy.collectionName) {
         const strategySlug = generateSlug(strategy.collectionName);
         urls.push({
-          loc: `${siteUrl}/nftstrategies/${strategySlug}`,
+          loc: `${siteUrl}/${strategySlug}`,
           priority: '0.8',
           changefreq: 'hourly'
         });

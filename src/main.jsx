@@ -12,8 +12,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<App />} />
-      <Route path="/nftstrategies" element={<App />} />
-      <Route path="/nftstrategies/:strategyName" element={<App />} />
+      <Route path="/:strategyName" element={<App />} />
     </Routes>
   </BrowserRouter>
 )

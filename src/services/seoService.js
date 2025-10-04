@@ -62,7 +62,7 @@ export class SEOService {
     const title = `${strategyName} Strategy - Performance Analysis & Metrics`;
     const description = `Detailed analysis of ${strategyName} NFT strategy. ${performanceSummary} Track real-time performance, floor prices, and market trends.`;
     
-    const strategyUrl = `${this.siteConfig.siteUrl}/nftstrategies/${collectionSlug}`;
+    const strategyUrl = `${this.siteConfig.siteUrl}/${collectionSlug}`;
     const ogImageUrl = `${this.siteConfig.siteUrl}/api/og-image/${collectionSlug}`;
     
     return {
