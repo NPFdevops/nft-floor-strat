@@ -63,39 +63,12 @@ const SkeletonTable = ({ rows = 10 }) => {
       >
         Loading NFT strategies data, please wait...
       </div>
-      {/* Table Header - matches original structure */}
-      <div className="table-header">
-        <h2 id="strategies-table-title">NFT Strategies</h2>
-        <div className="table-controls">
-          <div className="search-container">
-            <input
-              type="text"
-              placeholder="Search strategies..."
-              className="search-input"
-              aria-label="Search NFT strategies"
-              disabled
-            />
-          </div>
-          <div className="items-per-page">
-            <label htmlFor="items-per-page-select">Items per page:</label>
-            <select
-              id="items-per-page-select"
-              className="items-per-page-select"
-              aria-label="Number of items to display per page"
-              disabled
-            >
-              <option value={10}>10</option>
-            </select>
-          </div>
-        </div>
-      </div>
 
       {/* Table Wrapper */}
       <div className="table-wrapper">
         <table 
           className="strategies-table skeleton-table"
           role="table"
-          aria-labelledby="strategies-table-title"
           aria-describedby="skeleton-table-description"
           aria-busy={true}
         >
@@ -141,21 +114,10 @@ const SkeletonTable = ({ rows = 10 }) => {
           </tbody>
         </table>
       </div>
-
-      {/* Skeleton Pagination */}
-      <div className="pagination skeleton-pagination" role="navigation" aria-label="Table pagination">
-        <div className="pagination-info">
-          <div className="skeleton-text skeleton-pagination-text" aria-label="Loading pagination info"></div>
-        </div>
-        <div className="pagination-controls">
-          <div className="skeleton-button skeleton-pagination-button" aria-label="Loading first page button"></div>
-          <div className="skeleton-button skeleton-pagination-button" aria-label="Loading previous page button"></div>
-          <div className="skeleton-button skeleton-pagination-button skeleton-page-number" aria-label="Loading page number"></div>
-          <div className="skeleton-button skeleton-pagination-button skeleton-page-number" aria-label="Loading page number"></div>
-          <div className="skeleton-button skeleton-pagination-button skeleton-page-number" aria-label="Loading page number"></div>
-          <div className="skeleton-button skeleton-pagination-button" aria-label="Loading next page button"></div>
-          <div className="skeleton-button skeleton-pagination-button" aria-label="Loading last page button"></div>
-        </div>
+      
+      {/* Data Attribution - matches actual table */}
+      <div className="mt-4 text-right">
+        <div className="skeleton-text skeleton-attribution" style={{width: '120px', height: '14px', marginLeft: 'auto'}} aria-label="Loading data attribution"></div>
       </div>
     </div>
   );

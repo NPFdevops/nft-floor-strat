@@ -55,7 +55,7 @@ const InfoCards = ({ strategies = [] }) => {
       title: 'Total Market Cap',
       value: formatCurrency(totalMarketCap),
       subtitle: 'Combined value',
-      bgColor: isDark ? 'bg-gradient-to-br from-gray-800 to-gray-900' : 'bg-gradient-to-br from-pink-50 to-rose-50',
+      bgColor: isDark ? 'bg-black' : 'bg-gradient-to-br from-pink-50 to-rose-50',
       borderColor: isDark ? 'border-white border-2' : 'border-black border-2',
       textColor: isDark ? 'text-pink-400' : 'text-pink-600',
       valueColor: isDark ? 'text-pink-300' : 'text-pink-700'
@@ -65,7 +65,7 @@ const InfoCards = ({ strategies = [] }) => {
       title: 'Live Strategies',
       value: liveStrategiesCount.toString(),
       subtitle: 'Active strategies',
-      bgColor: isDark ? 'bg-gradient-to-br from-gray-800 to-gray-900' : 'bg-gradient-to-br from-pink-50 to-pink-100',
+      bgColor: isDark ? 'bg-black' : 'bg-gradient-to-br from-pink-50 to-pink-100',
       borderColor: isDark ? 'border-white border-2' : 'border-black border-2',
       textColor: isDark ? 'text-pink-400' : 'text-pink-700',
       valueColor: isDark ? 'text-pink-300' : 'text-pink-800'
@@ -75,7 +75,7 @@ const InfoCards = ({ strategies = [] }) => {
       title: 'Punk Dominance',
       value: formatPercentage(punkDominancePercentage),
       subtitle: punkstrategies.length > 0 ? `${punkstrategies.length} strategies` : 'No punk strategies',
-      bgColor: isDark ? 'bg-gradient-to-br from-gray-800 to-gray-900' : 'bg-gradient-to-br from-rose-50 to-pink-50',
+      bgColor: isDark ? 'bg-black' : 'bg-gradient-to-br from-rose-50 to-pink-50',
       borderColor: isDark ? 'border-white border-2' : 'border-black border-2',
       textColor: isDark ? 'text-rose-400' : 'text-rose-600',
       valueColor: isDark ? 'text-rose-300' : 'text-rose-700'
@@ -98,9 +98,9 @@ const InfoCards = ({ strategies = [] }) => {
               <p className={`text-lg lg:text-xl font-bold ${card.valueColor} mb-1`}>
                 {card.value}
               </p>
-              <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+              {/* <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                 {card.subtitle}
-              </p>
+              </p> */}
             </div>
           </div>
         ))}
@@ -122,9 +122,9 @@ const InfoCards = ({ strategies = [] }) => {
                 <p className={`text-base font-bold ${card.valueColor} mb-1`}>
                   {card.value}
                 </p>
-                <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} leading-tight`}>
+                {/* <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} leading-tight`}>
                   {card.subtitle}
-                </p>
+                </p> */}
               </div>
             </div>
           ))}

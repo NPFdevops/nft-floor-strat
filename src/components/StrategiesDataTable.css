@@ -715,10 +715,14 @@
 }
 
 /* Keep 24h change column with original styling on hover in dark mode */
-.strategies-table-container.dark .strategies-table tbody tr:hover .change-cell.positive,
-.strategies-table-container.dark .strategies-table tbody tr:hover .change-cell.negative {
+.strategies-table-container.dark .strategies-table tbody tr:hover .change-cell.positive {
   color: #FFFFFF !important;
   background: #F11F9D !important;
+}
+
+.strategies-table-container.dark .strategies-table tbody tr:hover .change-cell.negative {
+  color: #000000 !important;
+  background: #FFECF5 !important;
 }
 
 .strategies-table-container.dark .clickable-row:hover {
@@ -758,10 +762,17 @@
 }
 
 /* Dark mode: Custom color and background for 24h change column */
-.strategies-table-container.dark .change-cell.positive,
-.strategies-table-container.dark .change-cell.negative {
+.strategies-table-container.dark .change-cell.positive {
   color: #FFFFFF !important;
   background: #F11F9D !important;
+  border-radius: 2px;
+  padding: 4px 8px;
+  margin: -4px -8px;
+}
+
+.strategies-table-container.dark .change-cell.negative {
+  color: #000000 !important;
+  background: #FFECF5 !important;
   border-radius: 2px;
   padding: 4px 8px;
   margin: -4px -8px;

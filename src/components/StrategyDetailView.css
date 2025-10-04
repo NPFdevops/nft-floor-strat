@@ -94,7 +94,7 @@
 }
 
 .strategy-detail-container.dark .comparison-table-container {
-  background: #1f2937;
+  background: #000000;
   border-color: #ffffff;
 }
 
@@ -177,7 +177,7 @@
 }
 
 .strategy-detail-container.dark .metric-card {
-  background: #1f2937;
+  background: #000000;
   border-color: #ffffff;
 }
 
@@ -277,7 +277,7 @@
 /* Ensure all card backgrounds in Holdings are properly styled */
 .strategy-detail-container.dark .bg-gray-50,
 .strategy-detail-container.dark .bg-white {
-  background-color: #374151 !important;
+  background-color: #000000 !important;
 }
 
 .strategy-detail-container.dark .bg-gray-200 {
@@ -285,11 +285,11 @@
 }
 
 .strategy-detail-container.dark .bg-gray-800 {
-  background-color: #1f2937 !important;
+  background-color: #000000 !important;
 }
 
 .strategy-detail-container.dark .bg-gray-700 {
-  background-color: #374151 !important;
+  background-color: #000000 !important;
 }
 
 .strategy-detail-container.dark .bg-gray-600 {
@@ -349,7 +349,7 @@
 }
 
 .strategy-detail-container.dark .chart-container {
-  background: #1f2937;
+  background: #000000;
   border-color: #ffffff;
 }
 
@@ -699,8 +699,8 @@
 }
 
 .strategy-detail-container.dark .sales-item {
-  background: #1f2937;
-  border-color: #374151;
+  background: #000000;
+  border-color: #ffffff;
 }
 
 .sales-item:hover {
@@ -804,7 +804,7 @@
 }
 
 .strategy-detail-container.dark .card {
-  background: #1f2937;
+  background: #000000;
   border-color: #ffffff;
 }
 
