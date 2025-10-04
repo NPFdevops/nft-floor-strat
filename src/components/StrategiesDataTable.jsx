@@ -3,6 +3,7 @@ import './StrategiesDataTable.css';
 import { nftStrategyService } from '../services/nftStrategyService.js';
 import { fetchTopCollections } from '../services/nftAPI.js';
 import { holdingsService } from '../services/holdingsService.js';
+import { ethPriceService } from '../services/ethPriceService.js';
 import SkeletonTable from './SkeletonTable.jsx';
 import { posthogService } from '../services/posthogService';
 import { strategyToSlugMappingService } from '../services/strategyToSlugMapping';
@@ -65,6 +66,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
           try {
             // Get market cap from NFTpricefloor API using the mapping service for accurate matching
             let nftPriceFloorMarketCap = null;
+            let project = null; // Define project outside scope for mNAV calculation
             
             if (allCollections.length > 0) {
               // Use mapping service to get the correct NFTPriceFloor slug
@@ -72,7 +74,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
               console.log(`🔄 Mapping "${strategy.collectionName}" -> "${mappedSlug}"`);
               
               // Try to find collection by mapped slug first (most accurate)
-              let project = allCollections.find(p => p.slug === mappedSlug);
+              project = allCollections.find(p => p.slug === mappedSlug);
               
               // Fallback to name matching if slug match fails
               if (!project) {
@@ -104,8 +106,11 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
             
 
             
-            // Fetch holdings count for this strategy
+            // Fetch holdings count and calculate treasury value for mNAV
             let holdingsCount = 0;
+            let treasuryValueUsd = null;
+            let mNav = null;
+            
             try {
               console.log(`🔄 Fetching holdings for strategy: ${strategy.name}`);
               const strategyAddress = strategy.tokenAddress;
@@ -115,6 +120,31 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 const holdings = await holdingsService.fetchHoldings(strategyAddress, nftAddress);
                 holdingsCount = holdings?.length || 0;
                 console.log(`✅ Holdings count for ${strategy.name}: ${holdingsCount}`);
+                
+                // Calculate treasury value using floor price if we have holdings and found a project
+                if (holdingsCount > 0 && project && project.floorPrice) {
+                  const floorPriceEth = project.floorPrice;
+                  
+                  if (floorPriceEth && floorPriceEth > 0) {
+                    const totalValueEth = floorPriceEth * holdingsCount;
+                    
+                    // Convert to USD using current ETH price
+                    try {
+                      const usdValue = await ethPriceService.convertEthToUsd(totalValueEth);
+                      if (usdValue && usdValue > 0) {
+                        treasuryValueUsd = usdValue;
+                        
+                        // Calculate mNAV = Market Cap ÷ Treasury Value
+                        if (nftStrategyMarketCap && nftStrategyMarketCap > 0) {
+                          mNav = nftStrategyMarketCap / treasuryValueUsd;
+                          console.log(`💰 mNAV for ${strategy.name}: ${mNav.toFixed(2)}x (MC: $${nftStrategyMarketCap.toFixed(0)}, Treasury: $${treasuryValueUsd.toFixed(0)})`);
+                        }
+                      }
+                    } catch (ethError) {
+                      console.warn(`Failed to convert ETH to USD for ${strategy.name}:`, ethError);
+                    }
+                  }
+                }
               } else {
                 console.warn(`Missing required addresses for strategy ${strategy.name}:`, { strategyAddress, nftAddress });
                 holdingsCount = 0;
@@ -129,14 +159,18 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
               nftPriceFloorMarketCap,
               nftStrategyMarketCap,
               floorMarketCapRatio,
-              holdingsCount
+              holdingsCount,
+              treasuryValueUsd,
+              mNav
             };
           } catch (err) {
             console.warn('Failed to add market cap coefficient:', err);
             return {
               ...strategy,
               floorMarketCapRatio: null,
-              holdingsCount: 0
+              holdingsCount: 0,
+              treasuryValueUsd: null,
+              mNav: null
             };
           }
         }));
@@ -276,6 +310,12 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
   const formatNumber = (value) => {
     if (!value) return '0';
     return parseInt(value).toLocaleString();
+  };
+
+  // Format mNAV ratio
+  const formatMNav = (value) => {
+    if (!value || value <= 0 || isNaN(value)) return 'No data';
+    return `${value.toFixed(2)}x`;
   };
 
   // Get sort icon
@@ -473,6 +513,23 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 24h Change {getSortIcon('poolData.price_change_24h')}
               </th>
               <th 
+                className={`sortable ${sortConfig.key === 'mNav' ? 'active' : ''}`}
+                onClick={() => handleSort('mNav')}
+                onKeyDown={(e) => e.key === 'Enter' && handleSort('mNav')}
+                tabIndex="0"
+                role="columnheader"
+                aria-sort={
+                  sortConfig.key === 'mNav' 
+                    ? sortConfig.direction === 'asc' ? 'ascending' : 'descending'
+                    : 'none'
+                }
+                aria-label="Sort by mNAV ratio"
+              >
+                <Tooltip text="Market Cap ÷ Treasury Value">
+                  <span>mNAV {getSortIcon('mNav')}</span>
+                </Tooltip>
+              </th>
+              <th 
                 className={`sortable ${sortConfig.key === 'burnPercentage' ? 'active' : ''}`}
                 onClick={() => handleSort('burnPercentage')}
                 onKeyDown={(e) => e.key === 'Enter' && handleSort('burnPercentage')}
@@ -594,6 +651,11 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 <td className={`change-cell ${parseFloat(strategy.poolData?.price_change_24h) >= 0 ? 'positive' : 'negative'}`} role="gridcell">
                   <span aria-label={`24 hour change: ${parseFloat(strategy.poolData?.price_change_24h) >= 0 ? 'positive' : 'negative'} ${formatPercentage(strategy.poolData?.price_change_24h)}`}>
                     {formatPercentage(strategy.poolData?.price_change_24h)}
+                  </span>
+                </td>
+                <td className="mnav-cell" role="gridcell">
+                  <span aria-label={`mNAV ratio: ${formatMNav(strategy.mNav)}`}>
+                    {formatMNav(strategy.mNav)}
                   </span>
                 </td>
                 <td className="burn-cell" role="gridcell">

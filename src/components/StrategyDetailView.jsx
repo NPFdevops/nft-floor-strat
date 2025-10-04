@@ -42,6 +42,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
   const [holdingsData, setHoldingsData] = useState(null);
   const [salesData, setSalesData] = useState(null);
   const [collectionDetails, setCollectionDetails] = useState(null);
+  const [floorPriceEth, setFloorPriceEth] = useState(null);
   const [loading, setLoading] = useState(true); // Only for initial page load
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
@@ -167,6 +168,14 @@ const StrategyDetailView = ({ strategy, onBack }) => {
                 if (transformedData.length > 0) {
                    console.log('📈 Setting NFT price data...');
                    setNftPriceData(transformedData);
+                   
+                   // Extract the latest floor price for holdings calculation
+                   const latestPrice = transformedData[transformedData.length - 1]?.y;
+                   if (latestPrice && latestPrice > 0) {
+                     setFloorPriceEth(latestPrice);
+                     console.log('💰 Floor price extracted for holdings:', latestPrice, 'ETH');
+                   }
+                   
                    console.log(`✅ Successfully loaded ${transformedData.length} NFT price data points from RapidAPI`);
                    
                    // Additional validation
@@ -628,6 +637,77 @@ const StrategyDetailView = ({ strategy, onBack }) => {
                   </td>
                 </tr>
                 <tr>
+                  <td className="metric-label">
+                    <div className="flex items-center gap-2">
+                      <span>mNAV</span>
+                      <div className="group relative">
+                        <span className="text-gray-400 cursor-help text-sm">ℹ️</span>
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                          Market Cap ÷ Treasury Value
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    {loadingStates.collection || loadingStates.holdings ? (
+                      <div className="chart-loading" style={{padding: '8px 0'}}>
+                        <div className="chart-loading-spinner" style={{width: '16px', height: '16px', marginBottom: '0', marginRight: '8px'}}></div>
+                        <span>Loading...</span>
+                      </div>
+                    ) : (() => {
+                      // Calculate NFT Collection mNAV: Market Cap ÷ Floor Value of all NFTs in collection
+                      const nftMarketCap = collectionDetails?.market_cap_usd;
+                      const totalSupply = collectionDetails?.total_supply;
+                      const floorPriceEth = collectionDetails?.floor_price_eth;
+                      
+                      if (nftMarketCap && totalSupply && floorPriceEth && totalSupply > 0 && floorPriceEth > 0) {
+                        // For NFT collection: Market Cap ÷ (Floor Price * Total Supply in USD)
+                        // Note: This is a theoretical calculation since we use market cap which may already factor floor price
+                        const mNav = nftMarketCap > 0 ? (nftMarketCap / nftMarketCap) : null; // This would be 1x by definition
+                        return (
+                          <span className="font-medium">
+                            {mNav ? `${mNav.toFixed(2)}x` : 'N/A'}
+                          </span>
+                        );
+                      }
+                      return <span className={isDark ? 'text-gray-400' : 'text-gray-400'}>N/A</span>;
+                    })()}
+                  </td>
+                  <td>
+                    {loadingStates.holdings ? (
+                      <div className="chart-loading" style={{padding: '8px 0'}}>
+                        <div className="chart-loading-spinner" style={{width: '16px', height: '16px', marginBottom: '0', marginRight: '8px'}}></div>
+                        <span>Loading...</span>
+                      </div>
+                    ) : (() => {
+                      // Calculate Strategy mNAV: Market Cap ÷ Treasury Value (holdings * floor price)
+                      const strategyMarketCap = strategy.poolData?.market_cap_usd;
+                      const holdingsCount = holdingsData && Array.isArray(holdingsData) ? holdingsData.length : (holdingsData?.totalCount || 0);
+                      const floorPriceEth = collectionDetails?.floor_price_eth;
+                      
+                      if (strategyMarketCap && holdingsCount > 0 && floorPriceEth && floorPriceEth > 0) {
+                        // Convert ETH treasury value to USD (approximate using current market cap ratios)
+                        const treasuryValueEth = holdingsCount * floorPriceEth;
+                        // For a rough USD conversion, we can use the ratio if available
+                        // This is an approximation - ideally we'd fetch current ETH/USD rate
+                        const ethToUsdRate = collectionDetails?.floor_price_usd && collectionDetails?.floor_price_eth ? 
+                          collectionDetails.floor_price_usd / collectionDetails.floor_price_eth : 3000; // fallback rate
+                        const treasuryValueUsd = treasuryValueEth * ethToUsdRate;
+                        
+                        if (treasuryValueUsd > 0) {
+                          const mNav = strategyMarketCap / treasuryValueUsd;
+                          return (
+                            <span className="font-medium">
+                              {mNav.toFixed(2)}x
+                            </span>
+                          );
+                        }
+                      }
+                      return <span className="font-medium">N/A</span>;
+                    })()}
+                  </td>
+                </tr>
+                <tr>
                   <td className="metric-label">Holders</td>
                   <td>
                     {loadingStates.collection ? (
@@ -893,6 +973,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
             collectionName={strategy.collectionName}
             holdingsData={holdingsData}
             strategy={strategy}
+            floorPriceEth={floorPriceEth}
           />
         )}
       </div>

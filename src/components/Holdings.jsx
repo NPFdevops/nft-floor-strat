@@ -3,7 +3,7 @@ import { holdingsService } from '../services/holdingsService';
 import { useTheme } from '../contexts/ThemeContext';
 import { strategyToSlugMappingService } from '../services/strategyToSlugMapping';
 
-const Holdings = ({ strategyAddress, nftAddress, collectionName, holdingsData, strategy }) => {
+const Holdings = ({ strategyAddress, nftAddress, collectionName, holdingsData, strategy, floorPriceEth }) => {
   const { isDark } = useTheme();
   const [holdings, setHoldings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,9 +20,13 @@ const Holdings = ({ strategyAddress, nftAddress, collectionName, holdingsData, s
           setLoading(true);
           setError(null);
           
-          const summaryData = holdingsService.getHoldingsSummary(holdingsData);
+          // Calculate USD prices for individual holdings
+          const holdingsWithUsd = await holdingsService.calculateUsdPrices(holdingsData);
           
-          setHoldings(holdingsData);
+          // Get summary using floor price calculation
+          const summaryData = await holdingsService.getHoldingsSummary(holdingsData, floorPriceEth);
+          
+          setHoldings(holdingsWithUsd);
           setSummary(summaryData);
           
         } catch (err) {
@@ -45,9 +49,14 @@ const Holdings = ({ strategyAddress, nftAddress, collectionName, holdingsData, s
         setError(null);
         
         const fetchedHoldingsData = await holdingsService.fetchHoldings(strategyAddress, nftAddress);
-        const summaryData = holdingsService.getHoldingsSummary(fetchedHoldingsData);
         
-        setHoldings(fetchedHoldingsData);
+        // Calculate USD prices for individual holdings
+        const holdingsWithUsd = await holdingsService.calculateUsdPrices(fetchedHoldingsData);
+        
+        // Get summary using floor price calculation
+        const summaryData = await holdingsService.getHoldingsSummary(fetchedHoldingsData, floorPriceEth);
+        
+        setHoldings(holdingsWithUsd);
         setSummary(summaryData);
         
       } catch (err) {
@@ -59,10 +68,10 @@ const Holdings = ({ strategyAddress, nftAddress, collectionName, holdingsData, s
     };
 
     fetchHoldings();
-  }, [strategyAddress, nftAddress, holdingsData]);
+  }, [strategyAddress, nftAddress, holdingsData, floorPriceEth]);
 
   const formatCurrency = (value, currency = 'USD') => {
-    if (!value || value === '0') return '$0.00';
+    if (!value || value === '0' || value === null) return 'No data';
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: currency,
@@ -72,8 +81,16 @@ const Holdings = ({ strategyAddress, nftAddress, collectionName, holdingsData, s
   };
 
   const formatEth = (value) => {
-    if (!value || value === '0') return '0 ETH';
+    if (!value || value === '0' || value === null) return 'No data';
     return `${parseFloat(value).toFixed(4)} ETH`;
+  };
+
+  const formatMNav = (marketCap, treasuryValue) => {
+    if (!marketCap || !treasuryValue || marketCap <= 0 || treasuryValue <= 0) {
+      return 'No data';
+    }
+    const mNav = marketCap / treasuryValue;
+    return `${mNav.toFixed(2)}x`;
   };
 
   // Sort holdings based on current sort settings
@@ -206,16 +223,37 @@ const Holdings = ({ strategyAddress, nftAddress, collectionName, holdingsData, s
         <div className={`rounded-none ${isDark ? 'thick-border-dark bg-gray-800' : 'thick-border-light bg-white'} p-4`}>
           <h3 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'} mb-1`}>Total Value (ETH)</h3>
           <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>{formatEth(summary?.totalValueEth)}</p>
+          {floorPriceEth && (
+            <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
+              Based on floor price: {parseFloat(floorPriceEth).toFixed(4)} ETH
+            </p>
+          )}
         </div>
         
         <div className={`rounded-none ${isDark ? 'thick-border-dark bg-gray-800' : 'thick-border-light bg-white'} p-4`}>
           <h3 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'} mb-1`}>Total Value (USD)</h3>
           <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>{formatCurrency(summary?.totalValueUsd)}</p>
+          <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
+            Live ETH/USD rate from Coinbase
+          </p>
         </div>
         
         <div className={`rounded-none ${isDark ? 'thick-border-dark bg-gray-800' : 'thick-border-light bg-white'} p-4`}>
-          <h3 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'} mb-1`}>Average Value</h3>
-          <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>{formatCurrency(summary?.averageValueUsd)}</p>
+          <div className="flex items-center justify-between mb-1">
+            <h3 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>mNAV</h3>
+            <div className="group relative">
+              <span className="text-gray-400 cursor-help text-sm">ℹ️</span>
+              <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                Market Cap ÷ Treasury Value
+              </div>
+            </div>
+          </div>
+          <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>
+            {formatMNav(strategy?.poolData?.market_cap_usd, summary?.totalValueUsd ? parseFloat(summary.totalValueUsd) : null)}
+          </p>
+          <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
+            Market Cap ÷ Treasury
+          </p>
         </div>
       </div>
 

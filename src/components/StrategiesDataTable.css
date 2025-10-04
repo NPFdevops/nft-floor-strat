@@ -1066,6 +1066,35 @@
   margin: -4px -8px;
 }
 
+.mnav-cell {
+  font-family: 'Space Grotesk', sans-serif;
+  color: #111827;
+  font-weight: 600;
+  font-size: 14px;
+  min-width: 65px;
+  max-width: 100px;
+  width: auto;
+  text-align: center;
+}
+
+@media (min-width: 1024px) {
+  .mnav-cell {
+    width: 8%;
+    min-width: 70px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .mnav-cell {
+    min-width: 60px;
+    max-width: 80px;
+  }
+}
+
+.strategies-table-container.dark .mnav-cell {
+  color: #ffffff;
+}
+
 .burn-cell {
   font-family: 'Space Grotesk', sans-serif;
   color: #111827;

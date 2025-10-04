@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { ethPriceService } from './ethPriceService.js';
 
 class HoldingsService {
   constructor() {
@@ -94,9 +95,9 @@ class HoldingsService {
         currentPrice: holding.current_price,
         imageUrl: holding.image_url,
         // Convert price from wei to ETH for display
-        priceInEth: holding.current_price ? (parseFloat(holding.current_price) / 1e18).toFixed(4) : '0',
-        // Format price in USD (assuming 1 ETH = $2000 for now, this could be dynamic)
-        priceInUsd: holding.current_price ? ((parseFloat(holding.current_price) / 1e18) * 2000).toFixed(2) : '0'
+        priceInEth: holding.current_price ? (parseFloat(holding.current_price) / 1e18).toFixed(4) : null,
+        // USD price will be calculated separately using real ETH price
+        priceInUsd: null // Will be calculated later with real ETH price
       }));
       
       // Cache the result
@@ -128,32 +129,72 @@ class HoldingsService {
   }
 
   /**
-   * Get holdings summary statistics
+   * Calculate USD prices for holdings using current ETH price
    * @param {Array} holdings - Holdings array
-   * @returns {Object} Summary statistics
+   * @returns {Promise<Array>} Holdings with USD prices calculated
    */
-  getHoldingsSummary(holdings) {
+  async calculateUsdPrices(holdings) {
+    if (!holdings || holdings.length === 0) {
+      return holdings;
+    }
+
+    const ethPriceInUsd = await ethPriceService.getEthPriceInUsd();
+    
+    if (!ethPriceInUsd) {
+      console.warn('⚠️ Could not fetch ETH price, USD values will show as "No data"');
+      return holdings.map(holding => ({
+        ...holding,
+        priceInUsd: null
+      }));
+    }
+
+    return holdings.map(holding => {
+      const ethPrice = parseFloat(holding.priceInEth);
+      const usdPrice = ethPrice && !isNaN(ethPrice) ? ethPrice * ethPriceInUsd : null;
+      
+      return {
+        ...holding,
+        priceInUsd: usdPrice ? usdPrice.toFixed(2) : null
+      };
+    });
+  }
+
+  /**
+   * Get holdings summary statistics using floor price calculation
+   * @param {Array} holdings - Holdings array
+   * @param {number} floorPriceEth - Floor price in ETH from NFTPriceFloor API
+   * @returns {Promise<Object>} Summary statistics
+   */
+  async getHoldingsSummary(holdings, floorPriceEth = null) {
     if (!holdings || holdings.length === 0) {
       return {
         totalCount: 0,
-        totalValueEth: '0',
-        totalValueUsd: '0',
-        averageValueEth: '0',
-        averageValueUsd: '0'
+        totalValueEth: null,
+        totalValueUsd: null,
+        averageValueEth: null,
+        averageValueUsd: null
       };
     }
 
-    const totalValueEth = holdings.reduce((sum, holding) => sum + parseFloat(holding.priceInEth || 0), 0);
-    const totalValueUsd = holdings.reduce((sum, holding) => sum + parseFloat(holding.priceInUsd || 0), 0);
-    const averageValueEth = totalValueEth / holdings.length;
-    const averageValueUsd = totalValueUsd / holdings.length;
+    // Calculate total value using floor price if provided
+    let totalValueEth = null;
+    if (floorPriceEth && !isNaN(floorPriceEth) && floorPriceEth > 0) {
+      totalValueEth = floorPriceEth * holdings.length;
+    }
+
+    // Calculate total value in USD if we have ETH total
+    let totalValueUsd = null;
+    if (totalValueEth) {
+      const usdValue = await ethPriceService.convertEthToUsd(totalValueEth);
+      totalValueUsd = usdValue ? usdValue.toFixed(2) : null;
+    }
 
     return {
       totalCount: holdings.length,
-      totalValueEth: totalValueEth.toFixed(4),
-      totalValueUsd: totalValueUsd.toFixed(2),
-      averageValueEth: averageValueEth.toFixed(4),
-      averageValueUsd: averageValueUsd.toFixed(2)
+      totalValueEth: totalValueEth ? totalValueEth.toFixed(4) : null,
+      totalValueUsd: totalValueUsd,
+      averageValueEth: null, // Hide average as requested
+      averageValueUsd: null  // Hide average as requested
     };
   }
 
