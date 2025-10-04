@@ -1375,12 +1375,26 @@
 /* Tablet and mobile layout - hide 24h change column */
 @media (max-width: 1024px) {
   /* Hide 24h Change column on tablet/mobile since it's merged with Price */
-  .change-cell {
+  .strategies-table-container .strategies-table .change-cell {
     display: none !important;
   }
   
-  .strategies-table th:nth-child(5) { /* 24h Change header */
+  .strategies-table-container .strategies-table th:nth-child(5) { /* 24h Change header */
     display: none !important;
+  }
+  
+  .strategies-table-container .strategies-table td:nth-child(5) { /* 24h Change data cells */
+    display: none !important;
+  }
+  
+  /* Additional aggressive selectors to ensure column is hidden */
+  .strategies-table-container.dark .strategies-table .change-cell,
+  .strategies-table-container.light .strategies-table .change-cell {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
 }
 
@@ -1429,12 +1443,26 @@
   }
   
   /* Hide 24h Change column on mobile since it's merged with Price */
-  .change-cell {
+  .strategies-table-container .strategies-table .change-cell {
     display: none !important;
   }
   
-  .strategies-table th:nth-child(5) { /* 24h Change header */
+  .strategies-table-container .strategies-table th:nth-child(5) { /* 24h Change header */
     display: none !important;
+  }
+  
+  .strategies-table-container .strategies-table td:nth-child(5) { /* 24h Change data cells */
+    display: none !important;
+  }
+  
+  /* Additional aggressive selectors to ensure column is hidden */
+  .strategies-table-container.dark .strategies-table .change-cell,
+  .strategies-table-container.light .strategies-table .change-cell {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
   
   /* Shrink holdings column */
