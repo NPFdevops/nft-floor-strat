@@ -455,7 +455,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 }
                 aria-label="Sort by price"
               >
-                <span className="desktop-header-text">Price</span><span className="mobile-header-text">Price & Change</span> {getSortIcon('poolData.price_usd')}
+                <span className="desktop-header-text">Price</span><span className="mobile-header-text">Price</span> {getSortIcon('poolData.price_usd')}
               </th>
               <th 
                 className={`sortable ${sortConfig.key === 'poolData.price_change_24h' ? 'active' : ''}`}
