@@ -572,16 +572,42 @@ const StrategyDetailView = ({ strategy, onBack }) => {
                         <span>Loading...</span>
                       </div>
                     ) : (
-                      <span className="font-medium">
-                        {collectionDetails?.floor_price_eth ? 
-                          `${parseFloat(collectionDetails.floor_price_eth).toFixed(2)} ETH` : 
-                          <span className={isDark ? 'text-gray-400' : 'text-gray-400'}>N/A</span>
-                        }
-                      </span>
+                      <div className="price-content-mobile">
+                        <div className="price-value-mobile">
+                          {collectionDetails?.floor_price_eth ? 
+                            `${parseFloat(collectionDetails.floor_price_eth).toFixed(2)} ETH` : 
+                            <span className={isDark ? 'text-gray-400' : 'text-gray-400'}>N/A</span>
+                          }
+                        </div>
+                        <div className={`price-change-mobile ${
+                          (() => {
+                            const diff24h = collectionDetails?.floorTemporalityUsd?.diff24h;
+                            const priceChange24h = collectionDetails?.price_change_24h;
+                            const finalValue = diff24h !== undefined && diff24h !== null ? diff24h : priceChange24h;
+                            return finalValue >= 0 ? 'positive' : 'negative';
+                          })()
+                        }`}>
+                          {(() => {
+                            const diff24h = collectionDetails?.floorTemporalityUsd?.diff24h;
+                            const priceChange24h = collectionDetails?.price_change_24h;
+                            const finalValue = diff24h !== undefined && diff24h !== null ? diff24h : priceChange24h;
+                            return formatPercentage(finalValue);
+                          })()}
+                        </div>
+                      </div>
                     )}
                   </td>
                   <td>
-                    <span className="font-medium">{formatCurrencyWithDecimals(strategy.poolData?.price_usd, 4)}</span>
+                    <div className="price-content-mobile">
+                      <div className="price-value-mobile font-medium">
+                        {formatCurrencyWithDecimals(strategy.poolData?.price_usd, 4)}
+                      </div>
+                      <div className={`price-change-mobile ${
+                        strategy.poolData?.price_change_24h >= 0 ? 'positive' : 'negative'
+                      }`}>
+                        {formatPercentage(strategy.poolData?.price_change_24h)}
+                      </div>
+                    </div>
                   </td>
                 </tr>
                 <tr>

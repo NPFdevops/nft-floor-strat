@@ -913,7 +913,44 @@
     padding: 16px;
   }
 
-  /* Fix mobile display for 24h change colors */
+  /* Hide 24h Change row on mobile - show it inline with price instead */
+  .comparison-table tbody tr:nth-child(2) {
+    display: none !important;
+  }
+
+  /* Mobile price content layout */
+  .price-content-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .price-value-mobile {
+    font-weight: 700;
+    font-size: 13px;
+    color: inherit;
+  }
+
+  .price-change-mobile {
+    display: block !important;
+    font-weight: 600;
+    font-size: 11px;
+    padding: 1px 4px;
+    border-radius: 2px;
+    margin-top: 1px;
+  }
+
+  .price-change-mobile.positive {
+    color: #059669 !important;
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%) !important;
+  }
+
+  .price-change-mobile.negative {
+    color: #dc2626 !important;
+    background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%) !important;
+  }
+
+  /* Fix desktop display for 24h change colors */
   .change-cell.positive,
   .change-cell.negative {
     margin: 0 !important;
@@ -924,6 +961,17 @@
     overflow: visible !important;
     font-size: 13px !important;
     line-height: 1.2 !important;
+  }
+
+  /* Dark mode mobile fixes for price change */
+  .strategy-detail-container.dark .price-change-mobile.positive {
+    color: #FFFFFF !important;
+    background: #F11F9D !important;
+  }
+
+  .strategy-detail-container.dark .price-change-mobile.negative {
+    color: #000000 !important;
+    background: #FFECF5 !important;
   }
 
   /* Dark mode mobile fixes for 640px */
@@ -953,11 +1001,26 @@
     grid-template-columns: 1fr;
   }
 
+  /* Hide 24h Change row on very small mobile too */
+  .comparison-table tbody tr:nth-child(2) {
+    display: none !important;
+  }
+
   /* Additional mobile fixes for very small screens */
   .comparison-table th,
   .comparison-table td {
     padding: 6px 8px !important;
     font-size: 12px !important;
+  }
+
+  /* Mobile price change for very small screens */
+  .price-change-mobile {
+    font-size: 9px !important;
+    padding: 1px 3px !important;
+  }
+
+  .price-value-mobile {
+    font-size: 11px !important;
   }
 
   .change-cell.positive,
