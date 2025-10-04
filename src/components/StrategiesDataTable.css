@@ -1372,6 +1372,18 @@
   }
 }
 
+/* Tablet and mobile layout - hide 24h change column */
+@media (max-width: 1024px) {
+  /* Hide 24h Change column on tablet/mobile since it's merged with Price */
+  .change-cell {
+    display: none !important;
+  }
+  
+  .strategies-table th:nth-child(5) { /* 24h Change header */
+    display: none !important;
+  }
+}
+
 @media (max-width: 768px) {
   .strategies-table-container {
     padding: 0;
@@ -1418,11 +1430,11 @@
   
   /* Hide 24h Change column on mobile since it's merged with Price */
   .change-cell {
-    display: none;
+    display: none !important;
   }
   
   .strategies-table th:nth-child(5) { /* 24h Change header */
-    display: none;
+    display: none !important;
   }
   
   /* Shrink holdings column */
@@ -1460,13 +1472,13 @@
   }
   
   .price-change-mobile.positive {
-    color: #059669;
-    background: rgba(16, 185, 129, 0.1);
+    color: #FFFFFF !important;
+    background: #F11F9D !important;
   }
   
   .price-change-mobile.negative {
-    color: #dc2626;
-    background: rgba(220, 38, 38, 0.1);
+    color: #000000 !important;
+    background: #FFECF5 !important;
   }
   
   .strategy-cell {
@@ -1585,13 +1597,13 @@
 }
 
 .strategies-table-container.dark .price-change-mobile.positive {
-  color: #10b981;
-  background: rgba(16, 185, 129, 0.2);
+  color: #FFFFFF !important;
+  background: #F11F9D !important;
 }
 
 .strategies-table-container.dark .price-change-mobile.negative {
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.2);
+  color: #000000 !important;
+  background: #FFECF5 !important;
 }
 
 /* Dark mode support */
