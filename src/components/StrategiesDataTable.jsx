@@ -7,6 +7,21 @@ import SkeletonTable from './SkeletonTable.jsx';
 import { posthogService } from '../services/posthogService';
 import { strategyToSlugMappingService } from '../services/strategyToSlugMapping';
 import { useTheme } from '../contexts/ThemeContext';
+import chromieSquiggleImage from '../assets/chromie-squiggle-art-blocks-curated.png';
+
+// Helper function to get the optimized collection image
+const getCollectionImage = (strategy) => {
+  // Check if this is Chromie Squiggle collection and use local optimized image
+  if (strategy.collectionName && 
+      (strategy.collectionName.toLowerCase().includes('chromie squiggle') ||
+       strategy.collectionName.toLowerCase().includes('chromiesquiggle') ||
+       strategy.collectionName.toLowerCase().includes('art blocks curated'))) {
+    return chromieSquiggleImage;
+  }
+  
+  // Fallback to existing collectionImage if available
+  return strategy.collectionImage || null;
+};
 
 const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
   const { isDark } = useTheme();
@@ -539,9 +554,9 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
               >
                 <td className="collection-cell" role="gridcell">
                   <div className="collection-info">
-                    {strategy.collectionImage && (
+                    {getCollectionImage(strategy) && (
                       <img 
-                        src={strategy.collectionImage} 
+                        src={getCollectionImage(strategy)} 
                         alt={`${strategy.collectionName} collection avatar`}
                         className="collection-image"
                         loading="lazy"
