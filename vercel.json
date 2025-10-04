@@ -21,6 +21,35 @@
     }
   },
   
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/health",
+      "dest": "/api/health"
+    },
+    {
+      "src": "/robots.txt",
+      "dest": "/api/robots.txt.js"
+    },
+    {
+      "src": "/sitemap.xml",
+      "dest": "/api/sitemap.xml.js"
+    },
+    {
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$)",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  
   "headers": [
     {
       "source": "/(.*)",
@@ -136,33 +165,6 @@
           "value": "public, max-age=31536000, immutable"
         }
       ]
-    }
-  ],
-  
-  "rewrites": [
-    {
-      "source": "/api/strategies",
-      "destination": "/api/strategies"
-    },
-    {
-      "source": "/api/holdings(.*)",
-      "destination": "/api/holdings$1"
-    },
-    {
-      "source": "/api/sold(.*)",
-      "destination": "/api/sold$1"
-    },
-    {
-      "source": "/api/health",
-      "destination": "/api/health"
-    },
-    {
-      "source": "/health",
-      "destination": "/api/health"
-    },
-    {
-      "source": "/((?!api).*)",
-      "destination": "/index.html"
     }
   ],
   

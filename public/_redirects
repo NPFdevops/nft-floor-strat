@@ -1,0 +1,16 @@
+# API routes should be handled by serverless functions
+/api/* /api/:splat 200
+/health /api/health 200
+
+# Static assets with cache headers
+/js/* /js/:splat 200
+/css/* /css/:splat 200
+/images/* /images/:splat 200
+/fonts/* /fonts/:splat 200
+
+# SEO routes
+/robots.txt /api/robots.txt.js 200
+/sitemap.xml /api/sitemap.xml.js 200
+
+# SPA fallback - all other routes should serve index.html
+/* /index.html 200
