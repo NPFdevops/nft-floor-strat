@@ -11,7 +11,8 @@
     "sync:initial": "node src/scripts/initialSetup.js",
     "sync:full-year": "node src/scripts/fullYearSync.js",
     "db:status": "node src/scripts/dbStatus.js",
-    "build:analyze": "vite build --mode analyze",
+    "build:analyze": "ANALYZE=true vite build",
+    "analyze:bundle": "npx vite-bundle-analyzer dist",
     "build:production": "NODE_ENV=production vite build",
     "build:staging": "NODE_ENV=staging vite build",
     "test:health": "curl -f http://localhost:3000/api/health || exit 1",
@@ -19,7 +20,9 @@
     "typecheck": "echo 'Type checking not configured yet'",
     "deploy:staging": "vercel --target staging",
     "deploy:production": "vercel --prod",
-    "postbuild": "echo 'Build completed successfully'"
+    "postbuild": "echo 'Build completed successfully'",
+    "test:optimizations": "node test-optimizations.cjs",
+    "analyze:performance": "npm run build && npm run test:optimizations"
   },
   "keywords": [],
   "author": "",

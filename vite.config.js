@@ -16,10 +16,13 @@ export default defineConfig({
     // Terser options for better compression
     terserOptions: {
       compress: {
-        drop_console: process.env.NODE_ENV === 'production', // Remove console.logs in production
+        drop_console: process.env.NODE_ENV === 'production',
         drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info'],
-        passes: 2
+        pure_funcs: ['console.log', 'console.info', 'console.warn', 'console.debug'],
+        passes: 3, // Increased passes for better compression
+        unsafe: true, // Enable more aggressive optimizations
+        unsafe_comps: true,
+        unsafe_math: true
       },
       mangle: {
         safari10: true

@@ -77,15 +77,23 @@ CREATE TABLE IF NOT EXISTS api_usage (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Indexes for better performance
+-- Optimized indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_price_history_collection_date ON price_history(collection_slug, date DESC);
 CREATE INDEX IF NOT EXISTS idx_price_history_date ON price_history(date DESC);
+CREATE INDEX IF NOT EXISTS idx_price_history_timestamp ON price_history(timestamp DESC);
 CREATE INDEX IF NOT EXISTS idx_collections_slug ON collections(slug);
 CREATE INDEX IF NOT EXISTS idx_collections_ranking ON collections(ranking);
 CREATE INDEX IF NOT EXISTS idx_collections_market_cap ON collections(market_cap DESC);
 CREATE INDEX IF NOT EXISTS idx_collections_top_250 ON collections(is_top_250, selection_period);
+CREATE INDEX IF NOT EXISTS idx_collections_active ON collections(is_active, market_cap DESC);
 CREATE INDEX IF NOT EXISTS idx_collection_periods ON collection_selection_periods(period, status);
 CREATE INDEX IF NOT EXISTS idx_sync_log_date ON sync_log(started_at DESC);
+CREATE INDEX IF NOT EXISTS idx_sync_log_status ON sync_log(status, sync_type);
+CREATE INDEX IF NOT EXISTS idx_api_usage_endpoint ON api_usage(endpoint, last_request_at DESC);
+
+-- Covering indexes for common query patterns
+CREATE INDEX IF NOT EXISTS idx_collections_cover ON collections(slug, name, market_cap, ranking, is_top_250) WHERE is_active = 1;
+CREATE INDEX IF NOT EXISTS idx_price_history_cover ON price_history(collection_slug, date, floor_eth, floor_usd, volume_usd);
 
 -- Views for common queries
 CREATE VIEW IF NOT EXISTS latest_prices AS

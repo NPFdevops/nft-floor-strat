@@ -1,12 +1,12 @@
 // In-memory cache for serverless functions
 let cache = new Map();
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-const MAX_CACHE_SIZE = 100;
+const CACHE_TTL = 2 * 60 * 1000; // 2 minutes (shorter for sales data)
+const MAX_CACHE_SIZE = 200;
 
 // Rate limiting
 const rateLimiter = new Map();
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
-const RATE_LIMIT_MAX = 60; // requests per window
+const RATE_LIMIT_MAX = 120; // Higher limit for sales (more dynamic data)
 
 function isProduction() {
   return process.env.NODE_ENV === 'production';
@@ -76,44 +76,53 @@ function setSecurityHeaders(res) {
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 }
 
-function setCacheHeaders(res, maxAge = 300) {
-  res.setHeader('Cache-Control', `public, max-age=${maxAge}, s-maxage=${maxAge * 2}, stale-while-revalidate=86400`);
+function setCacheHeaders(res, maxAge = 120) { // Shorter cache for sales data
+  res.setHeader('Cache-Control', `public, max-age=${maxAge}, s-maxage=${maxAge * 2}, stale-while-revalidate=3600`);
   res.setHeader('Vary', 'Accept-Encoding');
 }
 
 function setCORSHeaders(res) {
-  const allowedOrigins = isProduction() 
-    ? ['https://www.nftstrategy.fun', 'https://nftstrategy.fun']
-    : ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://localhost:3000'];
-    
   res.setHeader('Access-Control-Allow-Origin', '*'); // For API endpoints, allow all
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   res.setHeader('Access-Control-Max-Age', '86400');
 }
 
-function compressResponse(data, res) {
-  const jsonString = JSON.stringify(data);
+function validateQueryParams(query) {
+  const { strategyAddress, nftAddress } = query;
   
-  // Set content-type and encoding headers
-  res.setHeader('Content-Type', 'application/json; charset=utf-8');
-  
-  if (jsonString.length > 1024) { // Only compress responses > 1KB
-    // Vercel automatically handles gzip compression, just set the header
-    res.setHeader('Content-Encoding', 'identity'); // Let Vercel handle compression
-    console.log(`📦 Response size: ${jsonString.length} bytes (Vercel compression enabled)`);
+  if (!strategyAddress || !nftAddress) {
+    return {
+      valid: false,
+      error: 'Missing required parameters: strategyAddress and nftAddress'
+    };
   }
   
-  return jsonString;
+  // Basic validation - check if they look like valid addresses
+  if (!/^0x[a-fA-F0-9]{40}$/.test(strategyAddress)) {
+    return {
+      valid: false,
+      error: 'Invalid strategyAddress format'
+    };
+  }
+  
+  if (!/^0x[a-fA-F0-9]{40}$/.test(nftAddress)) {
+    return {
+      valid: false,
+      error: 'Invalid nftAddress format'
+    };
+  }
+  
+  return { valid: true };
 }
 
 export default async function handler(req, res) {
   const startTime = Date.now();
   const requestId = Math.random().toString(36).substr(2, 9);
   
-  logDebug(`🚀 [${requestId}] Strategies API called:`, {
+  logDebug(`🚀 [${requestId}] Sales API called:`, {
     method: req.method,
-    url: req.url,
+    query: req.query,
     userAgent: req.headers['user-agent']?.substring(0, 100)
   });
 
@@ -137,36 +146,55 @@ export default async function handler(req, res) {
     return res.status(429).json({ 
       error: 'Too Many Requests',
       message: 'Rate limit exceeded. Please try again later.',
-      retryAfter: 60
+      retryAfter: 60,
+      requestId
     });
   }
 
   if (req.method !== 'GET') {
     logError(`❌ [${requestId}] Method not allowed:`, req.method);
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ error: 'Method not allowed', requestId });
   }
 
   try {
-    const cacheKey = 'strategies';
+    // Validate query parameters
+    const validation = validateQueryParams(req.query);
+    if (!validation.valid) {
+      logError(`❌ [${requestId}] Invalid parameters:`, validation.error);
+      return res.status(400).json({ 
+        error: validation.error,
+        requestId
+      });
+    }
+    
+    const { strategyAddress, nftAddress } = req.query;
+    const cacheKey = `sold_${strategyAddress}_${nftAddress}`;
     const cached = cache.get(cacheKey);
     
     // Return cached response if available and fresh
     if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
-      logDebug(`⚡ [${requestId}] Cache HIT - returning cached strategies`);
-      setCacheHeaders(res, 300);
+      logDebug(`⚡ [${requestId}] Cache HIT - returning cached sales data`);
+      setCacheHeaders(res, 120);
       res.setHeader('X-Cache-Status', 'HIT');
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
       res.setHeader('X-Response-Time', `${Date.now() - startTime}ms`);
       return res.status(200).json(cached.data);
     }
     
-    logDebug(`🔄 [${requestId}] Cache MISS - fetching fresh data`);
+    logDebug(`🔄 [${requestId}] Cache MISS - fetching fresh sales data`);
+    
+    // Build URL with proper encoding
+    const url = new URL('https://www.nftstrategy.fun/api/sold');
+    url.searchParams.append('strategyAddress', strategyAddress);
+    url.searchParams.append('nftAddress', nftAddress);
+    
+    logDebug(`📡 [${requestId}] External API URL:`, url.toString());
     
     // Fetch with timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout
     
-    const response = await fetch('https://www.nftstrategy.fun/api/strategies', {
+    const response = await fetch(url.toString(), {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -193,7 +221,8 @@ export default async function handler(req, res) {
         error: 'External API error', 
         status: response.status,
         message: response.status === 429 ? 'External API rate limited' : response.statusText,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        requestId
       };
       
       return res.status(response.status >= 500 ? 502 : response.status).json(errorResponse);
@@ -206,18 +235,20 @@ export default async function handler(req, res) {
       return res.status(502).json({ 
         error: 'Invalid response format from external API',
         contentType: contentType,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        requestId
       });
     }
 
     const data = await response.json();
     
-    // Validate response structure
-    if (!Array.isArray(data)) {
-      logError(`❌ [${requestId}] Invalid response structure - expected array`);
+    // Validate response structure (sales can be array or empty)
+    if (data === null || data === undefined) {
+      logError(`❌ [${requestId}] Empty response from external API`);
       return res.status(502).json({ 
-        error: 'Invalid data structure from external API',
-        timestamp: new Date().toISOString()
+        error: 'Empty response from external API',
+        timestamp: new Date().toISOString(),
+        requestId
       });
     }
     
@@ -227,14 +258,15 @@ export default async function handler(req, res) {
       timestamp: Date.now()
     });
     
-    logDebug(`✅ [${requestId}] Successfully fetched and cached ${data.length} strategies`);
+    const dataSize = Array.isArray(data) ? data.length : typeof data === 'object' ? Object.keys(data).length : 1;
+    logDebug(`✅ [${requestId}] Successfully fetched and cached sales data (${dataSize} items)`);
     
     // Set response headers
-    setCacheHeaders(res, 300);
+    setCacheHeaders(res, 120);
     res.setHeader('X-Cache-Status', 'MISS');
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('X-Response-Time', `${Date.now() - startTime}ms`);
-    res.setHeader('X-Data-Count', data.length.toString());
+    res.setHeader('X-Data-Size', dataSize.toString());
     
     return res.status(200).json(data);
 

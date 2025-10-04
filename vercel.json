@@ -11,6 +11,10 @@
       "maxDuration": 30,
       "memory": 512
     },
+    "api/sold.js": {
+      "maxDuration": 30,
+      "memory": 512
+    },
     "api/health.js": {
       "maxDuration": 15,
       "memory": 256
@@ -143,6 +147,10 @@
     {
       "source": "/api/holdings(.*)",
       "destination": "/api/holdings$1"
+    },
+    {
+      "source": "/api/sold(.*)",
+      "destination": "/api/sold$1"
     },
     {
       "source": "/api/health",

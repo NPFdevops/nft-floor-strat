@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import StrategiesDataTable from './components/StrategiesDataTable';
-import StrategyDetailView from './components/StrategyDetailView';
-import InfoCards from './components/InfoCards';
-import SettingsModal from './components/SettingsModal';
 import SEO from './components/SEO';
+import { EnhancedLoadingState } from './components/EnhancedLoadingState';
+
+// Lazy load heavy components
+const StrategiesDataTable = lazy(() => import('./components/StrategiesDataTable'));
+const StrategyDetailView = lazy(() => import('./components/StrategyDetailView'));
+const InfoCards = lazy(() => import('./components/InfoCards'));
+const SettingsModal = lazy(() => import('./components/SettingsModal'));
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { createStrategyUrl, createStrategiesUrl, findStrategyByEncodedName } from './utils/urlUtils';
 import { posthogService } from './services/posthogService';
@@ -247,23 +250,25 @@ function AppContent() {
                 
                 {/* Strategies Content */}
                 <div className="flex flex-1 flex-col w-full min-w-0">
-                  {selectedStrategy ? (
-                    <StrategyDetailView 
-                      strategy={selectedStrategy}
-                      onBack={handleBackToStrategies}
-                    />
-                  ) : (
-                    <>
-                      {/* Info Cards */}
-                      <InfoCards strategies={strategies} />
-                      
-                      {/* Strategies Table */}
-                      <StrategiesDataTable 
-                        onStrategySelect={handleStrategySelect}
-                        onStrategiesUpdate={handleStrategiesUpdate}
+                  <Suspense fallback={<EnhancedLoadingState />}>
+                    {selectedStrategy ? (
+                      <StrategyDetailView 
+                        strategy={selectedStrategy}
+                        onBack={handleBackToStrategies}
                       />
-                    </>
-                  )}
+                    ) : (
+                      <>
+                        {/* Info Cards */}
+                        <InfoCards strategies={strategies} />
+                        
+                        {/* Strategies Table */}
+                        <StrategiesDataTable 
+                          onStrategySelect={handleStrategySelect}
+                          onStrategiesUpdate={handleStrategiesUpdate}
+                        />
+                      </>
+                    )}
+                  </Suspense>
                 </div>
               </div>
             </div>
@@ -311,8 +316,9 @@ function AppContent() {
       </nav>
       
       {/* Settings Modal */}
-      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
-      
+      <Suspense fallback={null}>
+        <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      </Suspense>
       {/* Footer */}
       <footer className={`${isDark ? 'bg-black border-gray-800' : 'bg-white border-gray-200'} border-t mt-auto w-full overflow-x-hidden`}>
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-12 min-w-0">
