@@ -1273,6 +1273,24 @@
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
 }
 
+/* Header text switching - desktop shows full text */
+.desktop-header-text {
+  display: inline;
+}
+
+.mobile-header-text {
+  display: none;
+}
+
+/* Desktop price cell shows single line */
+.price-content {
+  display: block;
+}
+
+.price-change-mobile {
+  display: none;
+}
+
 /* Responsive Design - Updated for better tablet/desktop experience */
 @media (min-width: 1024px) {
   .table-header h2 {
@@ -1340,18 +1358,77 @@
   
   .strategies-table {
     font-size: 12px;
-    min-width: 800px;
+    min-width: 750px; /* Reduced from 800px */
   }
   
   .strategies-table th,
   .strategies-table td {
-    padding: 12px 8px;
+    padding: 12px 6px; /* Reduced horizontal padding */
     font-size: 12px;
   }
   
+  /* Header text switching for mobile */
+  .desktop-header-text {
+    display: none;
+  }
+  
+  .mobile-header-text {
+    display: inline;
+  }
+  
+  /* Hide 24h Change column on mobile since it's merged with Price */
+  .change-cell {
+    display: none;
+  }
+  
+  .strategies-table th:nth-child(5) { /* 24h Change header */
+    display: none;
+  }
+  
+  /* Shrink holdings column */
+  .holdings-cell {
+    min-width: 50px; /* Reduced from default */
+    max-width: 70px;
+    text-align: center;
+    font-size: 12px;
+  }
+  
+  /* Price column with merged content */
+  .price-cell {
+    min-width: 90px;
+  }
+  
+  .price-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  
+  .price-value {
+    font-weight: 700;
+    font-size: 12px;
+    color: #111827;
+  }
+  
+  .price-change-mobile {
+    font-weight: 600;
+    font-size: 10px;
+    padding: 1px 4px;
+    border-radius: 2px;
+  }
+  
+  .price-change-mobile.positive {
+    color: #059669;
+    background: rgba(16, 185, 129, 0.1);
+  }
+  
+  .price-change-mobile.negative {
+    color: #dc2626;
+    background: rgba(220, 38, 38, 0.1);
+  }
   
   .strategy-cell {
-    min-width: 120px;
+    min-width: 110px; /* Slightly reduced */
     font-size: 12px;
   }
   
@@ -1388,42 +1465,61 @@
 
 @media (max-width: 480px) {
   .strategies-table-container {
-    padding: 8px;
+    padding: 6px;
   }
   
   .table-header h2 {
-    font-size: 24px;
+    font-size: 22px;
   }
   
   .strategies-table {
     font-size: 11px;
-    min-width: 700px;
+    min-width: 650px; /* Further reduced */
   }
   
   .strategies-table th,
   .strategies-table td {
-    padding: 10px 6px;
+    padding: 8px 4px; /* Further reduced padding */
     font-size: 11px;
   }
   
+  /* Further optimize holdings column */
+  .holdings-cell {
+    min-width: 45px;
+    max-width: 60px;
+    font-size: 11px;
+  }
+  
+  /* Compact price column */
+  .price-cell {
+    min-width: 80px;
+  }
+  
+  .price-value {
+    font-size: 11px;
+  }
+  
+  .price-change-mobile {
+    font-size: 9px;
+  }
   
   .strategy-cell {
-    min-width: 100px;
+    min-width: 95px;
     font-size: 11px;
   }
   
   .burn-cell {
     font-size: 11px;
-    min-width: 60px;
+    min-width: 55px;
   }
   
   .view-button {
-    padding: 6px 10px;
+    padding: 6px 8px;
     font-size: 10px;
   }
   
   .tooltip-text {
-    width: 140px;
+    width: 130px;
     font-size: 10px;
     padding: 6px 8px;
   }
@@ -1434,9 +1530,9 @@
   }
   
   .pagination-button {
-    padding: 8px 12px;
-    font-size: 12px;
-    min-width: 40px;
+    padding: 6px 10px;
+    font-size: 11px;
+    min-width: 36px;
   }
 }
 

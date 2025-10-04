@@ -440,7 +440,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 }
                 aria-label="Sort by number of NFT holdings"
               >
-                Holdings {getSortIcon('holdingsCount')}
+                <span className="desktop-header-text">Holdings</span><span className="mobile-header-text">Holds</span> {getSortIcon('holdingsCount')}
               </th>
               <th 
                 className={`sortable ${sortConfig.key === 'poolData.price_usd' ? 'active' : ''}`}
@@ -455,7 +455,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 }
                 aria-label="Sort by price"
               >
-                Price {getSortIcon('poolData.price_usd')}
+                <span className="desktop-header-text">Price</span><span className="mobile-header-text">Price & Change</span> {getSortIcon('poolData.price_usd')}
               </th>
               <th 
                 className={`sortable ${sortConfig.key === 'poolData.price_change_24h' ? 'active' : ''}`}
@@ -582,9 +582,14 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                   </span>
                 </td>
                 <td className="price-cell" role="gridcell">
-                  <span aria-label={`Price: ${formatCurrency(strategy.poolData?.price_usd)}`}>
-                    {formatCurrency(strategy.poolData?.price_usd)}
-                  </span>
+                  <div className="price-content">
+                    <div className="price-value" aria-label={`Price: ${formatCurrency(strategy.poolData?.price_usd)}`}>
+                      {formatCurrency(strategy.poolData?.price_usd)}
+                    </div>
+                    <div className={`price-change-mobile ${parseFloat(strategy.poolData?.price_change_24h) >= 0 ? 'positive' : 'negative'}`} aria-label={`24 hour change: ${parseFloat(strategy.poolData?.price_change_24h) >= 0 ? 'positive' : 'negative'} ${formatPercentage(strategy.poolData?.price_change_24h)}`}>
+                      {formatPercentage(strategy.poolData?.price_change_24h)}
+                    </div>
+                  </div>
                 </td>
                 <td className={`change-cell ${parseFloat(strategy.poolData?.price_change_24h) >= 0 ? 'positive' : 'negative'}`} role="gridcell">
                   <span aria-label={`24 hour change: ${parseFloat(strategy.poolData?.price_change_24h) >= 0 ? 'positive' : 'negative'} ${formatPercentage(strategy.poolData?.price_change_24h)}`}>
