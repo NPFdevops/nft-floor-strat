@@ -127,11 +127,13 @@ function AppContent() {
             <div className="flex items-center justify-between py-4 min-w-0">
               {/* Logo */}
               <div className={`flex items-center ${isDark ? 'text-white' : 'text-black'} flex-shrink-0 mr-2`}>
-                <img 
-                  src={isDark ? logoDarkImage : logoLightImage} 
-                  alt="NFT Price Floor Logo" 
-                  className="h-8 sm:h-10 lg:h-12"
-                />
+                <a href="https://nftpricefloor.com" className="inline-block hover:opacity-80 transition-opacity">
+                  <img 
+                    src={isDark ? logoDarkImage : logoLightImage} 
+                    alt="NFT Price Floor Logo" 
+                    className="h-8 sm:h-10 lg:h-12"
+                  />
+                </a>
               </div>
               
               {/* Desktop navigation - Centered */}
@@ -317,11 +319,13 @@ function AppContent() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             {/* Company Info */}
             <div className="col-span-1">
-              <img 
-                src={isDark ? logoDarkImage : logoLightImage} 
-                alt="NFT Price Floor Logo" 
-                className="h-8 mb-4"
-              />
+              <a href="https://nftpricefloor.com" className="inline-block hover:opacity-80 transition-opacity">
+                <img 
+                  src={isDark ? logoDarkImage : logoLightImage} 
+                  alt="NFT Price Floor Logo" 
+                  className="h-8 mb-4"
+                />
+              </a>
               <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-4">
                 Track and compare NFT floor prices across all major collections. Get real-time data and historical insights.
               </p>

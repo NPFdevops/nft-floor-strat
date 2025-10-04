@@ -25,8 +25,8 @@ class StrategyToSlugMappingService {
       'Chromie Squiggle by Snowfro': 'chromie-squiggle-art-blocks-curated',
       
       // CryptoDickbutts
-      'CryptoDickbutts': 'cryptodickbutts-s3',
-      'cryptodickbutts': 'cryptodickbutts-s3',
+      'CryptoDickbutts': 'cryptodickbutts',
+      'cryptodickbutts': 'cryptodickbutts',
       
       // CrypToadz by GREMPLIN
       'CrypToadz by GREMPLIN': 'cryptoadz',
@@ -382,7 +382,7 @@ class StrategyToSlugMappingService {
       'decentraland': 'decentraland',
       'cryptoadz-by-gremplin': 'cryptoadz',
       'chromie-squiggle-by-snowfro': 'chromie-squiggle-art-blocks-curated',
-      'cryptodickbutts-s3': 'cryptodickbutts-s3',
+      'cryptodickbutts-s3': 'cryptodickbutts',
       'hashmasks': 'hashmasks',
       'autoglyphs': 'autoglyphs',
       'loot-for-adventurers': 'loot-for-adventurers',

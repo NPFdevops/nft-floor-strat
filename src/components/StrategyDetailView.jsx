@@ -35,6 +35,208 @@ const generateMockPriceData = (days = 30, basePrice = 1.5) => {
   return data;
 };
 
+// Simple component to fetch and display token holders count
+const TokenHoldersCount = ({ strategy, isDark }) => {
+  const [holdersCount, setHoldersCount] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const fetchHoldersCount = async () => {
+      try {
+        // Check if this is CryptoPunks strategy - use specialized API
+        const isPunkStrategy = strategy.tokenName === 'PunkStrategy' || 
+                              strategy.tokenSymbol === 'PNKSTR' || 
+                              strategy.collectionName === 'CryptoPunks';
+        
+        // Use different query ID for CryptoPunks
+        const queryId = isPunkStrategy ? '5817968' : '5814457';
+        const limit = isPunkStrategy ? '50' : '50';
+        
+        
+        const response = await fetch(`https://api.dune.com/api/v1/query/${queryId}/results?limit=${limit}`, {
+          method: 'GET',
+          headers: {
+            'X-Dune-API-Key': import.meta.env.VITE_DUNE_API_KEY,
+            'Content-Type': 'application/json',
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        
+        // Handle CryptoPunks data differently
+        if (isPunkStrategy) {
+          if (result?.result?.rows && result.result.rows.length > 0) {
+            // CryptoPunks data - sort by date and get most recent holders count
+            const sortedRows = result.result.rows.sort((a, b) => new Date(b.day) - new Date(a.day));
+            const mostRecentRow = sortedRows[0];
+            
+            
+            setHoldersCount(parseInt(mostRecentRow.holders || 0));
+            return; // Exit early for CryptoPunks
+          } else {
+            setHoldersCount(0);
+            return;
+          }
+        }
+        
+        // Find data for the specific strategy, then get the latest entry
+        if (result?.result?.rows && result.result.rows.length > 0) {
+          const strategyName = strategy.tokenName || strategy.collectionName;
+          let relevantRows = [];
+          
+          console.log(`🔍 TokenHoldersCount DEBUG:`, {
+            strategyTokenName: strategy.tokenName,
+            strategyTokenSymbol: strategy.tokenSymbol,
+            strategyCollectionName: strategy.collectionName,
+            usingStrategyName: strategyName,
+            totalRowsAvailable: result.result.rows.length,
+            availableLabels: [...new Set(result.result.rows.map(row => row.label))]
+          });
+          
+          if (strategyName) {
+            // Create strategy label mapping based on actual API tokenName values
+            const strategyLabelMap = {
+              'ApeStrategy': 'APESTR',
+              'DickStrategy': 'DICKSTR', 
+              'PudgyStrategy': 'PUDGYSTR',
+              'SquiggleStrategy': 'SQUIGSTR',
+              'MeebitStrategy': 'MEEBSTR',
+              'ToadzStrategy': 'TOADSTR',
+              'BirbStrategy': 'BIRBSTR',
+              'PunkStrategy': 'PUNKSTR'
+            };
+            
+            // Try tokenSymbol first (most reliable)
+            if (strategy.tokenSymbol) {
+              relevantRows = result.result.rows.filter(row => row.label === strategy.tokenSymbol);
+              console.log(`🎯 TokenSymbol matching:`, {
+                tokenSymbol: strategy.tokenSymbol,
+                foundRows: relevantRows.length,
+                foundData: relevantRows.map(r => ({label: r.label, holders: r.holders, day: r.day}))
+              });
+            }
+            
+            // If tokenSymbol didn't work, try direct mapping
+            if (relevantRows.length === 0) {
+              const expectedLabel = strategyLabelMap[strategyName];
+              console.log(`🎯 Direct mapping attempt:`, {
+                strategyName,
+                expectedLabel,
+                hasMapping: !!expectedLabel
+              });
+              
+              if (expectedLabel) {
+                relevantRows = result.result.rows.filter(row => row.label === expectedLabel);
+                console.log(`🔍 Direct mapping results:`, {
+                  expectedLabel,
+                  foundRows: relevantRows.length,
+                  foundData: relevantRows.map(r => ({label: r.label, holders: r.holders, day: r.day}))
+                });
+              }
+            }
+            
+            // If no direct mapping, try to derive from strategy name
+            if (relevantRows.length === 0) {
+              // Extract first few letters + 'STR' pattern
+              const derivedLabel = strategyName.toUpperCase().replace(/STRATEGY$/, '').substring(0, 4) + 'STR';
+              console.log(`🔄 Trying derived mapping:`, {
+                originalName: strategyName,
+                derivedLabel,
+              });
+              relevantRows = result.result.rows.filter(row => row.label === derivedLabel);
+              console.log(`🔄 Derived mapping results:`, {
+                derivedLabel,
+                foundRows: relevantRows.length
+              });
+            }
+            
+            // If still no match, try fuzzy matching
+            if (relevantRows.length === 0) {
+              const strategyKey = strategyName.toUpperCase().replace(/STRATEGY$/, '').substring(0, 4);
+              console.log(`🔍 Trying fuzzy matching with key: ${strategyKey}`);
+              relevantRows = result.result.rows.filter(row => 
+                row.label && row.label.includes(strategyKey)
+              );
+              console.log(`🔍 Fuzzy matching results:`, {
+                strategyKey,
+                foundRows: relevantRows.length
+              });
+            }
+          }
+          
+          // If we found strategy-specific data, use the most recent entry
+          if (relevantRows.length > 0) {
+            const sortedRows = relevantRows.sort((a, b) => new Date(b.day) - new Date(a.day));
+            const mostRecentRow = sortedRows[0];
+            console.log(`✅ Found strategy-specific data for ${strategyName}:`, {
+              label: mostRecentRow.label,
+              holders: mostRecentRow.holders,
+              date: mostRecentRow.day,
+              matchedRows: relevantRows.length
+            });
+            setHoldersCount(parseInt(mostRecentRow.holders || 0));
+          } else {
+            // Fallback: use the most recent entry overall if no strategy-specific data
+            console.warn(`⚠️ No strategy-specific data found for ${strategyName}, using fallback`);
+            const allSorted = result.result.rows.sort((a, b) => new Date(b.day) - new Date(a.day));
+            if (allSorted.length > 0) {
+              console.log(`🔄 Using fallback data:`, {
+                label: allSorted[0].label,
+                holders: allSorted[0].holders,
+                date: allSorted[0].day
+              });
+              setHoldersCount(parseInt(allSorted[0].holders || 0));
+            } else {
+              setHoldersCount(0);
+            }
+          }
+        } else {
+          setHoldersCount(0);
+        }
+      } catch (error) {
+        console.error('Error fetching holders count:', error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchHoldersCount();
+  }, [strategy]);
+  
+  const formatNumber = (value) => {
+    if (!value) return 'N/A';
+    return new Intl.NumberFormat('en-US').format(value);
+  };
+  
+  if (loading) {
+    return (
+      <div className="chart-loading" style={{padding: '8px 0'}}>
+        <div className="chart-loading-spinner" style={{width: '16px', height: '16px', marginBottom: '0', marginRight: '8px'}}></div>
+        <span>Loading...</span>
+      </div>
+    );
+  }
+  
+  if (holdersCount !== null && holdersCount >= 0) {
+    return (
+      <span className="font-medium" title="Data from Dune Analytics">
+        {formatNumber(holdersCount)}
+      </span>
+    );
+  }
+  
+  // Fallback to strategy.totalHolders if available
+  if (strategy.totalHolders) {
+    return <span className="font-medium">{formatNumber(strategy.totalHolders)}</span>;
+  }
+  
+  return <span className={isDark ? 'text-gray-400' : 'text-gray-400'}>N/A</span>;
+};
+
 const StrategyDetailView = ({ strategy, onBack }) => {
   const { isDark } = useTheme();
   const [nftPriceData, setNftPriceData] = useState(null);
@@ -383,53 +585,130 @@ const StrategyDetailView = ({ strategy, onBack }) => {
             })
         );
 
-        // 5. Fetch historical sales data from NFT Strategy API
-        // Use OpenSea slug if available, otherwise use the mapped slug
-        const salesApiSlug = strategy.collectionOsSlug || collectionSlug;
-        console.log(`📊 Fetching sales data with slug: ${salesApiSlug}`);
+        // 5. Fetch historical sales data from /api/sold endpoint
+        const strategyAddress = strategy.tokenAddress || strategy.id;
+        const nftAddress = strategy.collection || strategy.contractAddress;
+        
+        // Debug strategy object properties
+        console.log('🔍 Strategy object debug:', {
+          strategy: strategy,
+          tokenAddress: strategy.tokenAddress,
+          id: strategy.id,
+          collection: strategy.collection,
+          contractAddress: strategy.contractAddress,
+          collectionName: strategy.collectionName,
+          availableKeys: Object.keys(strategy)
+        });
+        
+        console.log(`📊 Fetching sales data for strategy: ${strategyAddress}, NFT: ${nftAddress}`);
+        
+        // Basic validation - just check that addresses are present
+        if (!strategyAddress || !nftAddress) {
+          console.error('❌ Missing required parameters for sales API call:', {
+            strategyAddress,
+            nftAddress,
+            strategyObject: strategy
+          });
+          setSalesData([]);
+          setLoadingStates(prev => ({ ...prev, sales: false }));
+          setErrorStates(prev => ({ ...prev, sales: 'Missing required strategy or NFT address parameters.' }));
+          return;
+        }
+        // Use the actual strategy addresses
+        const finalStrategyAddress = strategyAddress;
+        const finalNftAddress = nftAddress;
+        
+        console.log('📊 Using actual strategy addresses for sales API:', {
+          strategyAddress: finalStrategyAddress,
+          nftAddress: finalNftAddress
+        });
+        
+        // Use relative URL to work with Vite proxy in development and serverless in production
+        const salesApiUrl = `/api/sold?strategyAddress=${encodeURIComponent(finalStrategyAddress)}&nftAddress=${encodeURIComponent(finalNftAddress)}`;
+        
+        console.log('🌐 Environment:', import.meta.env.MODE);
+        console.log('🌐 Sales API URL (relative):', salesApiUrl);
+        
+        // Create a promise that will timeout after 30 seconds
+        const fetchWithTimeout = async () => {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => {
+            console.log('⏰ Sales API request timeout after 30 seconds');
+            controller.abort();
+          }, 30000);
+          
+          try {
+            const response = await fetch(salesApiUrl, {
+              method: 'GET',
+              mode: 'cors',
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            return response;
+          } catch (error) {
+            clearTimeout(timeoutId);
+            throw error;
+          }
+        };
+        
         dataPromises.push(
-          fetch(`https://www.nftstrategy.fun/api/opensea/floor-price?collectionOsSlug=${salesApiSlug}&contractAddress=${strategy.collection || strategy.contractAddress}`)
+          fetchWithTimeout()
             .then(response => {
+              console.log('📶 Sales API Response:', {
+                status: response.status,
+                statusText: response.statusText,
+                ok: response.ok,
+                url: response.url,
+                headers: {
+                  contentType: response.headers.get('content-type'),
+                  contentLength: response.headers.get('content-length')
+                }
+              });
+              
               if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                console.error('❌ Sales API HTTP Error:', errorMessage);
+                throw new Error(errorMessage);
               }
               return response.json();
             })
             .then(result => {
               console.log('📊 Sales Data Result:', result);
-              // Transform the API response to match expected format
               let transformedData = [];
               
-              if (result && typeof result === 'object') {
-                // If result is a single object, wrap it in an array
-                if (!Array.isArray(result)) {
-                  transformedData = [{
-                    id: 1,
-                    tokenId: result.tokenId || result.token_id || 'N/A',
-                    name: result.name || `${strategy.collectionName} #${result.tokenId || result.token_id || ''}` || 'NFT',
-                    imageUrl: result.image || result.imageUrl || result.image_url || '',
-                    price: result.floorPrice || result.floor_price || result.price || 0,
-                    priceEth: result.floorPriceEth || result.floor_price_eth || result.price_eth || 0,
-                    marketplace: result.marketplace || 'OpenSea',
-                    buyer: result.owner || result.current_owner || 'Unknown',
-                    date: result.lastUpdated || result.last_updated || new Date().toISOString(),
-                    contractAddress: strategy.collection || strategy.contractAddress
-                  }];
-                } else {
-                  // If result is already an array, transform each item
-                  transformedData = result.map((item, index) => ({
+              // Handle the /api/sold response structure
+              if (result && Array.isArray(result)) {
+                // Transform the API response data to match expected format
+                transformedData = result.map((item, index) => {
+                  // Convert sold_price from wei to ETH (divide by 1e18)
+                  const priceInEth = item.sold_price ? parseFloat((item.sold_price / 1e18).toFixed(4)) : 0;
+                  
+                  return {
                     id: index + 1,
-                    tokenId: item.tokenId || item.token_id || 'N/A',
-                    name: item.name || `${strategy.collectionName} #${item.tokenId || item.token_id || ''}` || 'NFT',
-                    imageUrl: item.image || item.imageUrl || item.image_url || '',
-                    price: item.floorPrice || item.floor_price || item.price || 0,
-                    priceEth: item.floorPriceEth || item.floor_price_eth || item.price_eth || 0,
-                    marketplace: item.marketplace || 'OpenSea',
-                    buyer: item.owner || item.current_owner || 'Unknown',
-                    date: item.lastUpdated || item.last_updated || new Date().toISOString(),
-                    contractAddress: strategy.collection || strategy.contractAddress
-                  }));
-                }
+                    tokenId: item.token_id || 'N/A',
+                    name: `${strategy.collectionName} #${item.token_id || index + 1}`,
+                    imageUrl: item.image_url || '',
+                    price: priceInEth,
+                    priceEth: priceInEth,
+                    priceUsd: 0, // USD price not provided in the API response
+                    marketplace: 'OpenSea',
+                    buyer: 'Unknown', // Buyer info not provided in the API response
+                    date: new Date().toISOString(), // Date not provided in the API response
+                    contractAddress: nftAddress,
+                    floorPrice: priceInEth,
+                    floorPriceEth: priceInEth
+                  };
+                });
+                
+                console.log(`✅ Successfully processed ${transformedData.length} sales items from /api/sold`);
+                console.log('Sample transformed item:', transformedData[0]);
+              } else {
+                console.warn('⚠️ Unexpected /api/sold response format:', result);
+                transformedData = [];
               }
               
               console.log('Transformed sales data:', transformedData);
@@ -437,13 +716,22 @@ const StrategyDetailView = ({ strategy, onBack }) => {
               setLoadingStates(prev => ({ ...prev, sales: false }));
               setErrorStates(prev => ({ ...prev, sales: null }));
             })
-            .catch(err => {
-              console.error('❌ Error fetching sales data:', err);
+            .catch((err) => {
+              console.error('❌ Sales API failed:', {
+                error: err,
+                message: err.message,
+                stack: err.stack,
+                apiUrl: salesApiUrl,
+                originalAddresses: { strategyAddress, nftAddress },
+                finalAddresses: { strategyAddress: finalStrategyAddress, nftAddress: finalNftAddress }
+              });
+              
               setSalesData([]);
               setLoadingStates(prev => ({ ...prev, sales: false }));
-              setErrorStates(prev => ({ ...prev, sales: 'Failed to load sales data. Sales history may be unavailable.' }));
+              setErrorStates(prev => ({ ...prev, sales: `Failed to load sales data: ${err.message}. Check console for details.` }));
             })
         );
+
 
         // Wait for all promises to complete
         await Promise.allSettled(dataPromises);
@@ -768,7 +1056,7 @@ const StrategyDetailView = ({ strategy, onBack }) => {
                     )}
                   </td>
                   <td>
-                    <span className="font-medium">{formatNumber(strategy.totalHolders)}</span>
+                    <TokenHoldersCount strategy={strategy} isDark={isDark} />
                   </td>
                 </tr>
               </tbody>
@@ -1079,84 +1367,91 @@ const StrategyDetailView = ({ strategy, onBack }) => {
     const averagePrice = salesData.reduce((sum, item) => sum + (item.priceEth || item.price || 0), 0) / totalSales;
 
     return (
-      <div className="content-section">
+      <div className="space-y-6">
         {/* Sales Summary */}
-        <div className="sales-summary-grid">
-          <div className="metric-card">
-            <p className="metric-description" style={{marginBottom: '4px'}}>Total Sales</p>
-            <p className="metric-value">{totalSales}</p>
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className={`rounded-none ${isDark ? 'thick-border-dark bg-gray-800' : 'thick-border-light bg-white'} p-3 sm:p-4`}>
+            <h3 className={`text-xs sm:text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'} mb-1`}>Total Sales</h3>
+            <p className={`text-lg sm:text-xl lg:text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>{totalSales}</p>
           </div>
           
-          <div className="metric-card">
-            <p className="metric-description" style={{marginBottom: '4px'}}>Floor Price</p>
-            <p className="metric-value">{formatEth(floorPrice)}</p>
+          <div className={`rounded-none ${isDark ? 'thick-border-dark bg-gray-800' : 'thick-border-light bg-white'} p-3 sm:p-4`}>
+            <h3 className={`text-xs sm:text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'} mb-1`}>Floor Price</h3>
+            <p className={`text-lg sm:text-xl lg:text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>{formatEth(floorPrice)}</p>
           </div>
           
-          <div className="metric-card">
-            <p className="metric-description" style={{marginBottom: '4px'}}>Average Price</p>
-            <p className="metric-value">{formatEth(averagePrice)}</p>
+          <div className={`rounded-none ${isDark ? 'thick-border-dark bg-gray-800' : 'thick-border-light bg-white'} p-3 sm:p-4`}>
+            <h3 className={`text-xs sm:text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'} mb-1`}>Average Price</h3>
+            <p className={`text-lg sm:text-xl lg:text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>{formatEth(averagePrice)}</p>
           </div>
           
-          <div className="metric-card">
-            <p className="metric-description" style={{marginBottom: '4px'}}>Marketplace</p>
-            <p className="metric-value">{salesData[0]?.marketplace || 'OpenSea'}</p>
+          <div className={`rounded-none ${isDark ? 'thick-border-dark bg-gray-800' : 'thick-border-light bg-white'} p-3 sm:p-4`}>
+            <h3 className={`text-xs sm:text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'} mb-1`}>Total Revenue</h3>
+            <p className={`text-lg sm:text-xl lg:text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>{formatEth(salesData.reduce((sum, item) => sum + (item.priceEth || item.price || 0), 0))}</p>
           </div>
         </div>
 
         {/* Sales Grid */}
-        <div className="card">
-          <div className="card-header">
-            <h3 className="card-title">Floor Price Data</h3>
-            <span className="card-subtitle">{salesData.length} items</span>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>Sold Items</h3>
+            <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{salesData.length} items</span>
           </div>
-          <div className="card-body">
-            <div className="sales-grid">
-              {salesData.map((nft, index) => (
-                <div 
-                  key={`${nft.tokenId}-${index}`}
-                  className="sales-item"
-                >
-                  {/* NFT Image */}
-                  <div className="sales-item-image">
-                    {nft.imageUrl ? (
-                      <img
-                        src={nft.imageUrl}
-                        alt={nft.name}
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'flex';
-                        }}
-                      />
-                    ) : null}
-                    
-                    {/* Fallback for missing/broken images */}
-                    <div 
-                      className="sales-item-fallback"
-                      style={{ display: nft.imageUrl ? 'none' : 'flex' }}
-                    >
-                      <div className="sales-item-fallback-icon">🖼️</div>
-                      <p className="sales-item-fallback-text">No Image</p>
-                    </div>
-                    
-                    {/* Token ID Badge */}
-                    <div className="sales-item-badge">
-                      #{nft.tokenId}
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {salesData.map((nft, index) => (
+              <div 
+                key={`${nft.tokenId}-${index}`}
+                className={`rounded-none ${isDark ? 'thick-border-dark bg-gray-700' : 'thick-border-light bg-gray-50'} overflow-hidden transition-all duration-200`}
+              >
+                {/* NFT Image */}
+                <div className={`aspect-square ${isDark ? 'bg-gray-600 border-b-2 border-white' : 'bg-gray-200 border-b-2 border-black'} relative overflow-hidden`}>
+                  {nft.imageUrl ? (
+                    <img
+                      src={nft.imageUrl}
+                      alt={nft.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  
+                  {/* Fallback for missing/broken images */}
+                  <div 
+                    className={`absolute inset-0 flex items-center justify-center ${isDark ? 'bg-gray-600' : 'bg-gray-200'}`}
+                    style={{ display: nft.imageUrl ? 'none' : 'flex' }}
+                  >
+                    <div className="text-center">
+                      <div className="text-gray-400 text-3xl mb-2">🖼️</div>
+                      <p className={`${isDark ? 'text-gray-300' : 'text-gray-500'} text-xs`}>No Image</p>
                     </div>
                   </div>
                   
-                  {/* NFT Details */}
-                  <div className="sales-item-details">
-                    <p className="sales-item-price-label">Current Price</p>
-                    <p className="sales-item-price-value">{formatEth(nft.priceEth || nft.price)}</p>
+                  {/* Token ID Badge */}
+                  <div className={`absolute top-2 left-2 ${isDark ? 'bg-white text-black' : 'bg-black text-white'} px-2 py-1 text-xs font-bold rounded-none`}>
+                    #{nft.tokenId}
                   </div>
                 </div>
-              ))}
-            </div>
+                
+                {/* NFT Details */}
+                <div className="p-3">
+                  <div className="space-y-2">
+                    <div>
+                      <p className={`text-xs ${isDark ? 'text-gray-300' : 'text-gray-600'} uppercase tracking-wide`}>Sold Price</p>
+                      <p className={`text-sm font-bold ${isDark ? 'text-white' : 'text-black'}`}>{formatEth(nft.priceEth || nft.price)}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
     );
   };
+
 
   // Show skeleton during initial loading or when essential data is missing
   const showSkeleton = loading || (!strategy && !error);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { holdingsService } from '../services/holdingsService';
 import { useTheme } from '../contexts/ThemeContext';
 import { strategyToSlugMappingService } from '../services/strategyToSlugMapping';
@@ -11,6 +11,8 @@ const Holdings = ({ strategyAddress, nftAddress, collectionName, holdingsData, s
   const [summary, setSummary] = useState(null);
   const [sortBy, setSortBy] = useState('price'); // 'price' or 'tokenId'
   const [sortOrder, setSortOrder] = useState('asc'); // 'asc' or 'desc'
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const fetchHoldings = async () => {
@@ -69,6 +71,20 @@ const Holdings = ({ strategyAddress, nftAddress, collectionName, holdingsData, s
 
     fetchHoldings();
   }, [strategyAddress, nftAddress, holdingsData, floorPriceEth]);
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const formatCurrency = (value, currency = 'USD') => {
     if (!value || value === '0' || value === null) return 'No data';
@@ -214,44 +230,44 @@ const Holdings = ({ strategyAddress, nftAddress, collectionName, holdingsData, s
   return (
     <div className="space-y-6">
       {/* Holdings Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className={`rounded-none ${isDark ? 'thick-border-dark bg-gray-800' : 'thick-border-light bg-white'} p-4`}>
-          <h3 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'} mb-1`}>Total NFTs</h3>
-          <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>{summary?.totalCount || 0}</p>
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className={`rounded-none ${isDark ? 'thick-border-dark bg-gray-800' : 'thick-border-light bg-white'} p-3 sm:p-4`}>
+          <h3 className={`text-xs sm:text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'} mb-1`}>Total NFTs</h3>
+          <p className={`text-lg sm:text-xl lg:text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>{summary?.totalCount || 0}</p>
         </div>
         
-        <div className={`rounded-none ${isDark ? 'thick-border-dark bg-gray-800' : 'thick-border-light bg-white'} p-4`}>
-          <h3 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'} mb-1`}>Total Value (ETH)</h3>
-          <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>{formatEth(summary?.totalValueEth)}</p>
+        <div className={`rounded-none ${isDark ? 'thick-border-dark bg-gray-800' : 'thick-border-light bg-white'} p-3 sm:p-4`}>
+          <h3 className={`text-xs sm:text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'} mb-1`}>Total Value (ETH)</h3>
+          <p className={`text-lg sm:text-xl lg:text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>{formatEth(summary?.totalValueEth)}</p>
           {floorPriceEth && (
-            <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
+            <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-1 hidden sm:block`}>
               Based on floor price: {parseFloat(floorPriceEth).toFixed(4)} ETH
             </p>
           )}
         </div>
         
-        <div className={`rounded-none ${isDark ? 'thick-border-dark bg-gray-800' : 'thick-border-light bg-white'} p-4`}>
-          <h3 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'} mb-1`}>Total Value (USD)</h3>
-          <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>{formatCurrency(summary?.totalValueUsd)}</p>
-          <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
+        <div className={`rounded-none ${isDark ? 'thick-border-dark bg-gray-800' : 'thick-border-light bg-white'} p-3 sm:p-4`}>
+          <h3 className={`text-xs sm:text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'} mb-1`}>Total Value (USD)</h3>
+          <p className={`text-lg sm:text-xl lg:text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>{formatCurrency(summary?.totalValueUsd)}</p>
+          <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-1 hidden sm:block`}>
             Live ETH/USD rate from Coinbase
           </p>
         </div>
         
-        <div className={`rounded-none ${isDark ? 'thick-border-dark bg-gray-800' : 'thick-border-light bg-white'} p-4`}>
+        <div className={`rounded-none ${isDark ? 'thick-border-dark bg-gray-800' : 'thick-border-light bg-white'} p-3 sm:p-4`}>
           <div className="flex items-center justify-between mb-1">
-            <h3 className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>mNAV</h3>
+            <h3 className={`text-xs sm:text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>mNAV</h3>
             <div className="group relative">
-              <span className="text-gray-400 cursor-help text-sm">ℹ️</span>
+              <span className="text-gray-400 cursor-help text-xs sm:text-sm">ℹ️</span>
               <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
                 Market Cap ÷ Treasury Value
               </div>
             </div>
           </div>
-          <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>
+          <p className={`text-lg sm:text-xl lg:text-2xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>
             {formatMNav(strategy?.poolData?.market_cap_usd, summary?.totalValueUsd ? parseFloat(summary.totalValueUsd) : null)}
           </p>
-          <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
+          <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-1 hidden sm:block`}>
             Market Cap ÷ Treasury
           </p>
         </div>
@@ -262,8 +278,8 @@ const Holdings = ({ strategyAddress, nftAddress, collectionName, holdingsData, s
         <div className="flex items-center justify-between">
           <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-black'}`}>Current NFT Holdings</h3>
           <div className="flex items-center gap-4">
-            {/* Sort Controls */}
-            <div className="flex items-center gap-2">
+            {/* Sort Controls - Desktop Version (Hidden on Mobile) */}
+            <div className="hidden md:flex items-center gap-2">
               <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Sort by:</span>
               <div className={`flex ${isDark ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg p-1`}>
                 <button
@@ -296,7 +312,76 @@ const Holdings = ({ strategyAddress, nftAddress, collectionName, holdingsData, s
                 </button>
               </div>
             </div>
-            <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{holdings.length} items</span>
+
+            {/* Sort Controls - Mobile Dropdown Version (Hidden on Desktop) */}
+            <div className="md:hidden relative" ref={dropdownRef}>
+              <button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className={`flex items-center justify-between px-3 py-2 rounded-none text-sm font-medium transition-all ${
+                  isDark
+                    ? 'thick-border-dark bg-gray-800 text-white hover:bg-gray-700'
+                    : 'thick-border-light bg-white text-black hover:bg-gray-50'
+                } min-w-[140px]`}
+              >
+                <span>
+                  {sortBy === 'price' ? 'Price' : 'Token ID'} {sortOrder === 'desc' ? '↓' : '↑'}
+                </span>
+                <svg 
+                  className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {isDropdownOpen && (
+                <div className={`absolute right-0 mt-1 w-full rounded-none shadow-lg z-10 ${
+                  isDark 
+                    ? 'thick-border-dark bg-gray-800' 
+                    : 'thick-border-light bg-white'
+                }`}>
+                  <div className="py-1">
+                    <button
+                      onClick={() => {
+                        handleSortChange('price');
+                        setIsDropdownOpen(false);
+                      }}
+                      className={`w-full text-left px-3 py-2 text-sm transition-all ${
+                        sortBy === 'price'
+                          ? isDark
+                            ? 'bg-white text-black font-medium'
+                            : 'bg-black text-white font-medium'
+                          : isDark
+                            ? 'text-white hover:bg-gray-700'
+                            : 'text-black hover:bg-gray-100'
+                      }`}
+                    >
+                      Price {sortBy === 'price' && (sortOrder === 'desc' ? '↓' : '↑')}
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleSortChange('tokenId');
+                        setIsDropdownOpen(false);
+                      }}
+                      className={`w-full text-left px-3 py-2 text-sm transition-all ${
+                        sortBy === 'tokenId'
+                          ? isDark
+                            ? 'bg-white text-black font-medium'
+                            : 'bg-black text-white font-medium'
+                          : isDark
+                            ? 'text-white hover:bg-gray-700'
+                            : 'text-black hover:bg-gray-100'
+                      }`}
+                    >
+                      Token ID {sortBy === 'tokenId' && (sortOrder === 'desc' ? '↓' : '↑')}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+            <span className={`hidden text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{holdings.length} items</span>
           </div>
         </div>
         

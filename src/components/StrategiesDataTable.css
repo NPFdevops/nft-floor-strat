@@ -1,3 +1,57 @@
+/* === CSS CUSTOM PROPERTIES === */
+:root {
+  /* Core color scheme - Enhanced Pink theme */
+  --primary: 339 100% 55%;
+  --primary-foreground: 0 0% 98%;
+  --background: 331 100% 96%;  /* Light pink background */
+  --foreground: 0 0% 3.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 3.9%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 0 0% 9%;
+  --border: 0 0% 0%;  /* Black borders */
+  --input: 214.3 31.8% 91.4%;
+  --ring: 339 100% 55%;
+  --radius: 0.5rem;
+
+  /* Strategy Table specific colors */
+  --strategy-primary: #F11F9D;
+  --strategy-accent: #E3579A;
+  --strategy-light: #FFECF5;
+}
+
+/* === UTILITY CLASSES === */
+
+/* Hide scrollbars while maintaining functionality */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Text gradient utility */
+.strategy-gradient-text {
+  background: linear-gradient(135deg, #F11F9D 0%, #E3579A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Enhanced magenta accent utility */
+.strategy-magenta-accent {
+  background-color: var(--strategy-primary) !important;
+  color: white !important;
+}
+
+.strategy-magenta-accent:hover {
+  background-color: var(--strategy-accent) !important;
+}
+
 /* Accessibility utilities */
 .sr-only {
   position: absolute;
@@ -173,6 +227,37 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* Enhanced loading row animation */
+.strategies-loading-row {
+  background-color: #f9fafb;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Shimmer effect for loading states */
+.strategies-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 .loading-spinner p {
@@ -670,7 +755,9 @@
   background-color: #F11F9D;
   color: #ffffff;
   transform: translateY(-1px);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(241, 31, 157, 0.25), 0 2px 6px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  position: relative;
 }
 
 /* Ensure collection cell gets pink background on hover for all screen sizes */
@@ -868,6 +955,28 @@
   -webkit-overflow-scrolling: touch;
   margin: 0;
   padding: 0;
+  /* Enhanced scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: var(--strategy-primary) transparent;
+}
+
+.table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: var(--strategy-primary);
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--strategy-accent);
 }
 
 /* Collection Cell */
@@ -906,16 +1015,42 @@
 .collection-image {
   width: 44px;
   height: 44px;
-  border-radius: 2px;
+  border-radius: 6px;
   object-fit: cover;
   border: 2px solid #e5e7eb;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   flex-shrink: 0;
+  position: relative;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .collection-image:hover {
-  transform: scale(1.05);
-  border-color: #3b82f6;
+  transform: scale(1.05) translateZ(0);
+  border-color: var(--strategy-primary);
+  box-shadow: 0 8px 20px rgba(241, 31, 157, 0.2), 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Enhanced image container for potential blockchain badges */
+.collection-image-container {
+  position: relative;
+  display: inline-block;
+}
+
+.collection-blockchain-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  display: flex;
+  height: 16px;
+  width: 16px;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  border: 2px solid var(--strategy-primary);
+  border-radius: 50%;
+  font-size: 8px;
+  font-weight: 700;
+  z-index: 2;
 }
 
 /* New text content container */
@@ -1206,15 +1341,17 @@
   background: linear-gradient(135deg, #E3579A 0%, #E3579A 100%);
   color: white;
   border: 2px solid #FFECF5;
-  border-radius: 2px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 13px;
   font-weight: 600;
   font-family: 'Space Grotesk', sans-serif;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   min-width: 80px;
+  position: relative;
+  overflow: hidden;
 }
 
 .view-button:hover {
@@ -1231,6 +1368,53 @@
 .view-button:focus {
   outline: none;
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+}
+
+.view-button:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* === ACCESSIBILITY IMPROVEMENTS === */
+
+/* Focus indicators for interactive elements */
+.strategies-table th:focus,
+.strategies-table button:focus,
+.clickable-row:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .strategies-table {
+    border: 2px solid black;
+  }
+  
+  .strategies-table th,
+  .strategies-table td {
+    border: 1px solid black;
+  }
+  
+  .collection-image {
+    border: 3px solid black;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .collection-image:hover,
+  .strategies-table tbody tr:hover {
+    transform: none !important;
+  }
 }
 
 /* Pagination */
@@ -1262,17 +1446,19 @@
   border: 2px solid #e5e7eb;
   background: white;
   color: #374151;
-  border-radius: 2px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
   font-family: 'Space Grotesk', sans-serif;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   min-width: 48px;
   height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  overflow: hidden;
 }
 
 .pagination-button:hover:not(:disabled) {
@@ -1634,6 +1820,62 @@
   background: #FFECF5 !important;
 }
 
+/* === UTILITY CLASSES FOR EASY INTEGRATION === */
+
+.strategy-text-small { font-size: 0.75rem; }
+.strategy-text-base { font-size: 0.875rem; }
+.strategy-text-large { font-size: 1rem; }
+
+.strategy-weight-normal { font-weight: 400; }
+.strategy-weight-medium { font-weight: 500; }
+.strategy-weight-semibold { font-weight: 600; }
+.strategy-weight-bold { font-weight: 700; }
+
+.strategy-spacing-tight { padding: 0.5rem; }
+.strategy-spacing-normal { padding: 0.75rem 1rem; }
+.strategy-spacing-loose { padding: 1rem 1.5rem; }
+
+/* Enhanced hover effect for interactive elements */
+.strategy-hover-raise {
+  position: relative;
+  z-index: 0;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.strategy-hover-raise:hover {
+  z-index: 10;
+  box-shadow: 0 0 0 2px hsl(var(--border)), 0 10px 0 rgba(0, 0, 0, 0.3);
+  transform: translate(-2px, -2px);
+}
+
+/* Collection link styling similar to NFT table */
+.strategy-collection-link {
+  color: var(--strategy-primary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.strategy-collection-link:hover {
+  text-decoration: underline;
+  color: var(--strategy-accent);
+}
+
+/* Price change indicators enhanced */
+.strategy-price-positive {
+  color: #10b981; /* green-500 */
+  font-weight: 600;
+}
+
+.strategy-price-negative {
+  color: #ef4444; /* red-500 */
+  font-weight: 600;
+}
+
+.strategy-price-neutral {
+  color: #6b7280; /* gray-500 */
+  font-weight: 600;
+}
+
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .strategies-table-container {
@@ -1844,6 +2086,8 @@
   .collection-cell .collection-image {
     width: 32px !important;
     height: 32px !important;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
   
   .collection-cell .collection-text-content {

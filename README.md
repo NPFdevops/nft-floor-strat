@@ -14,6 +14,8 @@ A React-based web application that provides comprehensive NFT strategy analysis 
 - **🔍 Strategy Search**: Find and analyze specific NFT strategies
 - **💾 Smart Caching**: Optimized API calls with intelligent caching
 - **⚡ Real-time Data**: Live strategy performance data and analytics
+- **🔗 Blockchain Analytics**: Dune Analytics integration for on-chain metrics and DeFi data
+- **📊 Multi-Chain Support**: Support for Ethereum, Polygon, Arbitrum and other networks
 
 ## 🛠️ Tech Stack
 
@@ -25,6 +27,7 @@ A React-based web application that provides comprehensive NFT strategy analysis 
 - **Routing**: React Router DOM
 - **Build Tool**: Vite
 - **Deployment**: Vercel
+- **Blockchain Data**: Dune Analytics API for on-chain metrics
 
 ## 🚀 Quick Start
 
@@ -53,15 +56,24 @@ npm install
 # Copy the environment template
 cp .env.example .env
 
-# Edit .env and add your RapidAPI credentials
+# Edit .env and add your API credentials
 VITE_RAPIDAPI_KEY=your_rapidapi_key_here
 VITE_RAPIDAPI_HOST=nftpf-api-v0.p.rapidapi.com
+VITE_DUNE_API_KEY=your_dune_analytics_api_key_here
 ```
 
-**Getting RapidAPI Credentials:**
+**Getting API Credentials:**
+
+**RapidAPI (NFT Price Floor):**
 1. Sign up at [RapidAPI](https://rapidapi.com)
 2. Subscribe to [NFT Price Floor API](https://rapidapi.com/nftpf-api-v0.p.rapidapi.com)
 3. Get your API key from the dashboard
+
+**Dune Analytics:**
+1. Sign up at [Dune Analytics](https://dune.com)
+2. Go to Settings → API Keys
+3. Create a new API key
+4. Copy the API key to your `.env` file
 
 ### 4. Run Development Server
 
@@ -131,14 +143,22 @@ VITE_RAPIDAPI_HOST=nftpf-api-v0.p.rapidapi.com
 |----------|-------------|----------|---------|
 | `VITE_RAPIDAPI_KEY` | Your RapidAPI key for NFT Price Floor API | ✅ Yes | - |
 | `VITE_RAPIDAPI_HOST` | RapidAPI host domain | ✅ Yes | `nftpf-api-v0.p.rapidapi.com` |
+| `VITE_DUNE_API_KEY` | Your Dune Analytics API key for blockchain data | ✅ Yes | - |
 
 ### API Configuration
 
-The app uses the NFT Price Floor API through RapidAPI:
+**NFT Price Floor API (via RapidAPI):**
 - **Endpoint Pattern**: `/projects/{slug}/history/pricefloor/{granularity}`
 - **Supported Granularities**: `1d`, `1h`, `30m`
 - **Date Range**: Configurable start/end timestamps
 - **Response Format**: Arrays of timestamps, floorEth, floorUsd, volume data
+
+**Dune Analytics API:**
+- **Base URL**: `https://api.dune.com/api/v1`
+- **Authentication**: API Key via `X-Dune-API-Key` header
+- **Query Execution**: Asynchronous execution with polling for results
+- **Data Types**: NFT collections, DeFi protocols, blockchain statistics
+- **Cache Strategy**: Intelligent caching based on data freshness requirements
 
 ## 🏗️ Project Structure
 
@@ -152,7 +172,8 @@ src/
 │   ├── ApplyButton.jsx  # Apply changes button
 │   └── ScreenshotShare.jsx # Screenshot and sharing
 ├── services/            # API and caching services
-│   ├── nftAPI.js       # Main API service
+│   ├── nftAPI.js       # NFT Price Floor API service
+│   ├── duneAnalyticsService.js # Dune Analytics API service
 │   └── cacheService.js # Smart caching layer
 ├── utils/              # Utility functions
 │   ├── dateUtils.js    # Date manipulation helpers

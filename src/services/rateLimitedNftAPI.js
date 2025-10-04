@@ -154,7 +154,7 @@ class RateLimitedNftAPIService {
   /**
    * Fetch price history with rate limiting and caching
    */
-  async fetchPriceHistory(collectionName, timeframe = '1d', rapidApiKey) {
+  async fetchPriceHistory(collectionName, timeframe = '2h', rapidApiKey) {
     const cacheKey = `price_${collectionName}_${timeframe}`;
     
     // Check cache first
@@ -175,13 +175,17 @@ class RateLimitedNftAPIService {
       const url = `https://nftpf-api-v0.p.rapidapi.com/projects/${mappedSlug}/charts/${timeframe}`;
       console.log(`📡 [RATE-LIMITED-API] Fetching price history: ${url}`);
       
+      // Use new API key specifically for 2h timeframe endpoint
+      const apiKeyToUse = timeframe === '2h' ? import.meta.env.VITE_RAPIDAPI_KEY_NEW : rapidApiKey;
+      console.log(`🔑 [RATE-LIMITED-API] Using ${timeframe === '2h' ? 'new' : 'original'} API key for ${timeframe} endpoint`);
+      
       let lastError;
       for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
         try {
           const response = await fetch(url, {
             method: 'GET',
             headers: {
-              'X-RapidAPI-Key': rapidApiKey,
+              'X-RapidAPI-Key': apiKeyToUse,
               'X-RapidAPI-Host': 'nftpf-api-v0.p.rapidapi.com'
             },
             timeout: 30000 // 30 second timeout
@@ -231,7 +235,7 @@ class RateLimitedNftAPIService {
       try {
         const [collectionDetails, priceHistory] = await Promise.all([
           this.fetchCollectionDetails(collectionName, rapidApiKey),
-          this.fetchPriceHistory(collectionName, '1d', rapidApiKey)
+          this.fetchPriceHistory(collectionName, '2h', rapidApiKey)
         ]);
 
         results.push({

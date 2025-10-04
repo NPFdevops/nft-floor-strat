@@ -10,15 +10,39 @@ const DexScreenerChart = ({
   const [iframeError, setIframeError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isBlocked, setIsBlocked] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const iframeRef = useRef(null);
   const timeoutRef = useRef(null);
+  
+  // Mobile detection effect
+  useEffect(() => {
+    const checkIsMobile = () => {
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+      const mobileBreakpoint = window.innerWidth <= 768;
+      const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+      
+      setIsMobile(mobileBreakpoint || isMobileDevice);
+    };
+    
+    // Check on mount
+    checkIsMobile();
+    
+    // Check on window resize
+    window.addEventListener('resize', checkIsMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkIsMobile);
+    };
+  }, []);
   
   // Use strategy's token address first, then fallback to provided tokenAddress
   // Default to the PUDGYSTR token address from the provided URL if no address is available
   const contractAddress = strategy?.tokenAddress || tokenAddress || '0x4d40c47b13be30724b89019be0549ead71e363e50cef119a56bd64ead4e35016';
   
   // Build the DexScreener embed URL with optimized parameters matching the provided format
-  const dexScreenerUrl = `https://dexscreener.com/${chainId}/${contractAddress}?embed=1&loadChartSettings=0&trades=0&tabs=0&info=0&chartLeftToolbar=0&chartTimeframesToolbar=0&chartTheme=${theme}&theme=${theme}&chartStyle=1&chartType=usd&interval=60`;
+  // Add chartDefaultOnMobile=1 parameter for mobile devices
+  const mobileParam = isMobile ? '&chartDefaultOnMobile=1' : '';
+  const dexScreenerUrl = `https://dexscreener.com/${chainId}/${contractAddress}?embed=1&loadChartSettings=0&trades=0&tabs=0&info=0&chartLeftToolbar=0&chartTimeframesToolbar=0${mobileParam}&chartTheme=${theme}&theme=${theme}&chartStyle=1&chartType=usd&interval=120`;
 
   // Generate external DexScreener URL for viewing
   const externalDexScreenerUrl = `https://dexscreener.com/${chainId}/${contractAddress}`;
@@ -39,6 +63,18 @@ const DexScreenerChart = ({
     }
   };
 
+  // Debug: Log URL changes when mobile state changes (development only)
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      console.log('🎯 DexScreener - Mobile detection:', {
+        isMobile,
+        windowWidth: window.innerWidth,
+        userAgent: navigator.userAgent.substring(0, 100),
+        url: dexScreenerUrl
+      });
+    }
+  }, [isMobile, dexScreenerUrl]);
+  
   useEffect(() => {
     // Set a timeout to detect if the iframe fails to load
     timeoutRef.current = setTimeout(() => {
@@ -146,6 +182,7 @@ const DexScreenerChart = ({
       {/* DexScreener Embed Container */}
       <div id="dexscreener-embed">
         <iframe
+          key={`dexscreener-${isMobile ? 'mobile' : 'desktop'}`}
           ref={iframeRef}
           src={dexScreenerUrl}
           title={`${tokenName} Trading Chart`}

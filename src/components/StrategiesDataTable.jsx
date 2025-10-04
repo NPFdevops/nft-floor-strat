@@ -450,7 +450,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 }
                 aria-label="Sort by NFT Collection name"
               >
-                NFT Collection {getSortIcon('collectionName')}
+                nft collection {getSortIcon('collectionName')}
               </th>
               <th 
                 className={`sortable ${sortConfig.key === 'tokenName' ? 'active' : ''}`}
@@ -465,7 +465,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 }
                 aria-label="Sort by strategy type"
               >
-                Strategy {getSortIcon('tokenName')}
+                strategy {getSortIcon('tokenName')}
               </th>
               <th 
                 className={`sortable ${sortConfig.key === 'holdingsCount' ? 'active' : ''}`}
@@ -480,7 +480,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 }
                 aria-label="Sort by number of NFT holdings"
               >
-                <span className="desktop-header-text">Holdings</span><span className="mobile-header-text">Holds</span> {getSortIcon('holdingsCount')}
+                <span className="desktop-header-text">holdings</span><span className="mobile-header-text">holds</span> {getSortIcon('holdingsCount')}
               </th>
               <th 
                 className={`sortable ${sortConfig.key === 'poolData.price_usd' ? 'active' : ''}`}
@@ -495,7 +495,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 }
                 aria-label="Sort by price"
               >
-                <span className="desktop-header-text">Price</span><span className="mobile-header-text">Price</span> {getSortIcon('poolData.price_usd')}
+                <span className="desktop-header-text">price</span><span className="mobile-header-text">price</span> {getSortIcon('poolData.price_usd')}
               </th>
               <th 
                 className={`sortable ${sortConfig.key === 'poolData.price_change_24h' ? 'active' : ''}`}
@@ -510,7 +510,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 }
                 aria-label="Sort by 24 hour price change"
               >
-                24h Change {getSortIcon('poolData.price_change_24h')}
+                24h change {getSortIcon('poolData.price_change_24h')}
               </th>
               <th 
                 className={`sortable ${sortConfig.key === 'mNav' ? 'active' : ''}`}
@@ -526,7 +526,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 aria-label="Sort by mNAV ratio"
               >
                 <Tooltip text="Market Cap ÷ Treasury Value">
-                  <span>mNAV {getSortIcon('mNav')}</span>
+                  <span>mnav {getSortIcon('mNav')}</span>
                 </Tooltip>
               </th>
               <th 
@@ -542,7 +542,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 }
                 aria-label="Sort by burn percentage"
               >
-                % Burn {getSortIcon('burnPercentage')}
+                % burn {getSortIcon('burnPercentage')}
               </th>
               <th 
                 className={`sortable ${sortConfig.key === 'floorMarketCapRatio' ? 'active' : ''}`}
@@ -557,7 +557,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 }
                 aria-label="Sort by market cap ratio"
               >
-                MC Ratio {getSortIcon('floorMarketCapRatio')}
+                mc ratio {getSortIcon('floorMarketCapRatio')}
               </th>
               <th 
                 className={`sortable ${sortConfig.key === 'nftStrategyMarketCap' ? 'active' : ''}`}
@@ -572,7 +572,7 @@ const StrategiesDataTable = ({ onStrategySelect, onStrategiesUpdate }) => {
                 }
                 aria-label="Sort by market cap"
               >
-                Market Cap {getSortIcon('nftStrategyMarketCap')}
+                market cap {getSortIcon('nftStrategyMarketCap')}
               </th>
             </tr>
           </thead>

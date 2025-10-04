@@ -2,7 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createChart, AreaSeries } from 'lightweight-charts';
 import './TradingViewChart.css';
 import logoImage from '../assets/NFTPriceFloor_logo.png';
+import logoImageDark from '../assets/NFTPriceFloor_logo_dark.png';
 import { posthogService } from '../services/posthogService';
+import { useTheme } from '../contexts/ThemeContext';
 
 const TradingViewChart = ({ 
   collections = [], 
@@ -10,6 +12,7 @@ const TradingViewChart = ({
   onRangeChange,
   height = 400 
 }) => {
+  const { isDark } = useTheme();
   const chartContainerRef = useRef();
   const chartRef = useRef();
   const seriesRefs = useRef([]);
@@ -66,8 +69,8 @@ const TradingViewChart = ({
       // Create chart following latest documentation
       const chart = createChart(chartContainerRef.current, {
         layout: {
-          background: { type: 'solid', color: 'white' },
-          textColor: '#666666',
+          background: { type: 'solid', color: isDark ? '#000000' : 'white' },
+          textColor: isDark ? '#e5e5e5' : '#666666',
         },
         width: containerWidth,
         height: containerHeight,
@@ -76,7 +79,7 @@ const TradingViewChart = ({
             visible: false,
           },
           horzLines: {
-            color: '#f0f0f0',
+            color: isDark ? '#333333' : '#f0f0f0',
             style: 1,
           },
         },
@@ -280,7 +283,7 @@ const TradingViewChart = ({
     return () => {
       clearTimeout(timer);
     };
-  }, [collections, height]);
+  }, [collections, height, isDark]);
 
   const handleRangeClick = (range) => {
     const previousRange = selectedRange;
@@ -307,7 +310,11 @@ const TradingViewChart = ({
   if (!collections || collections.length === 0 || !collections.some(c => c && c.data && c.data.length > 0)) {
     return (
       <div className="trading-view-chart-container">
-        <div className="chart-placeholder" style={{ height: `${height}px` }}>
+        <div className="chart-placeholder" style={{ 
+          height: `${height}px`,
+          backgroundColor: isDark ? '#000000' : '#ffffff',
+          color: isDark ? '#e5e5e5' : '#666666'
+        }}>
           <div className="placeholder-content">
             <p>No data to display</p>
             <span>Select collections to see their floor price charts</span>
@@ -344,7 +351,7 @@ const TradingViewChart = ({
         }}
       >
         <img 
-          src={logoImage} 
+          src={isDark ? logoImageDark : logoImage} 
           alt="NFT Price Floor" 
           style={{
             height: '60px',

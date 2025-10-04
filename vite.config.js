@@ -118,6 +118,19 @@ export default defineConfig({
             }
           })
         }
+      },
+      '/api/sold': {
+        target: 'https://www.nftstrategy.fun',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path.replace(/^\/api\/sold/, '/api/sold'),
+        configure: (proxy, options) => {
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            if (process.env.NODE_ENV === 'development') {
+              console.log(`[PROXY] ${req.method} ${req.url} -> ${proxyReq.host}${proxyReq.path}`)
+            }
+          })
+        }
       }
     }
   },
