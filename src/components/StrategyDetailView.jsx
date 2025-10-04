@@ -97,13 +97,13 @@ const StrategyDetailView = ({ strategy, onBack }) => {
         // Fetch all data in parallel for better performance
         const dataPromises = [];
 
-        // 1. Fetch NFT floor price history using RapidAPI endpoint with mapped slug
-        console.log(`🔗 Fetching NFT price history from: https://nftpf-api-v0.p.rapidapi.com/projects/${collectionSlug}/charts/1d`);
+        // 1. Fetch NFT floor price history using RapidAPI endpoint with mapped slug (now using 2h timeframe)
+        console.log(`🔗 Fetching NFT price history from: https://nftpf-api-v0.p.rapidapi.com/projects/${collectionSlug}/charts/2h`);
         dataPromises.push(
-          fetch(`https://nftpf-api-v0.p.rapidapi.com/projects/${collectionSlug}/charts/1d`, {
+          fetch(`https://nftpf-api-v0.p.rapidapi.com/projects/${collectionSlug}/charts/2h`, {
             method: 'GET',
             headers: {
-              'X-RapidAPI-Key': import.meta.env.VITE_RAPIDAPI_KEY || '8365737378msh545ccf17407a091p1adbfcjsn47252db2d5db',
+              'X-RapidAPI-Key': import.meta.env.VITE_RAPIDAPI_KEY_NEW || '05b7deab45msh256a49c0a7471efp1f5bfbjsn7dc41dcb89af',
               'X-RapidAPI-Host': 'nftpf-api-v0.p.rapidapi.com'
             }
           })
@@ -599,8 +599,8 @@ const StrategyDetailView = ({ strategy, onBack }) => {
                       const finalValue = diff24h !== undefined && diff24h !== null ? diff24h : priceChange24h;
                       
                       return (
-                        <span className={`font-medium ${
-                          finalValue >= 0 ? 'text-green-600' : 'text-red-600'
+                        <span className={`font-medium change-cell ${
+                          finalValue >= 0 ? 'positive' : 'negative'
                         }`}>
                           {formatPercentage(finalValue)}
                         </span>
@@ -608,8 +608,8 @@ const StrategyDetailView = ({ strategy, onBack }) => {
                     })()}
                   </td>
                   <td>
-                    <span className={`font-medium ${
-                      strategy.poolData?.price_change_24h >= 0 ? 'text-green-600' : 'text-red-600'
+                    <span className={`font-medium change-cell ${
+                      strategy.poolData?.price_change_24h >= 0 ? 'positive' : 'negative'
                     }`}>
                       {formatPercentage(strategy.poolData?.price_change_24h)}
                     </span>

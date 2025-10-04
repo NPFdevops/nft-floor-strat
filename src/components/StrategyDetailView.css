@@ -170,6 +170,40 @@
   padding: 16px;
 }
 
+/* 24h Change Color Coding - matching StrategiesDataTable styles */
+.change-cell.positive {
+  color: #059669 !important;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%) !important;
+  border-radius: 2px;
+  padding: 4px 8px;
+  margin: -4px -8px;
+}
+
+.change-cell.negative {
+  color: #dc2626 !important;
+  background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%) !important;
+  border-radius: 2px;
+  padding: 4px 8px;
+  margin: -4px -8px;
+}
+
+/* Dark mode support for 24h change */
+.strategy-detail-container.dark .change-cell.positive {
+  color: #FFFFFF !important;
+  background: #F11F9D !important;
+  border-radius: 2px;
+  padding: 4px 8px;
+  margin: -4px -8px;
+}
+
+.strategy-detail-container.dark .change-cell.negative {
+  color: #000000 !important;
+  background: #FFECF5 !important;
+  border-radius: 2px;
+  padding: 4px 8px;
+  margin: -4px -8px;
+}
+
 @media (min-width: 1024px) {
   .metric-card {
     padding: 24px;
@@ -878,6 +912,30 @@
   .card-body {
     padding: 16px;
   }
+
+  /* Fix mobile display for 24h change colors */
+  .change-cell.positive,
+  .change-cell.negative {
+    margin: 0 !important;
+    padding: 2px 4px !important;
+    display: inline-block !important;
+    min-width: auto !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+  }
+
+  /* Dark mode mobile fixes for 640px */
+  .strategy-detail-container.dark .change-cell.positive {
+    color: #FFFFFF !important;
+    background: #F11F9D !important;
+  }
+
+  .strategy-detail-container.dark .change-cell.negative {
+    color: #000000 !important;
+    background: #FFECF5 !important;
+  }
 }
 
 @media (max-width: 480px) {
@@ -893,5 +951,35 @@
 
   .sales-grid {
     grid-template-columns: 1fr;
+  }
+
+  /* Additional mobile fixes for very small screens */
+  .comparison-table th,
+  .comparison-table td {
+    padding: 6px 8px !important;
+    font-size: 12px !important;
+  }
+
+  .change-cell.positive,
+  .change-cell.negative {
+    margin: 0 !important;
+    padding: 1px 3px !important;
+    font-size: 11px !important;
+    border-radius: 1px !important;
+    overflow: visible !important;
+    line-height: 1.2 !important;
+    display: inline-block !important;
+    white-space: nowrap !important;
+  }
+
+  /* Dark mode mobile fixes */
+  .strategy-detail-container.dark .change-cell.positive {
+    color: #FFFFFF !important;
+    background: #F11F9D !important;
+  }
+
+  .strategy-detail-container.dark .change-cell.negative {
+    color: #000000 !important;
+    background: #FFECF5 !important;
   }
 }
