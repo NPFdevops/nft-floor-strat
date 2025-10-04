@@ -572,32 +572,49 @@ const StrategyDetailView = ({ strategy, onBack }) => {
                         <span>Loading...</span>
                       </div>
                     ) : (
-                      <div className="price-content-mobile">
-                        <div className="price-value-mobile">
-                          {collectionDetails?.floor_price_eth ? 
-                            `${parseFloat(collectionDetails.floor_price_eth).toFixed(2)} ETH` : 
-                            <span className={isDark ? 'text-gray-400' : 'text-gray-400'}>N/A</span>
-                          }
+                      <>
+                        {/* Desktop layout - simple price display */}
+                        <div className="price-content-desktop">
+                          <span className="font-medium">
+                            {collectionDetails?.floor_price_eth ? 
+                              `${parseFloat(collectionDetails.floor_price_eth).toFixed(2)} ETH` : 
+                              <span className={isDark ? 'text-gray-400' : 'text-gray-400'}>N/A</span>
+                            }
+                          </span>
                         </div>
-                        <div className={`price-change-mobile ${
-                          (() => {
-                            const diff24h = collectionDetails?.floorTemporalityUsd?.diff24h;
-                            const priceChange24h = collectionDetails?.price_change_24h;
-                            const finalValue = diff24h !== undefined && diff24h !== null ? diff24h : priceChange24h;
-                            return finalValue >= 0 ? 'positive' : 'negative';
-                          })()
-                        }`}>
-                          {(() => {
-                            const diff24h = collectionDetails?.floorTemporalityUsd?.diff24h;
-                            const priceChange24h = collectionDetails?.price_change_24h;
-                            const finalValue = diff24h !== undefined && diff24h !== null ? diff24h : priceChange24h;
-                            return formatPercentage(finalValue);
-                          })()}
+                        {/* Mobile layout - price with change below */}
+                        <div className="price-content-mobile">
+                          <div className="price-value-mobile">
+                            {collectionDetails?.floor_price_eth ? 
+                              `${parseFloat(collectionDetails.floor_price_eth).toFixed(2)} ETH` : 
+                              <span className={isDark ? 'text-gray-400' : 'text-gray-400'}>N/A</span>
+                            }
+                          </div>
+                          <div className={`price-change-mobile ${
+                            (() => {
+                              const diff24h = collectionDetails?.floorTemporalityUsd?.diff24h;
+                              const priceChange24h = collectionDetails?.price_change_24h;
+                              const finalValue = diff24h !== undefined && diff24h !== null ? diff24h : priceChange24h;
+                              return finalValue >= 0 ? 'positive' : 'negative';
+                            })()
+                          }`}>
+                            {(() => {
+                              const diff24h = collectionDetails?.floorTemporalityUsd?.diff24h;
+                              const priceChange24h = collectionDetails?.price_change_24h;
+                              const finalValue = diff24h !== undefined && diff24h !== null ? diff24h : priceChange24h;
+                              return formatPercentage(finalValue);
+                            })()}
+                          </div>
                         </div>
-                      </div>
+                      </>
                     )}
                   </td>
                   <td>
+                    {/* Desktop layout - simple price display */}
+                    <div className="price-content-desktop">
+                      <span className="font-medium">{formatCurrencyWithDecimals(strategy.poolData?.price_usd, 4)}</span>
+                    </div>
+                    {/* Mobile layout - price with change below */}
                     <div className="price-content-mobile">
                       <div className="price-value-mobile font-medium">
                         {formatCurrencyWithDecimals(strategy.poolData?.price_usd, 4)}

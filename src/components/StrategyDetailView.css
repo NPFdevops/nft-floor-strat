@@ -187,6 +187,20 @@
   margin: -4px -8px;
 }
 
+/* Desktop layout - show desktop price layout and hide mobile price change */
+.price-content-desktop {
+  display: block;
+}
+
+.price-content-mobile {
+  display: none;
+}
+
+/* Show 24h Change row on desktop */
+.comparison-table tbody tr:nth-child(2) {
+  display: table-row;
+}
+
 /* Dark mode support for 24h change */
 .strategy-detail-container.dark .change-cell.positive {
   color: #FFFFFF !important;
@@ -918,11 +932,15 @@
     display: none !important;
   }
 
-  /* Mobile price content layout */
+  /* Mobile layout: show mobile price content, hide desktop content */
   .price-content-mobile {
-    display: flex;
+    display: flex !important;
     flex-direction: column;
     gap: 2px;
+  }
+
+  .price-content-desktop {
+    display: none !important;
   }
 
   .price-value-mobile {
